@@ -320,7 +320,7 @@ def propose_cme_entry(
         "Credential Hardening": 801, "Protocol Hardening": 901,
         "Application Controls": 904, "Runtime Detection": 1001,
         "Integrity Detection": 1004, "Patch Management": 1101,
-        "Recovery Controls": 1201,
+        "Recovery Controls": 1201, "Application Input Validation": 1301,
     }
     prefix = category_ranges.get(category, 101)
     suggested_id = _next_cme_id(prefix)
