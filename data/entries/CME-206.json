@@ -1,0 +1,41 @@
+{
+  "cme_id": "CME-206",
+  "control_name": "Network Policy (Kubernetes)",
+  "description": "Kubernetes NetworkPolicy resources that restrict pod-to-pod and pod-to-external communication. Default-deny ingress/egress with explicit allowlists.",
+  "tactic": "Isolate",
+  "category": "Network Isolation",
+  "control_layer": "Network",
+  "cvss_vector_impacts": [
+    {
+      "metric": "AV",
+      "from": "N",
+      "to": "A",
+      "rationale": "Pod only reachable from explicitly allowed sources"
+    },
+    {
+      "metric": "S",
+      "from": "C",
+      "to": "U",
+      "rationale": "Compromised pod cannot reach arbitrary cluster services"
+    }
+  ],
+  "cwe_relationships": [
+    "CWE-284",
+    "CWE-668"
+  ],
+  "verification": {
+    "method": "Check for default-deny NetworkPolicy in namespace",
+    "commands": [
+      {
+        "command": "kubectl get networkpolicy -n <namespace> -o name | head -5",
+        "expected": "networkpolicy.networking.k8s.io/default-deny",
+        "platform": "kubernetes"
+      }
+    ]
+  },
+  "confidence": "High",
+  "platforms": [
+    "Kubernetes",
+    "OpenShift"
+  ]
+}

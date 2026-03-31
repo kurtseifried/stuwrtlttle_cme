@@ -1,0 +1,46 @@
+{
+  "cme_id": "CME-102",
+  "control_name": "NX/XD Bit (Non-Executable Memory)",
+  "description": "Hardware-enforced memory page permissions that prevent execution of code in data regions (stack, heap), blocking classic code injection.",
+  "tactic": "Harden",
+  "category": "Kernel Hardening",
+  "control_layer": "OS/Kernel",
+  "cvss_vector_impacts": [
+    {
+      "metric": "AC",
+      "from": "L",
+      "to": "H",
+      "rationale": "Attacker must use ROP/JOP instead of direct shellcode injection"
+    }
+  ],
+  "cwe_relationships": [
+    "CWE-94",
+    "CWE-119"
+  ],
+  "verification": {
+    "method": "Check CPU supports NX bit and kernel has it enabled",
+    "commands": [
+      {
+        "command": "grep -q nx /proc/cpuinfo && echo 'NX enabled'",
+        "expected": "NX enabled",
+        "platform": "linux"
+      },
+      {
+        "command": "dmesg | grep -i 'NX.*protection'",
+        "expected": "NX (Execute Disable) protection: active",
+        "platform": "linux"
+      }
+    ]
+  },
+  "d3fend_mapping": {
+    "technique_id": "D3-EHPV",
+    "technique_name": "Exception Handler Pointer Validation"
+  },
+  "confidence": "High",
+  "platforms": [
+    "RHEL 9",
+    "RHEL 8",
+    "Ubuntu 24.04",
+    "SLES 15"
+  ]
+}

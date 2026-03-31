@@ -1,0 +1,39 @@
+{
+  "cme_id": "CME-803",
+  "control_name": "Account Lockout Policy (pam_faillock)",
+  "description": "Locks user accounts after a configurable number of failed authentication attempts, preventing online brute force attacks.",
+  "tactic": "Harden",
+  "category": "Credential Hardening",
+  "control_layer": "Identity",
+  "cvss_vector_impacts": [
+    {
+      "metric": "AC",
+      "from": "L",
+      "to": "H",
+      "rationale": "Brute force limited to N attempts before lockout"
+    }
+  ],
+  "cwe_relationships": [
+    "CWE-307"
+  ],
+  "verification": {
+    "method": "Check pam_faillock configuration",
+    "commands": [
+      {
+        "command": "grep faillock /etc/pam.d/system-auth",
+        "expected": "pam_faillock.so",
+        "platform": "rhel"
+      },
+      {
+        "command": "grep deny /etc/security/faillock.conf",
+        "expected": "deny = 5",
+        "platform": "rhel"
+      }
+    ]
+  },
+  "confidence": "High",
+  "platforms": [
+    "RHEL 9",
+    "RHEL 8"
+  ]
+}

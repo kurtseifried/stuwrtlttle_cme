@@ -1,0 +1,31 @@
+{
+  "cme_id": "CME-1001",
+  "control_name": "EDR Agent (Endpoint Detection & Response)",
+  "description": "Real-time behavioral detection and automated response agent on endpoints. Detects exploit patterns, lateral movement, and persistence mechanisms. Can kill processes, isolate hosts, and quarantine files automatically.",
+  "tactic": "Detect",
+  "category": "Runtime Detection",
+  "control_layer": "Application",
+  "cvss_vector_impacts": [
+    {
+      "metric": "AC",
+      "from": "L",
+      "to": "H",
+      "rationale": "Compensating control: exploit behavior patterns are detected and may be blocked in real-time"
+    }
+  ],
+  "cwe_relationships": [],
+  "verification": {
+    "method": "Verify EDR agent is running and connected to management console",
+    "commands": [
+      {
+        "command": "systemctl is-active falcon-sensor 2>/dev/null || systemctl is-active mdatp 2>/dev/null",
+        "expected": "active",
+        "platform": "linux"
+      }
+    ]
+  },
+  "confidence": "Medium",
+  "platforms": [
+    "Any"
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "cme_id": "CME-802",
+  "control_name": "Password Quality Enforcement (pwquality)",
+  "description": "Enforces minimum password complexity (length, character classes, dictionary checks) via pam_pwquality, making brute force and dictionary attacks impractical.",
+  "tactic": "Harden",
+  "category": "Credential Hardening",
+  "control_layer": "Identity",
+  "cvss_vector_impacts": [
+    {
+      "metric": "AC",
+      "from": "L",
+      "to": "H",
+      "rationale": "Password brute force requires significantly more time/resources"
+    }
+  ],
+  "cwe_relationships": [
+    "CWE-521"
+  ],
+  "verification": {
+    "method": "Check pwquality configuration",
+    "commands": [
+      {
+        "command": "grep -E 'minlen|minclass|dcredit' /etc/security/pwquality.conf",
+        "expected": "minlen = 14",
+        "platform": "rhel"
+      }
+    ]
+  },
+  "references": [
+    {
+      "source": "Red Hat Security Hardening Guide",
+      "section": "Password security"
+    },
+    {
+      "source": "CIS RHEL 9 Benchmark",
+      "section": "5.4 Configure PAM"
+    }
+  ],
+  "confidence": "Medium",
+  "platforms": [
+    "RHEL 9",
+    "RHEL 8",
+    "Ubuntu 24.04"
+  ]
+}

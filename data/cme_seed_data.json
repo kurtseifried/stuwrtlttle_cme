@@ -1,0 +1,1496 @@
+{
+  "schema_version": "1.0.0",
+  "generated": "2026-03-30",
+  "entries": [
+    {
+      "cme_id": "CME-101",
+      "control_name": "ASLR (Address Space Layout Randomization)",
+      "description": "Randomizes memory layout of processes, making memory corruption exploits significantly harder by requiring the attacker to guess or leak addresses.",
+      "tactic": "Harden",
+      "category": "Kernel Hardening",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Attacker must defeat randomization via info leak or brute force"}
+      ],
+      "cwe_relationships": ["CWE-119", "CWE-120", "CWE-122", "CWE-787", "CWE-125"],
+      "verification": {
+        "method": "Check kernel randomize_va_space sysctl is set to 2 (full randomization)",
+        "commands": [
+          {"command": "cat /proc/sys/kernel/randomize_va_space", "expected": "2", "platform": "linux"},
+          {"command": "sysctl kernel.randomize_va_space", "expected": "kernel.randomize_va_space = 2", "platform": "linux"}
+        ]
+      },
+      "d3fend_mapping": {"technique_id": "D3-SAOR", "technique_name": "Segment Address Offset Randomization"},
+      "references": [
+        {"source": "Red Hat Security Hardening Guide", "section": "Protecting against memory-based attacks"},
+        {"source": "CIS RHEL 9 Benchmark", "section": "1.5.2 Ensure address space layout randomization (ASLR) is enabled"}
+      ],
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04", "SLES 15", "Fedora"]
+    },
+    {
+      "cme_id": "CME-102",
+      "control_name": "NX/XD Bit (Non-Executable Memory)",
+      "description": "Hardware-enforced memory page permissions that prevent execution of code in data regions (stack, heap), blocking classic code injection.",
+      "tactic": "Harden",
+      "category": "Kernel Hardening",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Attacker must use ROP/JOP instead of direct shellcode injection"}
+      ],
+      "cwe_relationships": ["CWE-94", "CWE-119"],
+      "verification": {
+        "method": "Check CPU supports NX bit and kernel has it enabled",
+        "commands": [
+          {"command": "grep -q nx /proc/cpuinfo && echo 'NX enabled'", "expected": "NX enabled", "platform": "linux"},
+          {"command": "dmesg | grep -i 'NX.*protection'", "expected": "NX (Execute Disable) protection: active", "platform": "linux"}
+        ]
+      },
+      "d3fend_mapping": {"technique_id": "D3-EHPV", "technique_name": "Exception Handler Pointer Validation"},
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04", "SLES 15"]
+    },
+    {
+      "cme_id": "CME-103",
+      "control_name": "Stack Canaries (Stack Protector)",
+      "description": "Compiler-inserted random guard values on the stack that are checked before function return. Detects and aborts on stack buffer overflow before attacker gains control.",
+      "tactic": "Harden",
+      "category": "Kernel Hardening",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Attacker must leak or guess canary value to exploit stack overflow"}
+      ],
+      "cwe_relationships": ["CWE-121", "CWE-122", "CWE-120"],
+      "verification": {
+        "method": "Verify binaries compiled with -fstack-protector-strong",
+        "commands": [
+          {"command": "readelf -s /usr/bin/ls | grep __stack_chk_fail", "expected": "__stack_chk_fail", "platform": "linux"},
+          {"command": "rpm -q --queryformat '%{FLAGS}' coreutils | grep stack-protector", "expected": "stack-protector", "platform": "rhel"}
+        ]
+      },
+      "d3fend_mapping": {"technique_id": "D3-SPP", "technique_name": "Stack Frame Canary Validation"},
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04", "Fedora"]
+    },
+    {
+      "cme_id": "CME-104",
+      "control_name": "KASLR (Kernel Address Space Layout Randomization)",
+      "description": "Randomizes the kernel base address at each boot, making kernel exploits harder by requiring address leaks to locate kernel functions and data structures.",
+      "tactic": "Harden",
+      "category": "Kernel Hardening",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Kernel exploit must include info leak to locate kernel symbols"}
+      ],
+      "cwe_relationships": ["CWE-119", "CWE-269"],
+      "verification": {
+        "method": "Verify KASLR is not disabled in boot parameters",
+        "commands": [
+          {"command": "cat /proc/cmdline | grep -v nokaslr && echo 'KASLR active'", "expected": "KASLR active", "platform": "linux"},
+          {"command": "dmesg | grep 'KASLR'", "expected": "KASLR enabled", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04", "SLES 15"]
+    },
+    {
+      "cme_id": "CME-105",
+      "control_name": "SMEP (Supervisor Mode Execution Prevention)",
+      "description": "CPU feature preventing the kernel from executing code in userspace pages. Blocks ret2usr attacks where kernel exploit redirects execution to attacker-controlled userspace code.",
+      "tactic": "Harden",
+      "category": "Kernel Hardening",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Kernel exploit cannot simply jump to userspace shellcode"},
+        {"metric": "S", "from": "C", "to": "U", "rationale": "Prevents trivial kernel-to-userspace execution boundary crossing"}
+      ],
+      "cwe_relationships": ["CWE-119", "CWE-269"],
+      "verification": {
+        "method": "Check CPU flags for smep support",
+        "commands": [
+          {"command": "grep -o smep /proc/cpuinfo | head -1", "expected": "smep", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04"]
+    },
+    {
+      "cme_id": "CME-106",
+      "control_name": "SMAP (Supervisor Mode Access Prevention)",
+      "description": "CPU feature preventing the kernel from reading/writing userspace memory except through designated copy functions. Hardens kernel against data-only attacks using userspace-controlled structures.",
+      "tactic": "Harden",
+      "category": "Kernel Hardening",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Kernel exploit cannot trivially read/write userspace-controlled data"}
+      ],
+      "cwe_relationships": ["CWE-119", "CWE-269", "CWE-200"],
+      "verification": {
+        "method": "Check CPU flags for smap support",
+        "commands": [
+          {"command": "grep -o smap /proc/cpuinfo | head -1", "expected": "smap", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04"]
+    },
+    {
+      "cme_id": "CME-107",
+      "control_name": "Kernel Module Loading Restriction",
+      "description": "Disables dynamic kernel module loading at runtime, preventing insertion of rootkits or malicious kernel code after boot.",
+      "tactic": "Harden",
+      "category": "Kernel Hardening",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Cannot load malicious kernel modules even with root access"},
+        {"metric": "I", "from": "H", "to": "L", "rationale": "Prevents kernel-level persistence via modules"}
+      ],
+      "cwe_relationships": ["CWE-94", "CWE-829"],
+      "verification": {
+        "method": "Check modules_disabled sysctl",
+        "commands": [
+          {"command": "cat /proc/sys/kernel/modules_disabled", "expected": "1", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04"]
+    },
+    {
+      "cme_id": "CME-108",
+      "control_name": "kptr_restrict (Kernel Pointer Restriction)",
+      "description": "Hides kernel pointer addresses from unprivileged users, denying the address leaks needed to exploit kernel vulnerabilities when KASLR is active.",
+      "tactic": "Harden",
+      "category": "Kernel Hardening",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Removes trivial kernel address leak vector via /proc/kallsyms"}
+      ],
+      "cwe_relationships": ["CWE-200", "CWE-119"],
+      "verification": {
+        "method": "Check kptr_restrict sysctl is 1 or 2",
+        "commands": [
+          {"command": "cat /proc/sys/kernel/kptr_restrict", "expected": "1", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04"]
+    },
+    {
+      "cme_id": "CME-109",
+      "control_name": "Kernel Lockdown Mode",
+      "description": "LSM that restricts kernel features allowing arbitrary code execution or direct hardware access from userspace. Integrity mode blocks module parameters, ACPI tables, and iopl/ioperm. Confidentiality mode additionally blocks /dev/mem, kprobes, and BPF reads.",
+      "tactic": "Harden",
+      "category": "Kernel Hardening",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "PR", "from": "L", "to": "H", "rationale": "Even root cannot modify running kernel via blocked interfaces"},
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Many kernel exploitation primitives are disabled"}
+      ],
+      "cwe_relationships": ["CWE-269", "CWE-284"],
+      "verification": {
+        "method": "Check lockdown LSM state",
+        "commands": [
+          {"command": "cat /sys/kernel/security/lockdown", "expected": "[integrity]", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04"]
+    },
+    {
+      "cme_id": "CME-110",
+      "control_name": "KEXEC Restriction",
+      "description": "Prevents loading a new kernel at runtime via kexec, blocking a vector for kernel-level persistence and Secure Boot bypass.",
+      "tactic": "Harden",
+      "category": "Kernel Hardening",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Cannot replace running kernel to bypass security controls"}
+      ],
+      "cwe_relationships": ["CWE-269"],
+      "verification": {
+        "method": "Check kexec_load_disabled sysctl",
+        "commands": [
+          {"command": "cat /proc/sys/kernel/kexec_load_disabled", "expected": "1", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04"]
+    },
+    {
+      "cme_id": "CME-111",
+      "control_name": "Secure Boot (UEFI)",
+      "description": "Firmware-level verification that only signed bootloaders and kernels execute, preventing boot-level rootkits and unauthorized kernel replacement.",
+      "tactic": "Harden",
+      "category": "Kernel Hardening",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "I", "from": "H", "to": "L", "rationale": "Cannot persist malicious bootloader or kernel modifications"},
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Must bypass cryptographic verification chain"}
+      ],
+      "cwe_relationships": ["CWE-345", "CWE-494", "CWE-269"],
+      "verification": {
+        "method": "Check UEFI Secure Boot state",
+        "commands": [
+          {"command": "mokutil --sb-state", "expected": "SecureBoot enabled", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04", "SLES 15"]
+    },
+    {
+      "cme_id": "CME-112",
+      "control_name": "RELRO and PIE (Full)",
+      "description": "Compiler/linker hardening that makes the Global Offset Table read-only after relocation (Full RELRO) and builds position-independent executables (PIE), working with ASLR to randomize all code sections.",
+      "tactic": "Harden",
+      "category": "Kernel Hardening",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "GOT overwrite attacks blocked; all code addresses randomized"}
+      ],
+      "cwe_relationships": ["CWE-119", "CWE-120", "CWE-787"],
+      "verification": {
+        "method": "Check binary for Full RELRO and PIE",
+        "commands": [
+          {"command": "readelf -l /usr/bin/ls | grep GNU_RELRO", "expected": "GNU_RELRO", "platform": "linux"},
+          {"command": "file /usr/bin/ls | grep 'shared object'", "expected": "shared object", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04", "Fedora"]
+    },
+    {
+      "cme_id": "CME-113",
+      "control_name": "Control Flow Integrity (CFI / Shadow Call Stack)",
+      "description": "Hardware or compiler-enforced control flow integrity that validates indirect branch targets match expected types, blocking ROP/JOP chains. On ARM64, shadow call stack protects return addresses in a separate stack.",
+      "tactic": "Harden",
+      "category": "Kernel Hardening",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "ROP/JOP gadget chains are detected and blocked at runtime"}
+      ],
+      "cwe_relationships": ["CWE-119", "CWE-120", "CWE-787"],
+      "verification": {
+        "method": "Check kernel config for CFI or Shadow Call Stack",
+        "commands": [
+          {"command": "grep CONFIG_CFI_CLANG /boot/config-$(uname -r)", "expected": "CONFIG_CFI_CLANG=y", "platform": "linux"},
+          {"command": "grep CONFIG_SHADOW_CALL_STACK /boot/config-$(uname -r)", "expected": "CONFIG_SHADOW_CALL_STACK=y", "platform": "linux"}
+        ]
+      },
+      "confidence": "Medium",
+      "platforms": ["RHEL 9", "Ubuntu 24.04"]
+    },
+    {
+      "cme_id": "CME-201",
+      "control_name": "Zero Trust Gateway / Identity-Aware Proxy",
+      "description": "All network access requires authenticated identity verification. No implicit trust from network position. Every request is authenticated and authorized regardless of source network.",
+      "tactic": "Isolate",
+      "category": "Network Isolation",
+      "control_layer": "Network",
+      "cvss_vector_impacts": [
+        {"metric": "AV", "from": "N", "to": "L", "rationale": "Network-accessible services are shielded behind identity verification; attacker cannot exploit remotely without valid credentials"}
+      ],
+      "cwe_relationships": ["CWE-284", "CWE-306", "CWE-287"],
+      "verification": {
+        "method": "Verify identity-aware proxy or zero trust gateway is in enforcement path",
+        "commands": [
+          {"command": "curl -s -o /dev/null -w '%{http_code}' http://service.internal/healthz", "expected": "401", "platform": "any"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["Any"]
+    },
+    {
+      "cme_id": "CME-202",
+      "control_name": "Host-Based Firewall (firewalld/nftables)",
+      "description": "Per-host network access control using firewalld zones or nftables rules. Restricts which network sources can reach specific services, reducing attack surface.",
+      "tactic": "Isolate",
+      "category": "Network Isolation",
+      "control_layer": "Network",
+      "cvss_vector_impacts": [
+        {"metric": "AV", "from": "N", "to": "A", "rationale": "Service only reachable from adjacent/authorized networks"},
+        {"metric": "S", "from": "C", "to": "U", "rationale": "Firewall prevents lateral movement to other services"}
+      ],
+      "cwe_relationships": ["CWE-284"],
+      "verification": {
+        "method": "Verify firewalld is running with restrictive zone",
+        "commands": [
+          {"command": "firewall-cmd --state", "expected": "running", "platform": "rhel"},
+          {"command": "firewall-cmd --get-active-zones", "expected": "public", "platform": "rhel"},
+          {"command": "nft list ruleset | head -20", "expected": "table", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Fedora", "SLES 15"]
+    },
+    {
+      "cme_id": "CME-203",
+      "control_name": "Network Segmentation (VLANs/Subnets)",
+      "description": "Separates network traffic into isolated segments by trust zone, preventing lateral movement between zones (e.g., DMZ, internal, management).",
+      "tactic": "Isolate",
+      "category": "Network Isolation",
+      "control_layer": "Network",
+      "cvss_vector_impacts": [
+        {"metric": "AV", "from": "N", "to": "A", "rationale": "Compromised host in one segment cannot directly reach other segments"},
+        {"metric": "S", "from": "C", "to": "U", "rationale": "Blast radius limited to network segment"}
+      ],
+      "cwe_relationships": ["CWE-284", "CWE-668"],
+      "verification": {
+        "method": "Verify network topology shows segmentation between trust zones",
+        "commands": [
+          {"command": "ip addr show | grep -c 'inet '", "expected": "Multiple interfaces or VLANs", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["Any"]
+    },
+    {
+      "cme_id": "CME-204",
+      "control_name": "IPsec / WireGuard (Encrypted Transport)",
+      "description": "Encrypts all network traffic between hosts using IPsec or WireGuard, preventing eavesdropping, injection, and man-in-the-middle attacks on the wire.",
+      "tactic": "Isolate",
+      "category": "Network Isolation",
+      "control_layer": "Network",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Network-level MitM requires breaking cryptographic tunnel"},
+        {"metric": "C", "from": "H", "to": "L", "rationale": "Encrypted transit prevents passive eavesdropping"}
+      ],
+      "cwe_relationships": ["CWE-319", "CWE-300", "CWE-311"],
+      "verification": {
+        "method": "Verify IPsec or WireGuard tunnels are established",
+        "commands": [
+          {"command": "ipsec status 2>/dev/null || wg show 2>/dev/null", "expected": "established|interface", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04"]
+    },
+    {
+      "cme_id": "CME-205",
+      "control_name": "Service Binding to Localhost",
+      "description": "Configures services to listen only on 127.0.0.1/::1, eliminating remote network attack vector entirely. Remote access must go through a reverse proxy or tunnel.",
+      "tactic": "Isolate",
+      "category": "Network Isolation",
+      "control_layer": "Network",
+      "cvss_vector_impacts": [
+        {"metric": "AV", "from": "N", "to": "L", "rationale": "Service not reachable from network; requires local access"}
+      ],
+      "cwe_relationships": ["CWE-284", "CWE-668"],
+      "verification": {
+        "method": "Check service listen address is localhost only",
+        "commands": [
+          {"command": "ss -tlnp | grep ':8080'", "expected": "127.0.0.1:8080", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["Any"]
+    },
+    {
+      "cme_id": "CME-206",
+      "control_name": "Network Policy (Kubernetes)",
+      "description": "Kubernetes NetworkPolicy resources that restrict pod-to-pod and pod-to-external communication. Default-deny ingress/egress with explicit allowlists.",
+      "tactic": "Isolate",
+      "category": "Network Isolation",
+      "control_layer": "Network",
+      "cvss_vector_impacts": [
+        {"metric": "AV", "from": "N", "to": "A", "rationale": "Pod only reachable from explicitly allowed sources"},
+        {"metric": "S", "from": "C", "to": "U", "rationale": "Compromised pod cannot reach arbitrary cluster services"}
+      ],
+      "cwe_relationships": ["CWE-284", "CWE-668"],
+      "verification": {
+        "method": "Check for default-deny NetworkPolicy in namespace",
+        "commands": [
+          {"command": "kubectl get networkpolicy -n <namespace> -o name | head -5", "expected": "networkpolicy.networking.k8s.io/default-deny", "platform": "kubernetes"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["Kubernetes", "OpenShift"]
+    },
+    {
+      "cme_id": "CME-301",
+      "control_name": "SELinux (Enforcing Mode)",
+      "description": "Mandatory access control system that confines processes to least-privilege security domains. Even if a process is compromised, it cannot access files, ports, or other processes outside its policy-defined domain.",
+      "tactic": "Harden",
+      "category": "Mandatory Access Control",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "S", "from": "C", "to": "U", "rationale": "Compromised process cannot escape its SELinux domain to affect other services"},
+        {"metric": "C", "from": "H", "to": "L", "rationale": "Process cannot read files outside its policy-allowed set"},
+        {"metric": "I", "from": "H", "to": "L", "rationale": "Process cannot modify files or resources outside its domain"}
+      ],
+      "cwe_relationships": ["CWE-269", "CWE-284", "CWE-732"],
+      "verification": {
+        "method": "Verify SELinux is in enforcing mode",
+        "commands": [
+          {"command": "getenforce", "expected": "Enforcing", "platform": "rhel"},
+          {"command": "sestatus | grep 'Current mode'", "expected": "Current mode:                   enforcing", "platform": "rhel"}
+        ]
+      },
+      "d3fend_mapping": {"technique_id": "D3-MAC", "technique_name": "Mandatory Access Control"},
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Fedora", "CentOS Stream"]
+    },
+    {
+      "cme_id": "CME-302",
+      "control_name": "SELinux Confined User Mapping",
+      "description": "Maps Linux login users to SELinux confined user types instead of unconfined_u. Restricts user-level capabilities like running unconfined applications, accessing network, or executing in /tmp.",
+      "tactic": "Harden",
+      "category": "Mandatory Access Control",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "PR", "from": "L", "to": "H", "rationale": "Compromised user account has significantly restricted capabilities"}
+      ],
+      "cwe_relationships": ["CWE-269", "CWE-284"],
+      "verification": {
+        "method": "Verify no regular users mapped to unconfined_u",
+        "commands": [
+          {"command": "semanage login -l | grep -v 'unconfined_u\\|Login Name'", "expected": "staff_u|user_u|guest_u", "platform": "rhel"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Fedora"]
+    },
+    {
+      "cme_id": "CME-303",
+      "control_name": "SELinux Booleans (Restrictive)",
+      "description": "Fine-grained SELinux policy toggles that disable risky inter-domain interactions. Examples: httpd_can_network_connect=off prevents web servers from making outbound connections; container_manage_cgroup=off restricts container cgroup access.",
+      "tactic": "Harden",
+      "category": "Mandatory Access Control",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "S", "from": "C", "to": "U", "rationale": "Disables specific cross-domain access paths"}
+      ],
+      "cwe_relationships": ["CWE-284"],
+      "verification": {
+        "method": "Check key SELinux booleans are set to restrictive values",
+        "commands": [
+          {"command": "getsebool httpd_can_network_connect", "expected": "httpd_can_network_connect --> off", "platform": "rhel"}
+        ]
+      },
+      "confidence": "Medium",
+      "platforms": ["RHEL 9", "RHEL 8", "Fedora"]
+    },
+    {
+      "cme_id": "CME-304",
+      "control_name": "AppArmor (Enforcing Profile)",
+      "description": "Path-based mandatory access control that restricts per-application file, network, and capability access. Each application runs under a profile defining allowed operations.",
+      "tactic": "Harden",
+      "category": "Mandatory Access Control",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "S", "from": "C", "to": "U", "rationale": "Process confined to profile-defined resources"},
+        {"metric": "C", "from": "H", "to": "L", "rationale": "Cannot read files outside profile allowlist"}
+      ],
+      "cwe_relationships": ["CWE-269", "CWE-284"],
+      "verification": {
+        "method": "Check AppArmor status and profile enforcement",
+        "commands": [
+          {"command": "aa-status --enforced 2>/dev/null | head -5", "expected": "profiles are in enforce mode", "platform": "debian"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["Ubuntu 24.04", "SLES 15", "Debian 12"]
+    },
+    {
+      "cme_id": "CME-401",
+      "control_name": "System-wide Crypto Policy (FUTURE)",
+      "description": "Centrally enforces minimum cryptographic standards across all system components (OpenSSL, GnuTLS, NSS, OpenSSH, Kerberos). FUTURE policy disables TLS <1.2, SHA-1, RSA <3072, all CBC ciphers, and RC4.",
+      "tactic": "Harden",
+      "category": "Cryptographic Controls",
+      "control_layer": "Application",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Weak cipher downgrade attacks are impossible; only strong algorithms available"}
+      ],
+      "cwe_relationships": ["CWE-327", "CWE-326", "CWE-757"],
+      "verification": {
+        "method": "Check system crypto policy level",
+        "commands": [
+          {"command": "update-crypto-policies --show", "expected": "FUTURE", "platform": "rhel"}
+        ]
+      },
+      "references": [
+        {"source": "Red Hat Security Hardening Guide", "section": "Using system-wide cryptographic policies"}
+      ],
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Fedora", "CentOS Stream"]
+    },
+    {
+      "cme_id": "CME-402",
+      "control_name": "FIPS 140-3 Mode",
+      "description": "Enables FIPS-validated cryptographic modules system-wide. Only NIST-approved algorithms are available for all cryptographic operations. Non-compliant operations fail rather than fall back.",
+      "tactic": "Harden",
+      "category": "Cryptographic Controls",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "All crypto operations use validated, audited implementations"}
+      ],
+      "cwe_relationships": ["CWE-327", "CWE-326", "CWE-328"],
+      "verification": {
+        "method": "Verify FIPS mode is enabled",
+        "commands": [
+          {"command": "fips-mode-setup --check", "expected": "FIPS mode is enabled", "platform": "rhel"},
+          {"command": "cat /proc/sys/crypto/fips_enabled", "expected": "1", "platform": "linux"}
+        ]
+      },
+      "references": [
+        {"source": "Red Hat Security Hardening Guide", "section": "Switching RHEL to FIPS mode"}
+      ],
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8"]
+    },
+    {
+      "cme_id": "CME-403",
+      "control_name": "TLS 1.3 Enforcement",
+      "description": "Restricts all TLS connections to TLS 1.3 minimum, eliminating protocol downgrade attacks and leveraging TLS 1.3's reduced handshake, mandatory forward secrecy, and encrypted extensions.",
+      "tactic": "Harden",
+      "category": "Cryptographic Controls",
+      "control_layer": "Network",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "TLS downgrade attacks impossible; forward secrecy mandatory"}
+      ],
+      "cwe_relationships": ["CWE-757", "CWE-327"],
+      "verification": {
+        "method": "Verify minimum TLS version is 1.3",
+        "commands": [
+          {"command": "openssl s_client -connect localhost:443 -tls1_2 </dev/null 2>&1 | grep 'handshake failure'", "expected": "handshake failure", "platform": "any"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["Any"]
+    },
+    {
+      "cme_id": "CME-404",
+      "control_name": "Certificate Pinning",
+      "description": "Application pins expected TLS certificate fingerprints or public keys, preventing MitM attacks using rogue or compromised certificate authorities.",
+      "tactic": "Harden",
+      "category": "Cryptographic Controls",
+      "control_layer": "Application",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "MitM requires compromising the specific pinned certificate, not just any CA"}
+      ],
+      "cwe_relationships": ["CWE-295"],
+      "verification": {
+        "method": "Application-specific: check for pin configuration in app config or HTTP headers",
+        "commands": []
+      },
+      "confidence": "Medium",
+      "platforms": ["Any"]
+    },
+    {
+      "cme_id": "CME-405",
+      "control_name": "DNSSEC Validation",
+      "description": "Validates DNS responses using cryptographic signatures, preventing DNS spoofing, cache poisoning, and DNS-based redirection attacks.",
+      "tactic": "Harden",
+      "category": "Cryptographic Controls",
+      "control_layer": "Network",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "DNS-based redirect/spoofing attacks require breaking DNSSEC chain of trust"}
+      ],
+      "cwe_relationships": ["CWE-350"],
+      "verification": {
+        "method": "Verify DNSSEC validation is enabled in resolver",
+        "commands": [
+          {"command": "resolvectl status | grep DNSSEC", "expected": "DNSSEC setting: yes", "platform": "linux"},
+          {"command": "grep 'val-permissive-mode' /etc/unbound/unbound.conf", "expected": "val-permissive-mode: no", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "Ubuntu 24.04"]
+    },
+    {
+      "cme_id": "CME-406",
+      "control_name": "Signed Package Enforcement (GPG)",
+      "description": "Rejects installation of unsigned or tampered RPM/DEB packages by validating GPG signatures against trusted keys. Prevents supply chain attacks via package repositories.",
+      "tactic": "Harden",
+      "category": "Cryptographic Controls",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "I", "from": "H", "to": "L", "rationale": "Cannot install tampered packages; cryptographic verification enforced"}
+      ],
+      "cwe_relationships": ["CWE-345", "CWE-494"],
+      "verification": {
+        "method": "Verify gpgcheck enabled for all repos",
+        "commands": [
+          {"command": "grep -r 'gpgcheck' /etc/yum.repos.d/ | grep -v 'gpgcheck=1'", "expected": "", "platform": "rhel"},
+          {"command": "rpm -qa gpg-pubkey", "expected": "gpg-pubkey", "platform": "rhel"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Fedora"]
+    },
+    {
+      "cme_id": "CME-501",
+      "control_name": "Read-Only Root Filesystem",
+      "description": "Mounts root filesystem as read-only, preventing persistent modification of system binaries, libraries, and configuration. Writable areas are confined to specific tmpfs or overlay mounts.",
+      "tactic": "Isolate",
+      "category": "Filesystem Hardening",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "I", "from": "H", "to": "L", "rationale": "Cannot persistently modify system files even with root access"},
+        {"metric": "A", "from": "H", "to": "L", "rationale": "System recovers original state on reboot"}
+      ],
+      "cwe_relationships": ["CWE-284"],
+      "verification": {
+        "method": "Check mount options for root filesystem",
+        "commands": [
+          {"command": "mount | grep 'on / ' | grep 'ro,'", "expected": "ro,", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "Fedora CoreOS", "Container-optimized OS"]
+    },
+    {
+      "cme_id": "CME-502",
+      "control_name": "noexec on /tmp and /dev/shm",
+      "description": "Mounts /tmp and /dev/shm with noexec option, preventing execution of attacker-dropped binaries or scripts from temporary directories commonly used as staging areas.",
+      "tactic": "Harden",
+      "category": "Filesystem Hardening",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Attacker cannot execute payloads from common writable directories"}
+      ],
+      "cwe_relationships": ["CWE-94", "CWE-427"],
+      "verification": {
+        "method": "Check mount options for /tmp and /dev/shm",
+        "commands": [
+          {"command": "mount | grep '/tmp' | grep noexec", "expected": "noexec", "platform": "linux"},
+          {"command": "mount | grep '/dev/shm' | grep noexec", "expected": "noexec", "platform": "linux"}
+        ]
+      },
+      "references": [
+        {"source": "CIS RHEL 9 Benchmark", "section": "1.1.4-1.1.9 Ensure noexec option set on /tmp and /dev/shm"}
+      ],
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04"]
+    },
+    {
+      "cme_id": "CME-503",
+      "control_name": "nosuid on Non-Root Partitions",
+      "description": "Mounts partitions like /tmp, /var, /home with nosuid, preventing SUID/SGID binaries from taking effect, blocking a privilege escalation vector.",
+      "tactic": "Harden",
+      "category": "Filesystem Hardening",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "PR", "from": "L", "to": "H", "rationale": "Cannot deploy SUID binaries to escalate privileges from these partitions"}
+      ],
+      "cwe_relationships": ["CWE-269"],
+      "verification": {
+        "method": "Check nosuid on non-root partitions",
+        "commands": [
+          {"command": "mount | grep '/tmp' | grep nosuid", "expected": "nosuid", "platform": "linux"},
+          {"command": "mount | grep '/home' | grep nosuid", "expected": "nosuid", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04"]
+    },
+    {
+      "cme_id": "CME-504",
+      "control_name": "dm-verity (Verified Boot)",
+      "description": "Cryptographic verification of block device integrity using a Merkle tree hash. Every read from the block device is verified against pre-computed hashes, detecting any tampering at the block level.",
+      "tactic": "Harden",
+      "category": "Filesystem Hardening",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "I", "from": "H", "to": "N", "rationale": "Any block-level modification is cryptographically detected and rejected"}
+      ],
+      "cwe_relationships": ["CWE-345", "CWE-494"],
+      "verification": {
+        "method": "Check dm-verity status on root device",
+        "commands": [
+          {"command": "veritysetup status root", "expected": "status: verified", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "Fedora CoreOS", "ChromeOS", "Android"]
+    },
+    {
+      "cme_id": "CME-505",
+      "control_name": "IMA/EVM (Integrity Measurement Architecture)",
+      "description": "Kernel subsystem that measures file hashes at access time and optionally enforces an integrity policy. EVM extends this with extended attribute protection. Creates an audit trail of all executed code.",
+      "tactic": "Harden",
+      "category": "Filesystem Hardening",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "I", "from": "H", "to": "L", "rationale": "Modified binaries detected/blocked at execution time"}
+      ],
+      "cwe_relationships": ["CWE-345", "CWE-494"],
+      "verification": {
+        "method": "Check IMA policy is loaded and enforcing",
+        "commands": [
+          {"command": "cat /sys/kernel/security/ima/policy | head -5", "expected": "appraise", "platform": "linux"}
+        ]
+      },
+      "confidence": "Medium",
+      "platforms": ["RHEL 9", "RHEL 8"]
+    },
+    {
+      "cme_id": "CME-601",
+      "control_name": "Kernel-Level Syscall Filtering (seccomp)",
+      "description": "Restricts the set of system calls a process can make to the kernel. Reduces kernel attack surface by blocking syscalls the application doesn't need, preventing exploitation of kernel vulnerabilities through unused syscall handlers.",
+      "tactic": "Harden",
+      "category": "Syscall & BPF Controls",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "S", "from": "C", "to": "U", "rationale": "Process cannot invoke blocked syscalls to escape to host kernel"},
+        {"metric": "I", "from": "H", "to": "L", "rationale": "Blocked syscalls like execve/ptrace prevent shell breakout"}
+      ],
+      "cwe_relationships": ["CWE-119", "CWE-78"],
+      "verification": {
+        "method": "Check process seccomp status",
+        "commands": [
+          {"command": "grep Seccomp /proc/<pid>/status", "expected": "Seccomp:\t2", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04", "Kubernetes"]
+    },
+    {
+      "cme_id": "CME-602",
+      "control_name": "seccomp-bpf Profile (Container Default)",
+      "description": "Applies the default OCI/Docker/Podman seccomp-bpf profile which blocks ~44 dangerous syscalls including kexec_load, mount, reboot, and others. Basis for container isolation.",
+      "tactic": "Harden",
+      "category": "Syscall & BPF Controls",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "S", "from": "C", "to": "U", "rationale": "Blocked syscalls prevent container escape via kernel"},
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Many kernel exploit primitives require blocked syscalls"}
+      ],
+      "cwe_relationships": ["CWE-78", "CWE-119", "CWE-269"],
+      "verification": {
+        "method": "Verify container runtime has seccomp profile applied",
+        "commands": [
+          {"command": "podman inspect <container> | grep -A5 SecurityOpt", "expected": "seccomp", "platform": "linux"},
+          {"command": "kubectl get pod <pod> -o jsonpath='{.spec.securityContext.seccompProfile.type}'", "expected": "RuntimeDefault", "platform": "kubernetes"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "Kubernetes", "OpenShift"]
+    },
+    {
+      "cme_id": "CME-603",
+      "control_name": "Unprivileged BPF Disabled",
+      "description": "Prevents unprivileged users from loading BPF programs into the kernel. BPF programs run in kernel context and vulnerabilities in the BPF verifier have been a frequent source of privilege escalation.",
+      "tactic": "Harden",
+      "category": "Syscall & BPF Controls",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "PR", "from": "L", "to": "H", "rationale": "Unprivileged user cannot load BPF programs to exploit verifier bugs"}
+      ],
+      "cwe_relationships": ["CWE-269", "CWE-119"],
+      "verification": {
+        "method": "Check unprivileged_bpf_disabled sysctl",
+        "commands": [
+          {"command": "cat /proc/sys/kernel/unprivileged_bpf_disabled", "expected": "1", "platform": "linux"}
+        ]
+      },
+      "references": [
+        {"source": "Red Hat Security Hardening Guide", "section": "BPF hardening"}
+      ],
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04"]
+    },
+    {
+      "cme_id": "CME-604",
+      "control_name": "Unprivileged User Namespaces Disabled",
+      "description": "Prevents unprivileged users from creating user namespaces. User namespaces expose kernel attack surface (mount, network, PID operations) to unprivileged users and have been a frequent LPE vector.",
+      "tactic": "Harden",
+      "category": "Syscall & BPF Controls",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "PR", "from": "L", "to": "H", "rationale": "Unprivileged user cannot create namespaces to reach privileged kernel paths"},
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Many kernel LPE exploits require user namespaces as a prerequisite"}
+      ],
+      "cwe_relationships": ["CWE-269", "CWE-119"],
+      "verification": {
+        "method": "Check user.max_user_namespaces sysctl",
+        "commands": [
+          {"command": "cat /proc/sys/user/max_user_namespaces", "expected": "0", "platform": "linux"},
+          {"command": "sysctl kernel.unprivileged_userns_clone 2>/dev/null", "expected": "kernel.unprivileged_userns_clone = 0", "platform": "debian"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04"]
+    },
+    {
+      "cme_id": "CME-701",
+      "control_name": "Sandboxing / gVisor Runtime",
+      "description": "Application-level kernel emulation (gVisor) or VM-based isolation (Kata Containers) that intercepts syscalls and prevents direct host kernel interaction. Provides defense-in-depth for container isolation.",
+      "tactic": "Isolate",
+      "category": "Container Isolation",
+      "control_layer": "Application",
+      "cvss_vector_impacts": [
+        {"metric": "S", "from": "C", "to": "U", "rationale": "Container interacts with gVisor sentry, not host kernel; container escape requires breaking through gVisor first"}
+      ],
+      "cwe_relationships": ["CWE-269", "CWE-119"],
+      "verification": {
+        "method": "Check container runtime class",
+        "commands": [
+          {"command": "kubectl get pod <pod> -o jsonpath='{.spec.runtimeClassName}'", "expected": "gvisor", "platform": "kubernetes"},
+          {"command": "podman inspect <container> | grep runtime", "expected": "runsc|kata", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["Kubernetes", "GKE"]
+    },
+    {
+      "cme_id": "CME-702",
+      "control_name": "Linux Namespaces (User, PID, Network, Mount)",
+      "description": "Kernel namespace isolation providing separate views of system resources per process group. PID namespace hides host processes, mount namespace isolates filesystem, network namespace isolates network stack, user namespace remaps UIDs.",
+      "tactic": "Isolate",
+      "category": "Container Isolation",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "S", "from": "C", "to": "U", "rationale": "Process cannot see or interact with resources outside its namespace"},
+        {"metric": "PR", "from": "L", "to": "H", "rationale": "UID 0 inside namespace maps to unprivileged user on host (user ns)"}
+      ],
+      "cwe_relationships": ["CWE-269"],
+      "verification": {
+        "method": "Check process namespace isolation",
+        "commands": [
+          {"command": "ls -la /proc/<pid>/ns/", "expected": "user mnt pid net", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04", "Kubernetes"]
+    },
+    {
+      "cme_id": "CME-703",
+      "control_name": "Rootless Containers",
+      "description": "Containers run entirely without root privileges on the host. The container runtime, image pull, and all container processes run as an unprivileged user, eliminating host-level root compromise from container escape.",
+      "tactic": "Isolate",
+      "category": "Container Isolation",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "S", "from": "C", "to": "U", "rationale": "Container escape lands as unprivileged host user, not root"},
+        {"metric": "PR", "from": "L", "to": "H", "rationale": "Even root inside container is unprivileged on host"}
+      ],
+      "cwe_relationships": ["CWE-269", "CWE-250"],
+      "verification": {
+        "method": "Verify podman/docker running rootless",
+        "commands": [
+          {"command": "podman info | grep rootless", "expected": "rootless: true", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "Fedora", "Ubuntu 24.04"]
+    },
+    {
+      "cme_id": "CME-704",
+      "control_name": "cgroups v2 Resource Limits",
+      "description": "Constrains CPU, memory, I/O, and PIDs for process groups using cgroups v2 unified hierarchy. Prevents resource exhaustion attacks and limits blast radius of runaway or malicious processes.",
+      "tactic": "Isolate",
+      "category": "Container Isolation",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "A", "from": "H", "to": "L", "rationale": "Process cannot exhaust host resources; OOM killer scoped to cgroup"}
+      ],
+      "cwe_relationships": ["CWE-400", "CWE-770"],
+      "verification": {
+        "method": "Check cgroup v2 is mounted and limits are set",
+        "commands": [
+          {"command": "mount | grep cgroup2", "expected": "cgroup2", "platform": "linux"},
+          {"command": "cat /sys/fs/cgroup/<slice>/memory.max", "expected": "numeric limit", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04", "Kubernetes"]
+    },
+    {
+      "cme_id": "CME-705",
+      "control_name": "Dropped Linux Capabilities",
+      "description": "Removes unnecessary POSIX capabilities from container or process bounding set. Default container profiles drop CAP_SYS_ADMIN, CAP_NET_RAW, CAP_SYS_PTRACE, and others not needed by the workload.",
+      "tactic": "Isolate",
+      "category": "Container Isolation",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "PR", "from": "L", "to": "H", "rationale": "Even privileged operations require specific capabilities that have been dropped"},
+        {"metric": "S", "from": "C", "to": "U", "rationale": "Cannot mount filesystems, trace processes, or perform other scope-changing operations"}
+      ],
+      "cwe_relationships": ["CWE-250", "CWE-269"],
+      "verification": {
+        "method": "Check effective capabilities of running process",
+        "commands": [
+          {"command": "grep CapEff /proc/<pid>/status", "expected": "0000000000000000 or minimal set", "platform": "linux"},
+          {"command": "kubectl get pod <pod> -o jsonpath='{.spec.containers[0].securityContext.capabilities.drop}'", "expected": "ALL", "platform": "kubernetes"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "Kubernetes", "OpenShift"]
+    },
+    {
+      "cme_id": "CME-706",
+      "control_name": "Pod Security Standards (Restricted)",
+      "description": "Kubernetes Pod Security Standards at Restricted level: requires non-root, drops ALL capabilities, blocks privilege escalation, requires seccomp, blocks hostPath/hostNetwork/hostPID.",
+      "tactic": "Isolate",
+      "category": "Container Isolation",
+      "control_layer": "Application",
+      "cvss_vector_impacts": [
+        {"metric": "S", "from": "C", "to": "U", "rationale": "Pod cannot access host resources or escalate to host context"},
+        {"metric": "PR", "from": "L", "to": "H", "rationale": "Non-root, no privilege escalation, minimal capabilities"}
+      ],
+      "cwe_relationships": ["CWE-269", "CWE-284"],
+      "verification": {
+        "method": "Check namespace PSS enforcement label",
+        "commands": [
+          {"command": "kubectl get namespace <ns> -o jsonpath='{.metadata.labels.pod-security\\.kubernetes\\.io/enforce}'", "expected": "restricted", "platform": "kubernetes"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["Kubernetes 1.25+", "OpenShift 4.12+"]
+    },
+    {
+      "cme_id": "CME-707",
+      "control_name": "NoNewPrivileges",
+      "description": "Sets the no_new_privs process flag, preventing any child process from gaining new privileges via execve (SUID bits, file capabilities, setuid transitions). Inherited across fork/exec.",
+      "tactic": "Isolate",
+      "category": "Privilege Isolation",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "PR", "from": "L", "to": "H", "rationale": "Cannot use SUID binaries or file capabilities to escalate"}
+      ],
+      "cwe_relationships": ["CWE-269", "CWE-250"],
+      "verification": {
+        "method": "Check NoNewPrivs flag on process",
+        "commands": [
+          {"command": "grep NoNewPrivs /proc/<pid>/status", "expected": "NoNewPrivs:\t1", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04", "Kubernetes"]
+    },
+    {
+      "cme_id": "CME-708",
+      "control_name": "Least Privilege sudo Configuration",
+      "description": "Configures sudo to allow specific commands only, rather than unrestricted root access. Uses command allowlists, NOPASSWD only for specific safe commands, and requiretty.",
+      "tactic": "Isolate",
+      "category": "Privilege Isolation",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "PR", "from": "L", "to": "H", "rationale": "Compromised user account has limited elevation paths"}
+      ],
+      "cwe_relationships": ["CWE-269", "CWE-250"],
+      "verification": {
+        "method": "Audit sudoers for overly permissive rules",
+        "commands": [
+          {"command": "grep -r 'ALL=(ALL)' /etc/sudoers /etc/sudoers.d/ 2>/dev/null | grep -v NOPASSWD", "expected": "Minimal matches", "platform": "linux"}
+        ]
+      },
+      "confidence": "Medium",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04"]
+    },
+    {
+      "cme_id": "CME-709",
+      "control_name": "systemd Service Sandboxing (PrivateDevices, PrivateTmp, ProtectSystem)",
+      "description": "systemd unit directives that sandbox services: PrivateDevices removes device access, PrivateTmp isolates /tmp, ProtectSystem=strict makes / read-only, ProtectHome=true hides /home.",
+      "tactic": "Isolate",
+      "category": "Privilege Isolation",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "S", "from": "C", "to": "U", "rationale": "Service isolated from host filesystem, devices, and user data"},
+        {"metric": "C", "from": "H", "to": "L", "rationale": "Cannot access user home directories or arbitrary devices"},
+        {"metric": "I", "from": "H", "to": "L", "rationale": "Cannot modify system files outside designated directories"}
+      ],
+      "cwe_relationships": ["CWE-269", "CWE-284"],
+      "verification": {
+        "method": "Check systemd unit for sandbox directives",
+        "commands": [
+          {"command": "systemctl show <service> -p ProtectSystem,PrivateTmp,PrivateDevices,ProtectHome", "expected": "ProtectSystem=strict", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04", "Fedora"]
+    },
+    {
+      "cme_id": "CME-710",
+      "control_name": "DynamicUser (systemd)",
+      "description": "systemd dynamically allocates a unique UID/GID per service instance. No persistent user account exists; each service restart gets a fresh identity, preventing cross-service data access.",
+      "tactic": "Isolate",
+      "category": "Privilege Isolation",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "S", "from": "C", "to": "U", "rationale": "Service runs with ephemeral identity that owns no persistent files"}
+      ],
+      "cwe_relationships": ["CWE-269"],
+      "verification": {
+        "method": "Check DynamicUser setting",
+        "commands": [
+          {"command": "systemctl show <service> -p DynamicUser", "expected": "DynamicUser=yes", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04"]
+    },
+    {
+      "cme_id": "CME-801",
+      "control_name": "Multi-Factor Authentication (MFA)",
+      "description": "Requires multiple authentication factors (password + TOTP/FIDO2/smart card), preventing credential-only compromise. Even stolen passwords are insufficient for access.",
+      "tactic": "Harden",
+      "category": "Credential Hardening",
+      "control_layer": "Identity",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Stolen credential alone is insufficient; second factor required"},
+        {"metric": "PR", "from": "N", "to": "H", "rationale": "Unauthenticated access impossible; multi-factor barrier"}
+      ],
+      "cwe_relationships": ["CWE-287", "CWE-306", "CWE-521"],
+      "verification": {
+        "method": "Verify MFA enforcement in PAM or IdP",
+        "commands": [
+          {"command": "grep pam_google_authenticator /etc/pam.d/sshd", "expected": "auth required pam_google_authenticator.so", "platform": "linux"},
+          {"command": "grep -r 'auth.*required.*pam_u2f' /etc/pam.d/", "expected": "pam_u2f.so", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["Any"]
+    },
+    {
+      "cme_id": "CME-802",
+      "control_name": "Password Quality Enforcement (pwquality)",
+      "description": "Enforces minimum password complexity (length, character classes, dictionary checks) via pam_pwquality, making brute force and dictionary attacks impractical.",
+      "tactic": "Harden",
+      "category": "Credential Hardening",
+      "control_layer": "Identity",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Password brute force requires significantly more time/resources"}
+      ],
+      "cwe_relationships": ["CWE-521"],
+      "verification": {
+        "method": "Check pwquality configuration",
+        "commands": [
+          {"command": "grep -E 'minlen|minclass|dcredit' /etc/security/pwquality.conf", "expected": "minlen = 14", "platform": "rhel"}
+        ]
+      },
+      "references": [
+        {"source": "Red Hat Security Hardening Guide", "section": "Password security"},
+        {"source": "CIS RHEL 9 Benchmark", "section": "5.4 Configure PAM"}
+      ],
+      "confidence": "Medium",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04"]
+    },
+    {
+      "cme_id": "CME-803",
+      "control_name": "Account Lockout Policy (pam_faillock)",
+      "description": "Locks user accounts after a configurable number of failed authentication attempts, preventing online brute force attacks.",
+      "tactic": "Harden",
+      "category": "Credential Hardening",
+      "control_layer": "Identity",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Brute force limited to N attempts before lockout"}
+      ],
+      "cwe_relationships": ["CWE-307"],
+      "verification": {
+        "method": "Check pam_faillock configuration",
+        "commands": [
+          {"command": "grep faillock /etc/pam.d/system-auth", "expected": "pam_faillock.so", "platform": "rhel"},
+          {"command": "grep deny /etc/security/faillock.conf", "expected": "deny = 5", "platform": "rhel"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8"]
+    },
+    {
+      "cme_id": "CME-804",
+      "control_name": "SSH Key-Only Authentication",
+      "description": "Disables password-based SSH login entirely, requiring public key authentication. Eliminates remote brute force against SSH as an attack vector.",
+      "tactic": "Harden",
+      "category": "Credential Hardening",
+      "control_layer": "Identity",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Password brute force impossible; must compromise private key"},
+        {"metric": "PR", "from": "N", "to": "H", "rationale": "Requires possession of authorized private key"}
+      ],
+      "cwe_relationships": ["CWE-287", "CWE-521"],
+      "verification": {
+        "method": "Check sshd_config for password auth disabled",
+        "commands": [
+          {"command": "sshd -T | grep passwordauthentication", "expected": "passwordauthentication no", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04"]
+    },
+    {
+      "cme_id": "CME-805",
+      "control_name": "Credential Rotation Policy",
+      "description": "Automated rotation of secrets, API keys, and passwords on schedule. Limits the window during which compromised credentials remain valid.",
+      "tactic": "Harden",
+      "category": "Credential Hardening",
+      "control_layer": "Identity",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Compromised credentials expire before attacker can use them"}
+      ],
+      "cwe_relationships": ["CWE-798", "CWE-521"],
+      "verification": {
+        "method": "Check password aging and secret rotation policies",
+        "commands": [
+          {"command": "chage -l <user> | grep 'Maximum'", "expected": "Maximum number of days between password change : 90", "platform": "linux"}
+        ]
+      },
+      "confidence": "Medium",
+      "platforms": ["Any"]
+    },
+    {
+      "cme_id": "CME-806",
+      "control_name": "Kerberos Authentication (GSSAPI)",
+      "description": "Centralized ticket-based authentication using Kerberos. Passwords never transmitted over the network; mutual authentication prevents impersonation of either party.",
+      "tactic": "Harden",
+      "category": "Credential Hardening",
+      "control_layer": "Identity",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Credential interception useless; tickets are time-limited and host-bound"}
+      ],
+      "cwe_relationships": ["CWE-319", "CWE-287"],
+      "verification": {
+        "method": "Check Kerberos authentication is configured",
+        "commands": [
+          {"command": "klist -k /etc/krb5.keytab 2>/dev/null | head -3", "expected": "keytab entries", "platform": "linux"},
+          {"command": "sshd -T | grep gssapiauthentication", "expected": "gssapiauthentication yes", "platform": "linux"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8"]
+    },
+    {
+      "cme_id": "CME-901",
+      "control_name": "SSH Hardening (Comprehensive)",
+      "description": "Comprehensive SSH hardening: disable root login, enforce Protocol 2, restrict ciphers to AEAD (chacha20/aes-gcm), disable X11/agent forwarding, set MaxAuthTries, enable LoginGraceTime.",
+      "tactic": "Harden",
+      "category": "Protocol Hardening",
+      "control_layer": "Network",
+      "cvss_vector_impacts": [
+        {"metric": "PR", "from": "N", "to": "H", "rationale": "Root login disabled; strong auth required"},
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Weak ciphers unavailable; forwarding attacks blocked"}
+      ],
+      "cwe_relationships": ["CWE-287", "CWE-250"],
+      "verification": {
+        "method": "Audit sshd configuration",
+        "commands": [
+          {"command": "sshd -T | grep -E 'permitrootlogin|maxauthtries|x11forwarding'", "expected": "permitrootlogin no", "platform": "linux"}
+        ]
+      },
+      "references": [
+        {"source": "CIS RHEL 9 Benchmark", "section": "5.2 Configure SSH Server"}
+      ],
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04"]
+    },
+    {
+      "cme_id": "CME-902",
+      "control_name": "Disable Unused Network Services",
+      "description": "Disables and masks unnecessary listening services (rpcbind, avahi-daemon, cups, postfix on non-mail servers). Each removed service eliminates an attack surface.",
+      "tactic": "Harden",
+      "category": "Protocol Hardening",
+      "control_layer": "Network",
+      "cvss_vector_impacts": [
+        {"metric": "AV", "from": "N", "to": "L", "rationale": "Fewer network-accessible services means fewer remote attack vectors"}
+      ],
+      "cwe_relationships": ["CWE-284", "CWE-668"],
+      "verification": {
+        "method": "List listening services and verify only necessary ones are active",
+        "commands": [
+          {"command": "ss -tlnp | grep -v '127.0.0.1\\|::1'", "expected": "Only expected services", "platform": "linux"}
+        ]
+      },
+      "references": [
+        {"source": "CIS RHEL 9 Benchmark", "section": "2. Services"}
+      ],
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04"]
+    },
+    {
+      "cme_id": "CME-903",
+      "control_name": "Kernel Network Hardening (sysctl)",
+      "description": "Kernel network stack hardening via sysctl: enable SYN cookies (TCP SYN flood protection), disable IP forwarding, reject source-routed packets, ignore ICMP redirects, enable reverse path filtering.",
+      "tactic": "Harden",
+      "category": "Protocol Hardening",
+      "control_layer": "Network",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Network-level attacks (SYN flood, source routing, ICMP redirect) are blocked"}
+      ],
+      "cwe_relationships": ["CWE-284"],
+      "verification": {
+        "method": "Check network hardening sysctls",
+        "commands": [
+          {"command": "sysctl net.ipv4.tcp_syncookies", "expected": "net.ipv4.tcp_syncookies = 1", "platform": "linux"},
+          {"command": "sysctl net.ipv4.conf.all.accept_redirects", "expected": "net.ipv4.conf.all.accept_redirects = 0", "platform": "linux"},
+          {"command": "sysctl net.ipv4.conf.all.rp_filter", "expected": "net.ipv4.conf.all.rp_filter = 1", "platform": "linux"}
+        ]
+      },
+      "references": [
+        {"source": "Red Hat Security Hardening Guide", "section": "Network security"},
+        {"source": "CIS RHEL 9 Benchmark", "section": "3.2 Network Parameters"}
+      ],
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04"]
+    },
+    {
+      "cme_id": "CME-904",
+      "control_name": "WAF (Web Application Firewall)",
+      "description": "HTTP-layer filtering that inspects requests for injection, XSS, path traversal, and other OWASP Top 10 patterns. Can operate in blocking or detection mode with OWASP Core Rule Set.",
+      "tactic": "Harden",
+      "category": "Application Controls",
+      "control_layer": "Application",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Common exploit payloads are detected and blocked at the HTTP layer"}
+      ],
+      "cwe_relationships": ["CWE-79", "CWE-89", "CWE-94", "CWE-22"],
+      "verification": {
+        "method": "Verify WAF is in enforcement mode with rules loaded",
+        "commands": [
+          {"command": "curl -s -o /dev/null -w '%{http_code}' 'http://target/?q=<script>alert(1)</script>'", "expected": "403", "platform": "any"}
+        ]
+      },
+      "confidence": "Medium",
+      "platforms": ["Any"]
+    },
+    {
+      "cme_id": "CME-905",
+      "control_name": "Content Security Policy (CSP) Headers",
+      "description": "Browser-enforced HTTP header policy that restricts script sources, prevents inline execution, and blocks mixed content. Primary defense against stored/reflected XSS.",
+      "tactic": "Harden",
+      "category": "Application Controls",
+      "control_layer": "Application",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "XSS payloads blocked by browser CSP enforcement; script sources restricted"}
+      ],
+      "cwe_relationships": ["CWE-79"],
+      "verification": {
+        "method": "Check for CSP header in HTTP responses",
+        "commands": [
+          {"command": "curl -sI http://target/ | grep -i content-security-policy", "expected": "Content-Security-Policy:", "platform": "any"}
+        ]
+      },
+      "confidence": "Medium",
+      "platforms": ["Any"]
+    },
+    {
+      "cme_id": "CME-906",
+      "control_name": "Rate Limiting / Connection Throttling",
+      "description": "Limits request rate per client IP or authenticated identity. Mitigates brute force attacks, credential stuffing, and application-level denial of service.",
+      "tactic": "Harden",
+      "category": "Application Controls",
+      "control_layer": "Network",
+      "cvss_vector_impacts": [
+        {"metric": "A", "from": "H", "to": "L", "rationale": "Single client cannot exhaust application resources"},
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Brute force attacks throttled to impractical speeds"}
+      ],
+      "cwe_relationships": ["CWE-307", "CWE-400"],
+      "verification": {
+        "method": "Verify rate limiting is configured",
+        "commands": [
+          {"command": "grep -r 'limit_req_zone\\|rate-limit' /etc/nginx/ 2>/dev/null", "expected": "limit_req_zone", "platform": "any"}
+        ]
+      },
+      "confidence": "Medium",
+      "platforms": ["Any"]
+    },
+    {
+      "cme_id": "CME-1001",
+      "control_name": "EDR Agent (Endpoint Detection & Response)",
+      "description": "Real-time behavioral detection and automated response agent on endpoints. Detects exploit patterns, lateral movement, and persistence mechanisms. Can kill processes, isolate hosts, and quarantine files automatically.",
+      "tactic": "Detect",
+      "category": "Runtime Detection",
+      "control_layer": "Application",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Compensating control: exploit behavior patterns are detected and may be blocked in real-time"}
+      ],
+      "cwe_relationships": [],
+      "verification": {
+        "method": "Verify EDR agent is running and connected to management console",
+        "commands": [
+          {"command": "systemctl is-active falcon-sensor 2>/dev/null || systemctl is-active mdatp 2>/dev/null", "expected": "active", "platform": "linux"}
+        ]
+      },
+      "confidence": "Medium",
+      "platforms": ["Any"]
+    },
+    {
+      "cme_id": "CME-1002",
+      "control_name": "Audit Subsystem (auditd)",
+      "description": "Linux kernel audit framework that logs syscalls, file access, authentication events, and security-relevant operations. Provides forensic trail and can trigger alerts.",
+      "tactic": "Detect",
+      "category": "Runtime Detection",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Compensating control: attacker actions are logged and may trigger alerting"}
+      ],
+      "cwe_relationships": ["CWE-778"],
+      "verification": {
+        "method": "Verify auditd is running with rules loaded",
+        "commands": [
+          {"command": "auditctl -s | grep enabled", "expected": "enabled 1", "platform": "linux"},
+          {"command": "auditctl -l | wc -l", "expected": "Non-zero rule count", "platform": "linux"}
+        ]
+      },
+      "references": [
+        {"source": "Red Hat Security Hardening Guide", "section": "System auditing"},
+        {"source": "CIS RHEL 9 Benchmark", "section": "4. Logging and Auditing"}
+      ],
+      "confidence": "Medium",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04"]
+    },
+    {
+      "cme_id": "CME-1003",
+      "control_name": "Falco / eBPF Runtime Security",
+      "description": "Kernel-level runtime security using eBPF or kernel modules to detect anomalous behavior: unexpected shell spawns, sensitive file reads, network connections from unusual processes.",
+      "tactic": "Detect",
+      "category": "Runtime Detection",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Compensating control: exploit post-exploitation behavior triggers alerts"}
+      ],
+      "cwe_relationships": [],
+      "verification": {
+        "method": "Verify Falco is running with rules loaded",
+        "commands": [
+          {"command": "systemctl is-active falco", "expected": "active", "platform": "linux"},
+          {"command": "falco --list 2>/dev/null | head -5", "expected": "rule names", "platform": "linux"}
+        ]
+      },
+      "confidence": "Medium",
+      "platforms": ["RHEL 9", "Kubernetes"]
+    },
+    {
+      "cme_id": "CME-1004",
+      "control_name": "AIDE / File Integrity Monitoring",
+      "description": "Detects unauthorized modifications to critical system files by comparing against a known-good baseline database. Scheduled or continuous monitoring of /etc, /bin, /sbin, /usr.",
+      "tactic": "Detect",
+      "category": "Integrity Detection",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "I", "from": "H", "to": "L", "rationale": "Compensating control: file modifications detected, alerting triggered"}
+      ],
+      "cwe_relationships": ["CWE-345"],
+      "verification": {
+        "method": "Verify AIDE is installed and database is initialized",
+        "commands": [
+          {"command": "aide --check 2>/dev/null; echo $?", "expected": "0", "platform": "linux"}
+        ]
+      },
+      "references": [
+        {"source": "CIS RHEL 9 Benchmark", "section": "1.3 Filesystem Integrity Checking"}
+      ],
+      "confidence": "Medium",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu 24.04"]
+    },
+    {
+      "cme_id": "CME-1101",
+      "control_name": "Automated Patch Management (dnf-automatic)",
+      "description": "Automatically downloads and applies security updates on schedule. Reduces the window between vulnerability disclosure and patch application from days/weeks to hours.",
+      "tactic": "Evict",
+      "category": "Patch Management",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Temporal: vulnerability window shortened; exploits against patched code fail"}
+      ],
+      "cwe_relationships": [],
+      "verification": {
+        "method": "Verify automatic updates are enabled",
+        "commands": [
+          {"command": "systemctl is-active dnf-automatic-install.timer", "expected": "active", "platform": "rhel"},
+          {"command": "grep apply_updates /etc/dnf/automatic.conf", "expected": "apply_updates = yes", "platform": "rhel"}
+        ]
+      },
+      "references": [
+        {"source": "Red Hat System Administration Guide", "section": "Automatic updates"}
+      ],
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Fedora"]
+    },
+    {
+      "cme_id": "CME-1102",
+      "control_name": "Live Kernel Patching (kpatch/livepatch)",
+      "description": "Applies critical kernel security fixes without system reboot, eliminating the patch-reboot delay that leaves systems vulnerable. Patches are applied to the running kernel in memory.",
+      "tactic": "Evict",
+      "category": "Patch Management",
+      "control_layer": "OS/Kernel",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Temporal: kernel vulnerability patched immediately without reboot window"}
+      ],
+      "cwe_relationships": ["CWE-119"],
+      "verification": {
+        "method": "Check for active kernel live patches",
+        "commands": [
+          {"command": "kpatch list", "expected": "installed", "platform": "rhel"},
+          {"command": "canonical-livepatch status", "expected": "running", "platform": "debian"}
+        ]
+      },
+      "confidence": "High",
+      "platforms": ["RHEL 9", "RHEL 8", "Ubuntu Pro"]
+    },
+    {
+      "cme_id": "CME-1103",
+      "control_name": "Automated Container Image Rebuilds",
+      "description": "CI/CD pipeline automatically rebuilds and redeploys container images when base image CVEs are published. Running containers are replaced with patched versions without manual intervention.",
+      "tactic": "Evict",
+      "category": "Patch Management",
+      "control_layer": "Application",
+      "cvss_vector_impacts": [
+        {"metric": "AC", "from": "L", "to": "H", "rationale": "Temporal: vulnerable container images replaced within pipeline cycle time"}
+      ],
+      "cwe_relationships": [],
+      "verification": {
+        "method": "Verify image age and rebuild pipeline",
+        "commands": [
+          {"command": "podman image inspect <image> | grep Created", "expected": "Recent date", "platform": "linux"}
+        ]
+      },
+      "confidence": "Medium",
+      "platforms": ["Kubernetes", "OpenShift"]
+    },
+    {
+      "cme_id": "CME-1201",
+      "control_name": "Immutable Infrastructure",
+      "description": "Servers are replaced rather than patched in place. Golden images are built in CI/CD, deployed fresh, and destroyed on replacement. Compromised instances are terminated and redeployed from known-good state.",
+      "tactic": "Restore",
+      "category": "Recovery Controls",
+      "control_layer": "Application",
+      "cvss_vector_impacts": [
+        {"metric": "A", "from": "H", "to": "L", "rationale": "Compromised instance replaced from known-good image; minimal downtime"},
+        {"metric": "I", "from": "H", "to": "L", "rationale": "Persistent modifications eliminated on next deployment cycle"}
+      ],
+      "cwe_relationships": [],
+      "verification": {
+        "method": "Verify deployment pipeline builds from golden images",
+        "commands": []
+      },
+      "confidence": "Medium",
+      "platforms": ["Any"]
+    },
+    {
+      "cme_id": "CME-1202",
+      "control_name": "Automated Backup with Integrity Verification",
+      "description": "Regular automated backups with cryptographic integrity verification and tested restore procedures. Enables point-in-time recovery after ransomware, data corruption, or destructive attacks.",
+      "tactic": "Restore",
+      "category": "Recovery Controls",
+      "control_layer": "Data",
+      "cvss_vector_impacts": [
+        {"metric": "A", "from": "H", "to": "L", "rationale": "Data recoverable from verified backups; availability impact bounded by RPO"}
+      ],
+      "cwe_relationships": ["CWE-345"],
+      "verification": {
+        "method": "Verify backup schedule and last successful restore test",
+        "commands": []
+      },
+      "confidence": "Medium",
+      "platforms": ["Any"]
+    },
+    {
+      "cme_id": "CME-1203",
+      "control_name": "Disaster Recovery / Multi-Region Failover",
+      "description": "Active-passive or active-active multi-region deployment enabling failover when primary site is compromised or unavailable. Automated failover with defined RTO/RPO.",
+      "tactic": "Restore",
+      "category": "Recovery Controls",
+      "control_layer": "Application",
+      "cvss_vector_impacts": [
+        {"metric": "A", "from": "H", "to": "L", "rationale": "Service continues from secondary region; availability impact limited to failover time"}
+      ],
+      "cwe_relationships": [],
+      "verification": {
+        "method": "Verify failover configuration and last failover test",
+        "commands": []
+      },
+      "confidence": "Medium",
+      "platforms": ["Any"]
+    }
+  ]
+}

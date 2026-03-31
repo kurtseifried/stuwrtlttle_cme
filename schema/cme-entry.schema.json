@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cme.example.org/schema/cme-entry.schema.json",
+  "title": "Common Mitigation Enumeration (CME) Entry",
+  "description": "A structured defensive control entry in the CME taxonomy, designed to complement CVE/CWE by identifying mitigations and mapping their deterministic impact on CVSS environmental scoring.",
+  "type": "object",
+  "required": ["cme_id", "control_name", "description", "tactic", "category", "control_layer", "cvss_vector_impacts"],
+  "properties": {
+    "cme_id": {
+      "type": "string",
+      "pattern": "^CME-\\d{3,4}$",
+      "description": "Unique CME identifier (e.g., CME-104, CME-1001)"
+    },
+    "control_name": {
+      "type": "string",
+      "description": "Formal name of the mitigation control"
+    },
+    "description": {
+      "type": "string",
+      "description": "Technical description of what the control does and how it mitigates risk"
+    },
+    "tactic": {
+      "type": "string",
+      "enum": ["Harden", "Isolate", "Detect", "Evict", "Restore"],
+      "description": "D3FEND-aligned tactic category"
+    },
+    "category": {
+      "type": "string",
+      "description": "Sub-category within the tactic (e.g., Kernel Hardening, Network Isolation)"
+    },
+    "control_layer": {
+      "type": "string",
+      "enum": ["Network", "OS/Kernel", "Application", "Data", "Identity"],
+      "description": "Technology stack layer where the control resides"
+    },
+    "cvss_vector_impacts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/cvss_vector_impact"
+      },
+      "minItems": 1,
+      "description": "One or more CVSS base metric modifications this control provides"
+    },
+    "cwe_relationships": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^CWE-\\d+$"
+      },
+      "description": "CWE weakness classes this control mitigates"
+    },
+    "verification": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "description": "Human-readable description of how to verify the control is active"
+        },
+        "commands": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "command": {
+                "type": "string",
+                "description": "Shell command to run"
+              },
+              "expected": {
+                "type": "string",
+                "description": "Expected output or pattern indicating the control is active"
+              },
+              "platform": {
+                "type": "string",
+                "enum": ["linux", "rhel", "debian", "kubernetes", "any"],
+                "description": "Platform this check applies to"
+              }
+            },
+            "required": ["command", "expected"]
+          },
+          "description": "Machine-executable verification checks"
+        }
+      },
+      "description": "How a scanner or agent can confirm the control is active"
+    },
+    "d3fend_mapping": {
+      "type": "object",
+      "properties": {
+        "technique_id": {
+          "type": "string",
+          "description": "D3FEND technique ID (e.g., D3-SPP)"
+        },
+        "technique_name": {
+          "type": "string",
+          "description": "D3FEND technique name"
+        }
+      },
+      "description": "Mapping to equivalent D3FEND technique if one exists"
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "source": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "section": { "type": "string" }
+        },
+        "required": ["source"]
+      },
+      "description": "External references (Red Hat docs, NIST, CIS benchmarks, etc.)"
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["High", "Medium", "Low"],
+      "description": "Confidence level that the CVSS attenuation is deterministic and verifiable"
+    },
+    "platforms": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Platforms where this control is applicable (e.g., RHEL 9, Ubuntu 24.04, Kubernetes)"
+    }
+  },
+  "$defs": {
+    "cvss_vector_impact": {
+      "type": "object",
+      "required": ["metric", "from", "to"],
+      "properties": {
+        "metric": {
+          "type": "string",
+          "enum": ["AV", "AC", "PR", "UI", "S", "C", "I", "A"],
+          "description": "CVSS base metric being modified"
+        },
+        "from": {
+          "type": "string",
+          "description": "Original metric value (e.g., N, L, H, C)"
+        },
+        "to": {
+          "type": "string",
+          "description": "Modified metric value when control is active"
+        },
+        "rationale": {
+          "type": "string",
+          "description": "Technical justification for this specific attenuation"
+        }
+      }
+    }
+  }
+}
