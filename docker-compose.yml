@@ -1,0 +1,51 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: cme
+      POSTGRES_PASSWORD: cme
+      POSTGRES_DB: cme
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cme"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  seed:
+    build: .
+    command: uv run python -m src.seed
+    environment:
+      CME_DB_BACKEND: postgres
+      CME_PG_HOST: postgres
+      CME_PG_PORT: "5432"
+      CME_PG_USER: cme
+      CME_PG_PASSWORD: cme
+      CME_PG_DATABASE: cme
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  server:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      CME_DB_BACKEND: postgres
+      CME_TRANSPORT: streamable-http
+      CME_HTTP_HOST: "0.0.0.0"
+      CME_HTTP_PORT: "8000"
+      CME_PG_HOST: postgres
+      CME_PG_PORT: "5432"
+      CME_PG_USER: cme
+      CME_PG_PASSWORD: cme
+      CME_PG_DATABASE: cme
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+
+volumes:
+  pgdata:

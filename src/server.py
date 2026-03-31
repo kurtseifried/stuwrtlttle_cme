@@ -6,21 +6,18 @@ from pathlib import Path
 from jsonschema import Draft202012Validator
 from mcp.server.fastmcp import FastMCP
 
-from .db import (
-    DEFAULT_DB_PATH,
-    get_attenuation_for_cve,
-    get_connection,
-    get_entry,
-    get_mitigations_for_cwe,
-    init_db,
-    insert_entry,
-    list_categories,
-    list_tactics,
-    search_entries,
-)
+from . import config
 
-ENTRIES_DIR = DEFAULT_DB_PATH.parent / "entries"
-PROPOSALS_DIR = DEFAULT_DB_PATH.parent / "proposals"
+# Select database backend based on configuration
+if config.DB_BACKEND == "postgres":
+    from . import db_postgres as db
+else:
+    from . import db as db  # type: ignore[no-redef]
+
+PROJECT_ROOT = Path(__file__).parent.parent
+ENTRIES_DIR = PROJECT_ROOT / "data" / "entries"
+PROPOSALS_DIR = PROJECT_ROOT / "data" / "proposals"
+SCHEMA_PATH = PROJECT_ROOT / "schema" / "cme-entry.schema.json"
 
 mcp = FastMCP(
     "CME — Common Mitigation Enumeration",
@@ -29,6 +26,8 @@ mcp = FastMCP(
         "Query mitigations by ID, tactic, CWE, or keyword. Calculate risk attenuation "
         "for active controls."
     ),
+    host=config.HTTP_HOST,
+    port=config.HTTP_PORT,
 )
 
 _conn = None
@@ -37,12 +36,12 @@ _conn = None
 def _get_db():
     global _conn
     if _conn is None:
-        _conn = get_connection(DEFAULT_DB_PATH)
-        init_db(_conn)
+        _conn = db.get_connection()
+        db.init_db(_conn)
     return _conn
 
 
-# --- Tools ---
+# --- Query Tools ---
 
 
 @mcp.tool()
@@ -52,7 +51,7 @@ def get_cme_entry(cme_id: str) -> str:
     Returns the full entry including description, CVSS vector impacts,
     CWE relationships, verification commands, and references.
     """
-    entry = get_entry(_get_db(), cme_id.upper())
+    entry = db.get_entry(_get_db(), cme_id.upper())
     if not entry:
         return json.dumps({"error": f"No entry found for {cme_id}"})
     return json.dumps(entry, indent=2)
@@ -75,7 +74,7 @@ def search_cme(
 
     Returns matching CME entries with full details.
     """
-    results = search_entries(
+    results = db.search_entries(
         _get_db(),
         tactic=tactic or None,
         category=category or None,
@@ -98,7 +97,7 @@ def get_mitigations_for_weakness(cwe_id: str) -> str:
     cwe = cwe_id.upper()
     if not cwe.startswith("CWE-"):
         cwe = f"CWE-{cwe}"
-    results = get_mitigations_for_cwe(_get_db(), cwe)
+    results = db.get_mitigations_for_cwe(_get_db(), cwe)
     if not results:
         return json.dumps({"message": f"No mitigations found for {cwe}", "cwe_id": cwe})
     return json.dumps(results, indent=2)
@@ -125,7 +124,7 @@ def calculate_attenuation(active_cme_ids: list[str]) -> str:
         4. Apply modifications to CVSS base score for environmental score
     """
     ids = [i.upper() for i in active_cme_ids]
-    impacts = get_attenuation_for_cve(_get_db(), ids)
+    impacts = db.get_attenuation_for_cve(_get_db(), ids)
     if not impacts:
         return json.dumps({"message": "No impacts found for provided CME-IDs", "provided": ids})
 
@@ -143,7 +142,7 @@ def calculate_attenuation(active_cme_ids: list[str]) -> str:
             }
         else:
             aggregated[metric]["contributing_controls"].append(impact["cme_id"])
-            # Keep the more restrictive value (simplified: alphabetically later = more restrictive)
+            # Keep the more restrictive value
             severity_order = {"N": 0, "L": 1, "A": 2, "P": 3, "U": 4, "H": 5, "C": 6}
             current = severity_order.get(aggregated[metric]["modified_to"], 99)
             new = severity_order.get(impact["to_value"], 99)
@@ -163,8 +162,8 @@ def list_cme_taxonomy() -> str:
 
     Returns a hierarchical view of the taxonomy for navigation and discovery.
     """
-    tactics = list_tactics(_get_db())
-    categories = list_categories(_get_db())
+    tactics = db.list_tactics(_get_db())
+    categories = db.list_categories(_get_db())
     return json.dumps({"tactics": tactics, "categories": categories}, indent=2)
 
 
@@ -178,7 +177,7 @@ def get_verification_commands(cme_id: str) -> str:
     Args:
         cme_id: CME identifier (e.g., "CME-101")
     """
-    entry = get_entry(_get_db(), cme_id.upper())
+    entry = db.get_entry(_get_db(), cme_id.upper())
     if not entry:
         return json.dumps({"error": f"No entry found for {cme_id}"})
     verification = entry.get("verification", {})
@@ -209,7 +208,7 @@ def simulate_cve_risk(
     Returns the original vs modified vector with estimated attenuation.
     """
     ids = [i.upper() for i in active_cme_ids]
-    impacts = get_attenuation_for_cve(_get_db(), ids)
+    impacts = db.get_attenuation_for_cve(_get_db(), ids)
 
     # Parse the base vector
     metrics: dict[str, str] = {}
@@ -254,21 +253,26 @@ def simulate_cve_risk(
 
 
 def _load_schema() -> dict:
-    schema_path = DEFAULT_DB_PATH.parent.parent / "schema" / "cme-entry.schema.json"
-    with open(schema_path) as f:
+    with open(SCHEMA_PATH) as f:
         return json.load(f)
 
 
 def _next_cme_id(category_prefix: int) -> str:
-    """Find the next available CME-ID in a given number range (e.g., 100 for Kernel Hardening)."""
+    """Find the next available CME-ID in a given number range."""
     conn = _get_db()
-    rows = conn.execute(
-        "SELECT cme_id FROM cme_entries WHERE cme_id LIKE ? ORDER BY cme_id",
-        (f"CME-{category_prefix // 100}%",),
-    ).fetchall()
+    prefix_str = str(category_prefix // 100)
+    if config.DB_BACKEND == "postgres":
+        rows = conn.execute(
+            "SELECT cme_id FROM cme_entries WHERE cme_id LIKE %(pat)s ORDER BY cme_id",
+            {"pat": f"CME-{prefix_str}%"},
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT cme_id FROM cme_entries WHERE cme_id LIKE ? ORDER BY cme_id",
+            (f"CME-{prefix_str}%",),
+        ).fetchall()
     if not rows:
         return f"CME-{category_prefix}"
-    # Find highest existing ID in range and increment
     max_num = max(int(r["cme_id"].split("-")[1]) for r in rows)
     return f"CME-{max_num + 1}"
 
@@ -308,7 +312,6 @@ def propose_cme_entry(
 
     Returns the proposed entry with a suggested CME-ID and file path.
     """
-    # Determine the ID range for the category
     category_ranges = {
         "Kernel Hardening": 101, "Network Isolation": 201,
         "Mandatory Access Control": 301, "Cryptographic Controls": 401,
@@ -409,7 +412,7 @@ def approve_cme_proposal(cme_id: str) -> str:
 
     # Insert into live database
     conn = _get_db()
-    insert_entry(conn, entry)
+    db.insert_entry(conn, entry)
     conn.commit()
 
     return json.dumps({
@@ -457,12 +460,11 @@ def entry_resource(cme_id: str) -> str:
 @mcp.resource("cme://schema")
 def schema_resource() -> str:
     """The CME JSON schema."""
-    schema_path = DEFAULT_DB_PATH.parent.parent / "schema" / "cme-entry.schema.json"
-    return schema_path.read_text()
+    return SCHEMA_PATH.read_text()
 
 
 def main():
-    mcp.run()
+    mcp.run(transport=config.TRANSPORT)
 
 
 if __name__ == "__main__":

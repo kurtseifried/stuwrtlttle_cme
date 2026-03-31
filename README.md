@@ -1,6 +1,6 @@
 # CME — Common Mitigation Enumeration
 
-A structured taxonomy of defensive security controls mapped to deterministic CVSS vector attenuation, served via an MCP (Model Context Protocol) server backed by a SQLite database.
+A structured taxonomy of defensive security controls mapped to deterministic CVSS vector attenuation, served via an MCP (Model Context Protocol) server backed by SQLite (single-user) or PostgreSQL (multi-user).
 
 ---
 
@@ -92,13 +92,17 @@ D3FEND mappings are preserved where they exist (e.g., CME-101 ASLR maps to D3FEN
 
 ## Architecture
 
+The server supports two deployment modes, selected via environment variables:
+
+### Single-User Mode (default)
+
 ```
-data/entries/              src/server.py              Clients
+data/entries/              src/server.py              Client
   CME-101.json        ┌─────────────────────┐
   CME-102.json        │   CME MCP Server    │     Claude Code
   CME-103.json        │   (FastMCP, stdio)  │ <── Claude Desktop
-  ...                 │         |           │     AI Agents
-  CME-1203.json       │    ┌────┴────┐      │     Scanners
+  ...                 │         |           │
+  CME-1203.json       │    ┌────┴────┐      │
        |              │    │ SQLite  │      │
        |              │    │ cme.db  │      │
   schema/             │    └─────────┘      │
@@ -109,11 +113,34 @@ data/entries/              src/server.py              Clients
   (schema checks)      (JSON → SQLite)
 ```
 
-**Individual JSON files** (`data/entries/CME-*.json`) are the source of truth. The seed script loads them into a normalized SQLite database. The MCP server reads from SQLite and serves tools over stdio transport.
+SQLite database, stdio transport. Each client spawns its own server process. No infrastructure required.
+
+### Multi-User Mode (Docker Compose)
+
+```
+data/entries/              docker-compose.yml              Clients
+  CME-101.json        ┌──────────────────────────┐
+  CME-102.json        │  CME MCP Server          │    Claude Code
+  CME-103.json        │  (FastMCP, HTTP :8000)    │    Claude Desktop
+  ...                 │         |                 │ <──AI Agents
+  CME-1203.json       │    ┌────┴──────────┐      │    Scanners
+       |              │    │  PostgreSQL   │      │    Wiz / CrowdStrike
+       |              │    │  (persistent) │      │
+  schema/             │    └───────────────┘      │
+  cme-entry.schema    └──────────────────────────┘
+       |                        ^
+       v                        |
+  CI pipeline            seed container
+  (validate + seed)     (JSON → Postgres)
+```
+
+PostgreSQL database, streamable HTTP transport. One shared server process serves all clients concurrently. Deployed via `docker compose up`.
 
 ---
 
 ## Quick Start
+
+### Single-User (SQLite + stdio)
 
 ```bash
 # Install dependencies
@@ -129,19 +156,34 @@ uv run python -m src.validate
 uv run python -m src.server
 ```
 
+### Multi-User (PostgreSQL + HTTP)
+
+```bash
+# Start PostgreSQL, seed the database, and launch the MCP server
+docker compose up -d
+
+# Server is now available at http://localhost:8000/mcp
+# All clients connect to this single shared instance
+```
+
+To stop: `docker compose down` (data persists in the `pgdata` volume).
+To reset: `docker compose down -v && docker compose up -d`.
+
 ---
 
 ## MCP Server
 
 ### How It Runs
 
-The server uses **stdio transport** (the FastMCP default). It is **launched on-demand** by the MCP client (Claude Code, Claude Desktop, or any MCP-compatible client). You do not need to start or stop it manually. The client:
+The server supports two transport modes, controlled by the `CME_TRANSPORT` environment variable:
 
-1. Spawns the server process
-2. Communicates over stdin/stdout
-3. Tears it down when the session ends
+**stdio (default)** — The MCP client (Claude Code, Claude Desktop) spawns the server process on-demand, communicates over stdin/stdout, and tears it down when the session ends. No ports, no daemon, no manual lifecycle management. Best for single-user / local use.
 
-No ports, no daemon, no manual lifecycle management.
+**streamable-http** — The server runs as a persistent HTTP service on port 8000. Multiple clients connect to the same server simultaneously. Best for multi-user / shared deployments. Launch via `docker compose up` or manually with:
+
+```bash
+CME_DB_BACKEND=postgres CME_TRANSPORT=streamable-http uv run python -m src.server
+```
 
 ### Query Tools
 
@@ -187,6 +229,27 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
     "cme": {
       "command": "uv",
       "args": ["run", "--directory", "/Users/jwest/projects/cme", "python", "-m", "src.server"]
+    }
+  }
+}
+```
+
+### Connecting to Shared HTTP Server (Multi-User)
+
+When the server is running in HTTP mode (via Docker Compose or manually), configure clients to connect over HTTP instead of stdio:
+
+**Claude Code:**
+```bash
+claude mcp add cme --transport http http://your-server:8000/mcp
+```
+
+**Claude Desktop** (`claude_desktop_config.json`):
+```json
+{
+  "mcpServers": {
+    "cme": {
+      "transport": "http",
+      "url": "http://your-server:8000/mcp"
     }
   }
 }
@@ -467,30 +530,36 @@ This ensures:
 - Full audit trail via git history
 - Easy rollback by reverting a commit
 
-### Scaling to Shared On-Prem Deployment
+### Shared On-Prem Deployment
 
-The current architecture (SQLite + stdio) is designed for single-user / small-team use. For a larger on-prem deployment with multiple concurrent users, the architecture would evolve:
+For multiple concurrent users, deploy with Docker Compose:
 
-```
-Source of Truth          Shared Service            Clients
-─────────────────       ──────────────────        ──────────
-                        ┌──────────────────┐
-  Git repo              │  CME MCP Server  │      Claude Code
-  ├── data/entries/     │  (HTTP transport)│ <──  Claude Desktop
-  │   ├── CME-101.json  │       |          │      AI Agents
-  │   ├── CME-102.json  │  ┌────┴─────┐   │      Scanners
-  │   └── ...           │  │ Postgres │   │
-  ├── schema/           │  └──────────┘   │
-  └── CI pipeline       └──────────────────┘
-        │                       ^
-        └───── CI seeds DB ─────┘
+```bash
+docker compose up -d
 ```
 
-Key changes:
-- **SQLite → PostgreSQL** for concurrent read/write access
-- **stdio → HTTP transport** so one server process serves multiple clients
-- **Git repo remains source of truth** — CI seeds the shared database on merge
-- **Proposal workflow stays the same** — entries go through PR review before reaching the shared DB
+This starts:
+1. **PostgreSQL 17** — persistent database with a named volume
+2. **Seed container** — loads all `data/entries/*.json` into Postgres, then exits
+3. **CME MCP Server** — HTTP transport on port 8000, serving all clients
+
+All configuration is via environment variables:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `CME_DB_BACKEND` | `sqlite` | Database backend: `sqlite` or `postgres` |
+| `CME_TRANSPORT` | `stdio` | MCP transport: `stdio` or `streamable-http` |
+| `CME_HTTP_HOST` | `0.0.0.0` | HTTP bind address |
+| `CME_HTTP_PORT` | `8000` | HTTP port |
+| `CME_PG_HOST` | `localhost` | PostgreSQL host |
+| `CME_PG_PORT` | `5432` | PostgreSQL port |
+| `CME_PG_USER` | `cme` | PostgreSQL user |
+| `CME_PG_PASSWORD` | `cme` | PostgreSQL password |
+| `CME_PG_DATABASE` | `cme` | PostgreSQL database name |
+
+The git repo remains the source of truth. In a CI/CD pipeline, on merge:
+1. CI runs `uv run python -m src.validate` to check all entries
+2. CI rebuilds and restarts the seed container to load new entries into the shared Postgres
 
 ---
 
@@ -587,6 +656,9 @@ The effective risk drops dramatically — the attacker needs high privileges, hi
 ~/projects/cme/
 ├── pyproject.toml                  # Python project config, dependencies
 ├── README.md                       # This file
+├── Dockerfile                      # Container image for multi-user deployment
+├── docker-compose.yml              # PostgreSQL + MCP server stack
+├── .dockerignore
 ├── schema/
 │   └── cme-entry.schema.json       # JSON Schema for CME entries
 ├── data/
@@ -595,14 +667,16 @@ The effective risk drops dramatically — the attacker needs high privileges, hi
 │   │   ├── CME-102.json
 │   │   └── ... (71 files)
 │   ├── proposals/                  # Pending proposals awaiting review
-│   ├── cme.db                      # SQLite database (generated by seed script)
+│   ├── cme.db                      # SQLite database (generated, gitignored)
 │   └── cme_seed_data.json          # Legacy single-file seed data
 └── src/
     ├── __init__.py
-    ├── db.py                       # Database layer: schema, queries, hydration
-    ├── seed.py                     # Loads data/entries/*.json into SQLite
+    ├── config.py                   # Environment-based configuration
+    ├── db.py                       # SQLite database backend
+    ├── db_postgres.py              # PostgreSQL database backend
+    ├── seed.py                     # Loads data/entries/*.json into either backend
     ├── validate.py                 # Schema validation for all entry files
-    └── server.py                   # MCP server: 10 tools, 3 resources
+    └── server.py                   # MCP server: 10 tools, 3 resources, dual transport
 ```
 
 ---

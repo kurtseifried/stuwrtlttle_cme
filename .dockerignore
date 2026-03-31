@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.pyc
+*.db
+*.egg-info/
+.git/
+data/proposals/
+data/cme_seed_data.json

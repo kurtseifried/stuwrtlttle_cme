@@ -7,8 +7,9 @@ from pathlib import Path
 DEFAULT_DB_PATH = Path(__file__).parent.parent / "data" / "cme.db"
 
 
-def get_connection(db_path: Path = DEFAULT_DB_PATH) -> sqlite3.Connection:
-    conn = sqlite3.connect(str(db_path))
+def get_connection(db_path: Path | None = None) -> sqlite3.Connection:
+    path = db_path or DEFAULT_DB_PATH
+    conn = sqlite3.connect(str(path))
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA foreign_keys=ON")

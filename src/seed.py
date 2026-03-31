@@ -1,31 +1,46 @@
-"""Seed the CME database from individual entry JSON files."""
+"""Seed the CME database from individual entry JSON files.
+
+Supports both SQLite and PostgreSQL backends via CME_DB_BACKEND env var.
+"""
 
 import json
 from pathlib import Path
 
-from .db import DEFAULT_DB_PATH, get_connection, init_db, insert_entry
+from . import config
 
 ENTRIES_DIR = Path(__file__).parent.parent / "data" / "entries"
 
 
 def main():
-    # Remove existing DB to rebuild fresh
-    if DEFAULT_DB_PATH.exists():
-        DEFAULT_DB_PATH.unlink()
-
-    conn = get_connection(DEFAULT_DB_PATH)
-    init_db(conn)
+    if config.DB_BACKEND == "postgres":
+        from . import db_postgres as db
+        conn = db.get_connection()
+        db.init_db(conn)
+    else:
+        from . import db
+        # Remove existing DB to rebuild fresh
+        if db.DEFAULT_DB_PATH.exists():
+            db.DEFAULT_DB_PATH.unlink()
+        conn = db.get_connection()
+        db.init_db(conn)
 
     count = 0
     for path in sorted(ENTRIES_DIR.glob("CME-*.json")):
         with open(path) as f:
             entry = json.load(f)
-        insert_entry(conn, entry)
+        db.insert_entry(conn, entry)
         count += 1
 
     conn.commit()
-    conn.close()
-    print(f"Seeded {count} CME entries into {DEFAULT_DB_PATH}")
+
+    backend = config.DB_BACKEND
+    if backend == "postgres":
+        target = f"PostgreSQL ({config.PG_HOST}:{config.PG_PORT}/{config.PG_DATABASE})"
+    else:
+        from . import db as sqlite_db
+        target = str(sqlite_db.DEFAULT_DB_PATH)
+
+    print(f"Seeded {count} CME entries into {target}")
 
 
 if __name__ == "__main__":
