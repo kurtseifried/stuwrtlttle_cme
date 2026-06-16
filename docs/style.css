@@ -1,0 +1,535 @@
+:root {
+  --primary: #2b579a;
+  --primary-light: #e8eef6;
+  --text: #1a1a1a;
+  --text-muted: #555;
+  --border: #d0d7de;
+  --bg: #fff;
+  --bg-alt: #f6f8fa;
+  --code-bg: #1e1e2e;
+  --code-fg: #cdd6f4;
+  --green: #2b7a3e;
+  --red: #a02020;
+  --blue: #2b579a;
+  --gold: #b8860b;
+  --purple: #5b2b7a;
+
+  --tactic-harden: #2b7a3e;
+  --tactic-isolate: #2b579a;
+  --tactic-detect: #b8860b;
+  --tactic-evict: #a02020;
+  --tactic-restore: #5b2b7a;
+
+  --layer-network: #0969da;
+  --layer-os: #6e40c9;
+  --layer-app: #cf222e;
+  --layer-data: #0a7b6c;
+  --layer-identity: #953800;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+a { color: var(--primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* --- Header & Nav --- */
+
+.site-header {
+  background: var(--primary);
+  color: #fff;
+  padding: 0;
+  border-bottom: 3px solid #1e3f6f;
+}
+
+.site-header .header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.site-header .logo {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 14px 0;
+  color: #fff;
+}
+.site-header .logo:hover { text-decoration: none; }
+
+.site-header .logo span {
+  font-weight: 400;
+  opacity: 0.8;
+  font-size: 14px;
+  margin-left: 8px;
+}
+
+nav { display: flex; gap: 0; }
+
+nav a {
+  color: rgba(255,255,255,0.85);
+  padding: 14px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -3px;
+  transition: border-color 0.15s, color 0.15s;
+}
+nav a:hover { color: #fff; text-decoration: none; border-bottom-color: rgba(255,255,255,0.5); }
+nav a.active { color: #fff; border-bottom-color: #fff; }
+
+/* --- Layout --- */
+
+.container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+
+.page-subtitle {
+  color: var(--text-muted);
+  font-size: 15px;
+  margin-bottom: 24px;
+}
+
+/* --- Stats Bar --- */
+
+.stats-bar {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 20px;
+  flex: 1;
+  min-width: 140px;
+}
+
+.stat-card .stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.stat-card .stat-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* --- Badges --- */
+
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  vertical-align: middle;
+}
+
+.badge-tactic-harden   { background: #e6f4ea; color: var(--tactic-harden); }
+.badge-tactic-isolate   { background: var(--primary-light); color: var(--tactic-isolate); }
+.badge-tactic-detect    { background: #fef3e0; color: var(--tactic-detect); }
+.badge-tactic-evict     { background: #fde8e8; color: var(--tactic-evict); }
+.badge-tactic-restore   { background: #f3e8fd; color: var(--tactic-restore); }
+
+.badge-layer-network    { background: #ddf4ff; color: var(--layer-network); }
+.badge-layer-os         { background: #ede4fa; color: var(--layer-os); }
+.badge-layer-app        { background: #ffebe9; color: var(--layer-app); }
+.badge-layer-data       { background: #dafbe1; color: var(--layer-data); }
+.badge-layer-identity   { background: #fff1e5; color: var(--layer-identity); }
+
+.badge-confidence-high   { background: #e6f4ea; color: var(--green); }
+.badge-confidence-medium { background: #fef3e0; color: var(--gold); }
+.badge-confidence-low    { background: #fde8e8; color: var(--red); }
+
+/* --- Taxonomy Tree (Index) --- */
+
+.taxonomy-group { margin-bottom: 32px; }
+
+.taxonomy-group .tactic-header {
+  font-size: 20px;
+  font-weight: 700;
+  padding: 12px 16px;
+  border-radius: 8px 8px 0 0;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.taxonomy-group .category-section {
+  border: 1px solid var(--border);
+  border-top: none;
+}
+
+.taxonomy-group .category-section:last-child {
+  border-radius: 0 0 8px 8px;
+}
+
+.category-header {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 10px 16px 6px;
+  background: var(--bg-alt);
+  border-top: 1px solid var(--border);
+}
+
+.entry-list { list-style: none; }
+
+.entry-list li {
+  padding: 8px 16px 8px 24px;
+  border-top: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.entry-list li:hover { background: var(--bg-alt); }
+
+.entry-list .cme-id {
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  min-width: 72px;
+}
+
+.entry-list .entry-name { flex: 1; }
+
+/* --- Entry Detail Page --- */
+
+.entry-header {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+}
+
+.entry-header .entry-id {
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.entry-header h1 {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.entry-header .entry-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.entry-body { display: grid; grid-template-columns: 1fr 300px; gap: 32px; }
+
+.entry-main section { margin-bottom: 28px; }
+
+.entry-main section h2 {
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 6px;
+  margin-bottom: 12px;
+}
+
+.entry-description { font-size: 15px; line-height: 1.7; }
+
+/* --- CVSS Table --- */
+
+.cvss-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.cvss-table th {
+  text-align: left;
+  background: var(--bg-alt);
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.cvss-table td {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.cvss-from {
+  font-weight: 700;
+  color: var(--red);
+  font-family: "SF Mono", "Fira Code", monospace;
+}
+
+.cvss-to {
+  font-weight: 700;
+  color: var(--green);
+  font-family: "SF Mono", "Fira Code", monospace;
+}
+
+.cvss-arrow { color: var(--text-muted); margin: 0 4px; }
+
+.cvss-rationale { color: var(--text-muted); font-size: 13px; }
+
+/* --- CWE Links --- */
+
+.cwe-list { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.cwe-link {
+  display: inline-block;
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-size: 13px;
+  padding: 3px 10px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--primary);
+}
+.cwe-link:hover { background: var(--primary-light); text-decoration: none; }
+
+/* --- Verification --- */
+
+.verification-method {
+  font-style: italic;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.verification-cmd {
+  background: var(--code-bg);
+  color: var(--code-fg);
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  overflow-x: auto;
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.verification-cmd .cmd-prompt { color: #a6e3a1; }
+.verification-cmd .cmd-expected { color: #89b4fa; }
+
+.cmd-platform {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* --- Sidebar --- */
+
+.entry-sidebar section {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.entry-sidebar section h3 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.sidebar-list { list-style: none; }
+.sidebar-list li { padding: 3px 0; font-size: 14px; }
+
+.d3fend-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.entry-nav {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  margin-top: 32px;
+  font-size: 14px;
+}
+
+.entry-nav a { display: flex; align-items: center; gap: 4px; }
+
+/* --- Tables (by-tactic, by-cwe) --- */
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.data-table th {
+  text-align: left;
+  background: var(--bg-alt);
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.data-table td {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.data-table tr:hover { background: var(--bg-alt); }
+
+.data-table .cme-id-cell {
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tactic-section { margin-bottom: 32px; }
+
+.tactic-section h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* --- CWE Reverse Lookup --- */
+
+.cwe-group { margin-bottom: 20px; }
+
+.cwe-group-header {
+  font-size: 16px;
+  font-weight: 700;
+  font-family: "SF Mono", "Fira Code", monospace;
+  padding: 8px 12px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 6px 6px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cwe-group-header a { font-size: 12px; font-weight: 400; }
+
+.cwe-group-entries {
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  list-style: none;
+}
+
+.cwe-group-entries li {
+  padding: 6px 12px 6px 20px;
+  border-top: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+/* --- Search --- */
+
+.search-box {
+  margin-bottom: 24px;
+}
+
+.search-box input {
+  width: 100%;
+  max-width: 500px;
+  padding: 10px 16px;
+  font-size: 15px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  outline: none;
+}
+.search-box input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(43,87,154,0.15); }
+
+.search-results { list-style: none; }
+
+.search-results li {
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.search-results .sr-id {
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-weight: 600;
+  color: var(--primary);
+  margin-right: 8px;
+}
+
+.search-results .sr-desc {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+.hidden { display: none; }
+
+/* --- Footer --- */
+
+.site-footer {
+  margin-top: 48px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* --- Responsive --- */
+
+@media (max-width: 768px) {
+  .entry-body { grid-template-columns: 1fr; }
+  .site-header .header-inner { flex-direction: column; gap: 0; }
+  nav { width: 100%; justify-content: center; }
+  .stats-bar { flex-direction: column; }
+  .entry-list li { flex-wrap: wrap; }
+}

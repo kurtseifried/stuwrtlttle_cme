@@ -6,8 +6,10 @@ requires-python = ">=3.11"
 dependencies = [
     "mcp[cli]",
     "psycopg[binary]",
+    "jinja2",
 ]
 
 [project.scripts]
 cme-server = "src.server:main"
 cme-seed = "src.seed:main"
+build-site = "build_site:main"

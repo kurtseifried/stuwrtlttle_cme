@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CME-504: dm-verity (Verified Boot) — Common Mitigation Enumeration</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../index.html" class="logo">CME <span>Common Mitigation Enumeration</span></a>
+      <nav>
+        <a href="../index.html" >Home</a>
+        <a href="../by-tactic.html" >By Tactic</a>
+        <a href="../by-cwe.html" >By CWE</a>
+        <a href="../search.html" >Search</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    
+<div class="entry-header">
+  <div class="entry-id">CME-504</div>
+  <h1>dm-verity (Verified Boot)</h1>
+  <div class="entry-meta">
+    <span class="badge badge-tactic-harden">Harden</span>
+    <span class="badge badge-layer-os-kernel">OS/Kernel</span>
+    
+    <span class="badge badge-confidence-high">High Confidence</span>
+    
+  </div>
+</div>
+
+<div class="entry-body">
+  <div class="entry-main">
+
+    <section>
+      <h2>Description</h2>
+      <p class="entry-description">Cryptographic verification of block device integrity using a Merkle tree hash. Every read from the block device is verified against pre-computed hashes, detecting any tampering at the block level.</p>
+    </section>
+
+    <section>
+      <h2>CVSS Vector Impacts</h2>
+      <table class="cvss-table">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Transition</th>
+            <th>Rationale</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td><strong>Integrity</strong> (I)</td>
+            <td>
+              <span class="cvss-from">H</span>
+              <span class="cvss-arrow">&rarr;</span>
+              <span class="cvss-to">N</span>
+            </td>
+            <td class="cvss-rationale">Any block-level modification is cryptographically detected and rejected</td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </section>
+
+    
+    <section>
+      <h2>CWE Relationships</h2>
+      <div class="cwe-list">
+        
+        <a href="https://cwe.mitre.org/data/definitions/345.html"
+           class="cwe-link" target="_blank" rel="noopener">CWE-345</a>
+        
+        <a href="https://cwe.mitre.org/data/definitions/494.html"
+           class="cwe-link" target="_blank" rel="noopener">CWE-494</a>
+        
+      </div>
+    </section>
+    
+
+    
+    <section>
+      <h2>Verification</h2>
+      
+      <p class="verification-method">Check dm-verity status on root device</p>
+      
+      
+      <div class="verification-cmd">
+        <span class="cmd-prompt">$</span> veritysetup status root
+        
+        <br><span class="cmd-expected"># Expected: status: verified</span>
+        
+      </div>
+      
+      <div class="cmd-platform">Platform: linux</div>
+      
+      
+    </section>
+    
+
+    
+
+    <div class="entry-nav">
+      
+      <a href="CME-503.html">&larr; CME-503: nosuid on Non-Root Partitions</a>
+      
+      
+      <a href="CME-505.html">CME-505: IMA/EVM (Integrity Measurement Architecture) &rarr;</a>
+      
+    </div>
+  </div>
+
+  <aside class="entry-sidebar">
+    <section>
+      <h3>Category</h3>
+      <p>Filesystem Hardening</p>
+    </section>
+
+    
+
+    
+    <section>
+      <h3>Platforms</h3>
+      <ul class="sidebar-list">
+        
+        <li>RHEL 9</li>
+        
+        <li>Fedora CoreOS</li>
+        
+        <li>ChromeOS</li>
+        
+        <li>Android</li>
+        
+      </ul>
+    </section>
+    
+
+    <section>
+      <h3>Quick Reference</h3>
+      <ul class="sidebar-list">
+        <li><strong>ID:</strong> CME-504</li>
+        <li><strong>Tactic:</strong> Harden</li>
+        <li><strong>Layer:</strong> OS/Kernel</li>
+        <li><strong>CWEs:</strong> 2</li>
+        <li><strong>CVSS Mods:</strong> 1</li>
+      </ul>
+    </section>
+  </aside>
+</div>
+
+  </main>
+
+  <footer class="site-footer">
+    Generated 2026-06-16 13:59 UTC &middot; 78 entries &middot;
+    Common Mitigation Enumeration (CME)
+  </footer>
+</body>
+</html>

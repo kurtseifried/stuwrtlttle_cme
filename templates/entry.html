@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}{{ entry.cme_id }}: {{ entry.control_name }}{% endblock %}
+
+{% block content %}
+<div class="entry-header">
+  <div class="entry-id">{{ entry.cme_id }}</div>
+  <h1>{{ entry.control_name }}</h1>
+  <div class="entry-meta">
+    <span class="badge badge-tactic-{{ entry.tactic|lower }}">{{ entry.tactic }}</span>
+    <span class="badge badge-layer-{{ entry.control_layer | lower | replace('/', '-') | replace(' ', '') }}">{{ entry.control_layer }}</span>
+    {% if entry.confidence %}
+    <span class="badge badge-confidence-{{ entry.confidence|lower }}">{{ entry.confidence }} Confidence</span>
+    {% endif %}
+  </div>
+</div>
+
+<div class="entry-body">
+  <div class="entry-main">
+
+    <section>
+      <h2>Description</h2>
+      <p class="entry-description">{{ entry.description }}</p>
+    </section>
+
+    <section>
+      <h2>CVSS Vector Impacts</h2>
+      <table class="cvss-table">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Transition</th>
+            <th>Rationale</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for impact in entry.cvss_vector_impacts %}
+          <tr>
+            <td><strong>{{ metric_names.get(impact.metric, impact.metric) }}</strong> ({{ impact.metric }})</td>
+            <td>
+              <span class="cvss-from">{{ impact['from'] }}</span>
+              <span class="cvss-arrow">&rarr;</span>
+              <span class="cvss-to">{{ impact.to }}</span>
+            </td>
+            <td class="cvss-rationale">{{ impact.rationale | default('') }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    {% if entry.cwe_relationships %}
+    <section>
+      <h2>CWE Relationships</h2>
+      <div class="cwe-list">
+        {% for cwe in entry.cwe_relationships %}
+        <a href="https://cwe.mitre.org/data/definitions/{{ cwe | replace('CWE-', '') }}.html"
+           class="cwe-link" target="_blank" rel="noopener">{{ cwe }}</a>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    {% if entry.verification %}
+    <section>
+      <h2>Verification</h2>
+      {% if entry.verification.method %}
+      <p class="verification-method">{{ entry.verification.method }}</p>
+      {% endif %}
+      {% for cmd in entry.verification.get('commands', []) %}
+      <div class="verification-cmd">
+        <span class="cmd-prompt">$</span> {{ cmd.command }}
+        {% if cmd.expected %}
+        <br><span class="cmd-expected"># Expected: {{ cmd.expected }}</span>
+        {% endif %}
+      </div>
+      {% if cmd.platform %}
+      <div class="cmd-platform">Platform: {{ cmd.platform }}</div>
+      {% endif %}
+      {% endfor %}
+    </section>
+    {% endif %}
+
+    {% if entry.references %}
+    <section>
+      <h2>References</h2>
+      <ul class="sidebar-list">
+        {% for ref in entry.references %}
+        <li>
+          {% if ref.url %}<a href="{{ ref.url }}" target="_blank" rel="noopener">{{ ref.source }}</a>{% else %}{{ ref.source }}{% endif %}
+          {% if ref.section %} &mdash; {{ ref.section }}{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+
+    <div class="entry-nav">
+      {% if prev_entry %}
+      <a href="{{ prev_entry.cme_id }}.html">&larr; {{ prev_entry.cme_id }}: {{ prev_entry.control_name }}</a>
+      {% else %}<span></span>{% endif %}
+      {% if next_entry %}
+      <a href="{{ next_entry.cme_id }}.html">{{ next_entry.cme_id }}: {{ next_entry.control_name }} &rarr;</a>
+      {% else %}<span></span>{% endif %}
+    </div>
+  </div>
+
+  <aside class="entry-sidebar">
+    <section>
+      <h3>Category</h3>
+      <p>{{ entry.category }}</p>
+    </section>
+
+    {% if entry.d3fend_mapping %}
+    <section>
+      <h3>D3FEND Mapping</h3>
+      <a href="https://d3fend.mitre.org/technique/{{ entry.d3fend_mapping.technique_id }}/"
+         class="d3fend-link" target="_blank" rel="noopener">
+        {{ entry.d3fend_mapping.technique_id }} &mdash; {{ entry.d3fend_mapping.technique_name }}
+      </a>
+    </section>
+    {% endif %}
+
+    {% if entry.platforms %}
+    <section>
+      <h3>Platforms</h3>
+      <ul class="sidebar-list">
+        {% for p in entry.platforms %}
+        <li>{{ p }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+
+    <section>
+      <h3>Quick Reference</h3>
+      <ul class="sidebar-list">
+        <li><strong>ID:</strong> {{ entry.cme_id }}</li>
+        <li><strong>Tactic:</strong> {{ entry.tactic }}</li>
+        <li><strong>Layer:</strong> {{ entry.control_layer }}</li>
+        <li><strong>CWEs:</strong> {{ entry.cwe_relationships | default([]) | length }}</li>
+        <li><strong>CVSS Mods:</strong> {{ entry.cvss_vector_impacts | length }}</li>
+      </ul>
+    </section>
+  </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Search{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Search CME Entries</h1>
+<p class="page-subtitle">Search by CME ID, control name, description, CWE ID, or category.</p>
+
+<div class="search-box">
+  <input type="text" id="search-input" placeholder="e.g. ASLR, CWE-119, Kernel Hardening, CME-301..." autofocus>
+</div>
+
+<div id="search-count" class="page-subtitle"></div>
+
+<ul class="search-results" id="search-results">
+  {% for entry in all_entries | sort(attribute='cme_num') %}
+  <li data-search="{{ entry.cme_id | lower }} {{ entry.control_name | lower }} {{ entry.description | lower }} {{ entry.category | lower }} {{ entry.tactic | lower }} {{ entry.control_layer | lower }} {{ (entry.cwe_relationships | default([]) | join(' ')) | lower }}">
+    <div>
+      <a href="entries/{{ entry.cme_id }}.html" class="sr-id">{{ entry.cme_id }}</a>
+      <a href="entries/{{ entry.cme_id }}.html">{{ entry.control_name }}</a>
+      <span class="badge badge-tactic-{{ entry.tactic|lower }}">{{ entry.tactic }}</span>
+      <span class="badge badge-layer-{{ entry.control_layer | lower | replace('/', '-') | replace(' ', '') }}">{{ entry.control_layer }}</span>
+    </div>
+    <div class="sr-desc">{{ entry.description[:150] }}{% if entry.description | length > 150 %}...{% endif %}</div>
+  </li>
+  {% endfor %}
+</ul>
+
+<script>
+(function() {
+  var input = document.getElementById('search-input');
+  var items = document.querySelectorAll('#search-results li');
+  var countEl = document.getElementById('search-count');
+  var total = items.length;
+  countEl.textContent = total + ' entries';
+
+  input.addEventListener('input', function() {
+    var q = this.value.toLowerCase().trim();
+    var visible = 0;
+    for (var i = 0; i < items.length; i++) {
+      var match = !q || items[i].getAttribute('data-search').indexOf(q) !== -1;
+      items[i].classList.toggle('hidden', !match);
+      if (match) visible++;
+    }
+    countEl.textContent = q ? visible + ' of ' + total + ' entries' : total + ' entries';
+  });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CME-1301: Path Traversal Prevention (Canonicalization) — Common Mitigation Enumeration</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../index.html" class="logo">CME <span>Common Mitigation Enumeration</span></a>
+      <nav>
+        <a href="../index.html" >Home</a>
+        <a href="../by-tactic.html" >By Tactic</a>
+        <a href="../by-cwe.html" >By CWE</a>
+        <a href="../search.html" >Search</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    
+<div class="entry-header">
+  <div class="entry-id">CME-1301</div>
+  <h1>Path Traversal Prevention (Canonicalization)</h1>
+  <div class="entry-meta">
+    <span class="badge badge-tactic-harden">Harden</span>
+    <span class="badge badge-layer-application">Application</span>
+    
+    <span class="badge badge-confidence-high">High Confidence</span>
+    
+  </div>
+</div>
+
+<div class="entry-body">
+  <div class="entry-main">
+
+    <section>
+      <h2>Description</h2>
+      <p class="entry-description">Application-level path validation that canonicalizes user-supplied paths (resolving symlinks, ../, and relative references) and verifies the resolved path falls within an allowed base directory. Rejects absolute path injection and directory traversal sequences before any filesystem operation. Prevents attackers from reading or writing files outside intended directories.</p>
+    </section>
+
+    <section>
+      <h2>CVSS Vector Impacts</h2>
+      <table class="cvss-table">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Transition</th>
+            <th>Rationale</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td><strong>Attack Complexity</strong> (AC)</td>
+            <td>
+              <span class="cvss-from">L</span>
+              <span class="cvss-arrow">&rarr;</span>
+              <span class="cvss-to">H</span>
+            </td>
+            <td class="cvss-rationale">Traversal payloads (../, absolute paths) are rejected before reaching filesystem operations</td>
+          </tr>
+          
+          <tr>
+            <td><strong>Confidentiality</strong> (C)</td>
+            <td>
+              <span class="cvss-from">H</span>
+              <span class="cvss-arrow">&rarr;</span>
+              <span class="cvss-to">L</span>
+            </td>
+            <td class="cvss-rationale">File read confined to allowed directory; sensitive files outside base path are unreachable</td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </section>
+
+    
+    <section>
+      <h2>CWE Relationships</h2>
+      <div class="cwe-list">
+        
+        <a href="https://cwe.mitre.org/data/definitions/22.html"
+           class="cwe-link" target="_blank" rel="noopener">CWE-22</a>
+        
+        <a href="https://cwe.mitre.org/data/definitions/23.html"
+           class="cwe-link" target="_blank" rel="noopener">CWE-23</a>
+        
+        <a href="https://cwe.mitre.org/data/definitions/36.html"
+           class="cwe-link" target="_blank" rel="noopener">CWE-36</a>
+        
+        <a href="https://cwe.mitre.org/data/definitions/73.html"
+           class="cwe-link" target="_blank" rel="noopener">CWE-73</a>
+        
+      </div>
+    </section>
+    
+
+    
+    <section>
+      <h2>Verification</h2>
+      
+      <p class="verification-method">Test application with path traversal payloads and verify rejection; inspect source for canonicalization before file access</p>
+      
+      
+      <div class="verification-cmd">
+        <span class="cmd-prompt">$</span> grep -rn &#39;os.path.realpath\|pathlib.*resolve\|os.path.abspath&#39; &lt;app_source&gt;/
+        
+        <br><span class="cmd-expected"># Expected: Path canonicalization calls present before file operations</span>
+        
+      </div>
+      
+      <div class="cmd-platform">Platform: any</div>
+      
+      
+      <div class="verification-cmd">
+        <span class="cmd-prompt">$</span> grep -rn &#39;startswith\|is_relative_to&#39; &lt;app_source&gt;/
+        
+        <br><span class="cmd-expected"># Expected: Base directory prefix check present after canonicalization</span>
+        
+      </div>
+      
+      <div class="cmd-platform">Platform: any</div>
+      
+      
+    </section>
+    
+
+    
+
+    <div class="entry-nav">
+      
+      <a href="CME-1203.html">&larr; CME-1203: Disaster Recovery / Multi-Region Failover</a>
+      
+      
+      <a href="CME-1302.html">CME-1302: Deserialization Allowlist (Safe Loading) &rarr;</a>
+      
+    </div>
+  </div>
+
+  <aside class="entry-sidebar">
+    <section>
+      <h3>Category</h3>
+      <p>Application Input Validation</p>
+    </section>
+
+    
+
+    
+    <section>
+      <h3>Platforms</h3>
+      <ul class="sidebar-list">
+        
+        <li>Any</li>
+        
+      </ul>
+    </section>
+    
+
+    <section>
+      <h3>Quick Reference</h3>
+      <ul class="sidebar-list">
+        <li><strong>ID:</strong> CME-1301</li>
+        <li><strong>Tactic:</strong> Harden</li>
+        <li><strong>Layer:</strong> Application</li>
+        <li><strong>CWEs:</strong> 4</li>
+        <li><strong>CVSS Mods:</strong> 2</li>
+      </ul>
+    </section>
+  </aside>
+</div>
+
+  </main>
+
+  <footer class="site-footer">
+    Generated 2026-06-16 13:59 UTC &middot; 78 entries &middot;
+    Common Mitigation Enumeration (CME)
+  </footer>
+</body>
+</html>

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Browse by Tactic{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Browse by Tactic</h1>
+<p class="page-subtitle">All CME entries organized by their D3FEND-aligned tactic.</p>
+
+{% for tactic in tactic_order %}
+{% if tactic in taxonomy %}
+<div class="tactic-section">
+  <h2>
+    <span class="badge badge-tactic-{{ tactic|lower }}">{{ tactic }}</span>
+    {{ tactic }} ({{ tactic_counts.get(tactic, 0) }})
+  </h2>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>CME ID</th>
+        <th>Control Name</th>
+        <th>Category</th>
+        <th>Layer</th>
+        <th>CVSS Modifications</th>
+        <th>CWEs</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for category in taxonomy[tactic] | sort %}
+      {% for entry in taxonomy[tactic][category] | sort(attribute='cme_num') %}
+      <tr>
+        <td class="cme-id-cell"><a href="entries/{{ entry.cme_id }}.html">{{ entry.cme_id }}</a></td>
+        <td><a href="entries/{{ entry.cme_id }}.html">{{ entry.control_name }}</a></td>
+        <td>{{ entry.category }}</td>
+        <td><span class="badge badge-layer-{{ entry.control_layer | lower | replace('/', '-') | replace(' ', '') }}">{{ entry.control_layer }}</span></td>
+        <td>
+          {% for impact in entry.cvss_vector_impacts %}
+          <span class="cvss-from">{{ impact.metric }}:{{ impact['from'] }}</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">{{ impact.to }}</span>{% if not loop.last %}, {% endif %}
+          {% endfor %}
+        </td>
+        <td>{{ entry.cwe_relationships | default([]) | length }}</td>
+      </tr>
+      {% endfor %}
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endfor %}
+{% endblock %}

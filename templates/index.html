@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Common Mitigation Enumeration</h1>
+<p class="page-subtitle">
+  A taxonomy of defensive security controls mapped to CWE weaknesses and CVSS vector attenuation.
+  Each CME entry describes a verifiable control that deterministically modifies CVSS environmental scoring.
+</p>
+
+<div class="stats-bar">
+  <div class="stat-card">
+    <div class="stat-value">{{ total_entries }}</div>
+    <div class="stat-label">Total Entries</div>
+  </div>
+  {% for tactic in tactic_order %}
+  <div class="stat-card">
+    <div class="stat-value">{{ tactic_counts.get(tactic, 0) }}</div>
+    <div class="stat-label">{{ tactic }}</div>
+  </div>
+  {% endfor %}
+</div>
+
+{% for tactic in tactic_order %}
+{% if tactic in taxonomy %}
+<div class="taxonomy-group">
+  <div class="tactic-header" style="background: var(--bg-alt);">
+    <span class="badge badge-tactic-{{ tactic|lower }}">{{ tactic }}</span>
+    <span>{{ tactic }}</span>
+    <span style="margin-left: auto; font-size: 14px; color: var(--text-muted);">{{ tactic_counts.get(tactic, 0) }} entries</span>
+  </div>
+  {% for category in taxonomy[tactic] | sort %}
+  <div class="category-section">
+    <div class="category-header">{{ category }}</div>
+    <ul class="entry-list">
+      {% for entry in taxonomy[tactic][category] | sort(attribute='cme_num') %}
+      <li>
+        <a href="entries/{{ entry.cme_id }}.html" class="cme-id">{{ entry.cme_id }}</a>
+        <a href="entries/{{ entry.cme_id }}.html" class="entry-name">{{ entry.control_name }}</a>
+        <span class="badge badge-layer-{{ entry.control_layer | lower | replace('/', '-') | replace(' ', '') }}">{{ entry.control_layer }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endfor %}
+{% endblock %}

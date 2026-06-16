@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}CME{% endblock %} — Common Mitigation Enumeration</title>
+  <link rel="stylesheet" href="{{ root }}style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="{{ root }}index.html" class="logo">CME <span>Common Mitigation Enumeration</span></a>
+      <nav>
+        <a href="{{ root }}index.html" {% if active_page == 'index' %}class="active"{% endif %}>Home</a>
+        <a href="{{ root }}by-tactic.html" {% if active_page == 'by-tactic' %}class="active"{% endif %}>By Tactic</a>
+        <a href="{{ root }}by-cwe.html" {% if active_page == 'by-cwe' %}class="active"{% endif %}>By CWE</a>
+        <a href="{{ root }}search.html" {% if active_page == 'search' %}class="active"{% endif %}>Search</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    Generated {{ generated_at }} &middot; {{ total_entries }} entries &middot;
+    Common Mitigation Enumeration (CME)
+  </footer>
+</body>
+</html>

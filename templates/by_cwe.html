@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Browse by CWE{% endblock %}
+
+{% block content %}
+<h1 class="page-title">CWE Coverage Map</h1>
+<p class="page-subtitle">
+  Reverse lookup: find which CME controls mitigate a given CWE weakness class.
+  {{ cwe_map | length }} distinct CWEs covered across {{ total_entries }} CME entries.
+</p>
+
+{% for cwe_id in cwe_map | sort(attribute='cwe_num') %}
+<div class="cwe-group" id="{{ cwe_id.cwe_id | lower }}">
+  <div class="cwe-group-header">
+    {{ cwe_id.cwe_id }}
+    <a href="https://cwe.mitre.org/data/definitions/{{ cwe_id.cwe_id | replace('CWE-', '') }}.html"
+       target="_blank" rel="noopener">View on MITRE &rarr;</a>
+  </div>
+  <ul class="cwe-group-entries">
+    {% for entry in cwe_id.entries | sort(attribute='cme_num') %}
+    <li>
+      <a href="entries/{{ entry.cme_id }}.html" class="cme-id" style="min-width: 72px;">{{ entry.cme_id }}</a>
+      <a href="entries/{{ entry.cme_id }}.html">{{ entry.control_name }}</a>
+      <span class="badge badge-tactic-{{ entry.tactic|lower }}">{{ entry.tactic }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endfor %}
+{% endblock %}
