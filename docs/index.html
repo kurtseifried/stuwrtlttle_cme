@@ -29,22 +29,22 @@
 
 <div class="stats-bar">
   <div class="stat-card">
-    <div class="stat-value">78</div>
+    <div class="stat-value">87</div>
     <div class="stat-label">Total Entries</div>
   </div>
   
   <div class="stat-card">
-    <div class="stat-value">49</div>
+    <div class="stat-value">52</div>
     <div class="stat-label">Harden</div>
   </div>
   
   <div class="stat-card">
-    <div class="stat-value">19</div>
+    <div class="stat-value">21</div>
     <div class="stat-label">Isolate</div>
   </div>
   
   <div class="stat-card">
-    <div class="stat-value">4</div>
+    <div class="stat-value">8</div>
     <div class="stat-label">Detect</div>
   </div>
   
@@ -66,7 +66,7 @@
   <div class="tactic-header" style="background: var(--bg-alt);">
     <span class="badge badge-tactic-harden">Harden</span>
     <span>Harden</span>
-    <span style="margin-left: auto; font-size: 14px; color: var(--text-muted);">49 entries</span>
+    <span style="margin-left: auto; font-size: 14px; color: var(--text-muted);">52 entries</span>
   </div>
   
   <div class="category-section">
@@ -89,6 +89,24 @@
         <a href="entries/CME-906.html" class="cme-id">CME-906</a>
         <a href="entries/CME-906.html" class="entry-name">Rate Limiting / Connection Throttling</a>
         <span class="badge badge-layer-network">Network</span>
+      </li>
+      
+      <li>
+        <a href="entries/CME-907.html" class="cme-id">CME-907</a>
+        <a href="entries/CME-907.html" class="entry-name">Application-Layer RBAC Enforcement</a>
+        <span class="badge badge-layer-application">Application</span>
+      </li>
+      
+      <li>
+        <a href="entries/CME-908.html" class="cme-id">CME-908</a>
+        <a href="entries/CME-908.html" class="entry-name">Object-Level Authorization Checks (IDOR Prevention)</a>
+        <span class="badge badge-layer-application">Application</span>
+      </li>
+      
+      <li>
+        <a href="entries/CME-909.html" class="cme-id">CME-909</a>
+        <a href="entries/CME-909.html" class="entry-name">Default-Deny API Authorization Policy</a>
+        <span class="badge badge-layer-application">Application</span>
       </li>
       
     </ul>
@@ -434,7 +452,26 @@
   <div class="tactic-header" style="background: var(--bg-alt);">
     <span class="badge badge-tactic-isolate">Isolate</span>
     <span>Isolate</span>
-    <span style="margin-left: auto; font-size: 14px; color: var(--text-muted);">19 entries</span>
+    <span style="margin-left: auto; font-size: 14px; color: var(--text-muted);">21 entries</span>
+  </div>
+  
+  <div class="category-section">
+    <div class="category-header">Application Controls</div>
+    <ul class="entry-list">
+      
+      <li>
+        <a href="entries/CME-910.html" class="cme-id">CME-910</a>
+        <a href="entries/CME-910.html" class="entry-name">Role Separation / Duty Segregation</a>
+        <span class="badge badge-layer-application">Application</span>
+      </li>
+      
+      <li>
+        <a href="entries/CME-911.html" class="cme-id">CME-911</a>
+        <a href="entries/CME-911.html" class="entry-name">Fine-Grained Administrative Permission Scoping</a>
+        <span class="badge badge-layer-application">Application</span>
+      </li>
+      
+    </ul>
   </div>
   
   <div class="category-section">
@@ -594,7 +631,7 @@
   <div class="tactic-header" style="background: var(--bg-alt);">
     <span class="badge badge-tactic-detect">Detect</span>
     <span>Detect</span>
-    <span style="margin-left: auto; font-size: 14px; color: var(--text-muted);">4 entries</span>
+    <span style="margin-left: auto; font-size: 14px; color: var(--text-muted);">8 entries</span>
   </div>
   
   <div class="category-section">
@@ -605,6 +642,12 @@
         <a href="entries/CME-1004.html" class="cme-id">CME-1004</a>
         <a href="entries/CME-1004.html" class="entry-name">AIDE / File Integrity Monitoring</a>
         <span class="badge badge-layer-os-kernel">OS/Kernel</span>
+      </li>
+      
+      <li>
+        <a href="entries/CME-1007.html" class="cme-id">CME-1007</a>
+        <a href="entries/CME-1007.html" class="entry-name">Application Configuration Drift Detection (IaC Enforcement)</a>
+        <span class="badge badge-layer-application">Application</span>
       </li>
       
     </ul>
@@ -630,6 +673,24 @@
         <a href="entries/CME-1003.html" class="cme-id">CME-1003</a>
         <a href="entries/CME-1003.html" class="entry-name">Falco / eBPF Runtime Security</a>
         <span class="badge badge-layer-os-kernel">OS/Kernel</span>
+      </li>
+      
+      <li>
+        <a href="entries/CME-1006.html" class="cme-id">CME-1006</a>
+        <a href="entries/CME-1006.html" class="entry-name">Privilege Change Audit Logging</a>
+        <span class="badge badge-layer-application">Application</span>
+      </li>
+      
+      <li>
+        <a href="entries/CME-1008.html" class="cme-id">CME-1008</a>
+        <a href="entries/CME-1008.html" class="entry-name">Application Admin Event Logging (SIEM Integration)</a>
+        <span class="badge badge-layer-application">Application</span>
+      </li>
+      
+      <li>
+        <a href="entries/CME-1009.html" class="cme-id">CME-1009</a>
+        <a href="entries/CME-1009.html" class="entry-name">Privilege Assignment Monitoring (Role Grant Alerting)</a>
+        <span class="badge badge-layer-application">Application</span>
       </li>
       
     </ul>
@@ -714,7 +775,7 @@
   </main>
 
   <footer class="site-footer">
-    Generated 2026-06-16 13:59 UTC &middot; 78 entries &middot;
+    Generated 2026-06-16 16:29 UTC &middot; 87 entries &middot;
     Common Mitigation Enumeration (CME)
   </footer>
 </body>

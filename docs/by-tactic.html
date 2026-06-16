@@ -29,7 +29,7 @@
 <div class="tactic-section">
   <h2>
     <span class="badge badge-tactic-harden">Harden</span>
-    Harden (49)
+    Harden (52)
   </h2>
   <table class="data-table">
     <thead>
@@ -84,6 +84,51 @@
           
         </td>
         <td>2</td>
+      </tr>
+      
+      <tr>
+        <td class="cme-id-cell"><a href="entries/CME-907.html">CME-907</a></td>
+        <td><a href="entries/CME-907.html">Application-Layer RBAC Enforcement</a></td>
+        <td>Application Controls</td>
+        <td><span class="badge badge-layer-application">Application</span></td>
+        <td>
+          
+          <span class="cvss-from">PR:L</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">H</span>, 
+          
+          <span class="cvss-from">I:H</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">L</span>
+          
+        </td>
+        <td>5</td>
+      </tr>
+      
+      <tr>
+        <td class="cme-id-cell"><a href="entries/CME-908.html">CME-908</a></td>
+        <td><a href="entries/CME-908.html">Object-Level Authorization Checks (IDOR Prevention)</a></td>
+        <td>Application Controls</td>
+        <td><span class="badge badge-layer-application">Application</span></td>
+        <td>
+          
+          <span class="cvss-from">AC:L</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">H</span>, 
+          
+          <span class="cvss-from">C:H</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">L</span>
+          
+        </td>
+        <td>2</td>
+      </tr>
+      
+      <tr>
+        <td class="cme-id-cell"><a href="entries/CME-909.html">CME-909</a></td>
+        <td><a href="entries/CME-909.html">Default-Deny API Authorization Policy</a></td>
+        <td>Application Controls</td>
+        <td><span class="badge badge-layer-application">Application</span></td>
+        <td>
+          
+          <span class="cvss-from">PR:N</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">L</span>, 
+          
+          <span class="cvss-from">AC:L</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">H</span>
+          
+        </td>
+        <td>3</td>
       </tr>
       
       
@@ -752,7 +797,7 @@
 <div class="tactic-section">
   <h2>
     <span class="badge badge-tactic-isolate">Isolate</span>
-    Isolate (19)
+    Isolate (21)
   </h2>
   <table class="data-table">
     <thead>
@@ -766,6 +811,36 @@
       </tr>
     </thead>
     <tbody>
+      
+      
+      <tr>
+        <td class="cme-id-cell"><a href="entries/CME-910.html">CME-910</a></td>
+        <td><a href="entries/CME-910.html">Role Separation / Duty Segregation</a></td>
+        <td>Application Controls</td>
+        <td><span class="badge badge-layer-application">Application</span></td>
+        <td>
+          
+          <span class="cvss-from">S:C</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">U</span>
+          
+        </td>
+        <td>3</td>
+      </tr>
+      
+      <tr>
+        <td class="cme-id-cell"><a href="entries/CME-911.html">CME-911</a></td>
+        <td><a href="entries/CME-911.html">Fine-Grained Administrative Permission Scoping</a></td>
+        <td>Application Controls</td>
+        <td><span class="badge badge-layer-application">Application</span></td>
+        <td>
+          
+          <span class="cvss-from">C:H</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">L</span>, 
+          
+          <span class="cvss-from">I:H</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">L</span>
+          
+        </td>
+        <td>4</td>
+      </tr>
+      
       
       
       <tr>
@@ -1059,7 +1134,7 @@
 <div class="tactic-section">
   <h2>
     <span class="badge badge-tactic-detect">Detect</span>
-    Detect (4)
+    Detect (8)
   </h2>
   <table class="data-table">
     <thead>
@@ -1086,6 +1161,21 @@
           
         </td>
         <td>1</td>
+      </tr>
+      
+      <tr>
+        <td class="cme-id-cell"><a href="entries/CME-1007.html">CME-1007</a></td>
+        <td><a href="entries/CME-1007.html">Application Configuration Drift Detection (IaC Enforcement)</a></td>
+        <td>Integrity Detection</td>
+        <td><span class="badge badge-layer-application">Application</span></td>
+        <td>
+          
+          <span class="cvss-from">AC:L</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">H</span>, 
+          
+          <span class="cvss-from">I:H</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">L</span>
+          
+        </td>
+        <td>4</td>
       </tr>
       
       
@@ -1127,6 +1217,47 @@
           
         </td>
         <td>0</td>
+      </tr>
+      
+      <tr>
+        <td class="cme-id-cell"><a href="entries/CME-1006.html">CME-1006</a></td>
+        <td><a href="entries/CME-1006.html">Privilege Change Audit Logging</a></td>
+        <td>Runtime Detection</td>
+        <td><span class="badge badge-layer-application">Application</span></td>
+        <td>
+          
+          <span class="cvss-from">AC:L</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">H</span>
+          
+        </td>
+        <td>2</td>
+      </tr>
+      
+      <tr>
+        <td class="cme-id-cell"><a href="entries/CME-1008.html">CME-1008</a></td>
+        <td><a href="entries/CME-1008.html">Application Admin Event Logging (SIEM Integration)</a></td>
+        <td>Runtime Detection</td>
+        <td><span class="badge badge-layer-application">Application</span></td>
+        <td>
+          
+          <span class="cvss-from">AC:L</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">H</span>
+          
+        </td>
+        <td>4</td>
+      </tr>
+      
+      <tr>
+        <td class="cme-id-cell"><a href="entries/CME-1009.html">CME-1009</a></td>
+        <td><a href="entries/CME-1009.html">Privilege Assignment Monitoring (Role Grant Alerting)</a></td>
+        <td>Runtime Detection</td>
+        <td><span class="badge badge-layer-application">Application</span></td>
+        <td>
+          
+          <span class="cvss-from">AC:L</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">H</span>, 
+          
+          <span class="cvss-from">C:H</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">L</span>
+          
+        </td>
+        <td>3</td>
       </tr>
       
       
@@ -1271,7 +1402,7 @@
   </main>
 
   <footer class="site-footer">
-    Generated 2026-06-16 13:59 UTC &middot; 78 entries &middot;
+    Generated 2026-06-16 16:29 UTC &middot; 87 entries &middot;
     Common Mitigation Enumeration (CME)
   </footer>
 </body>

@@ -642,6 +642,56 @@
     <div class="sr-desc">Limits request rate per client IP or authenticated identity. Mitigates brute force attacks, credential stuffing, and application-level denial of servi...</div>
   </li>
   
+  <li data-search="cme-907 application-layer rbac enforcement enforce role-based access control within the application by mapping each user to a set of roles, each role to a set of permissions, and verifying the caller holds the required permission before executing any privileged operation. authorization checks run as middleware or decorators on every privileged api endpoint, evaluated after authentication and before business logic. role assignments follow least privilege — users receive the minimum role needed for their function. prevents authenticated users from accessing administrative functions, modifying other users&#39; data, or escalating their own privileges through direct api calls. application controls harden application cwe-266 cwe-1220 cwe-862 cwe-863 cwe-285">
+    <div>
+      <a href="entries/CME-907.html" class="sr-id">CME-907</a>
+      <a href="entries/CME-907.html">Application-Layer RBAC Enforcement</a>
+      <span class="badge badge-tactic-harden">Harden</span>
+      <span class="badge badge-layer-application">Application</span>
+    </div>
+    <div class="sr-desc">Enforce role-based access control within the application by mapping each user to a set of roles, each role to a set of permissions, and verifying the ...</div>
+  </li>
+  
+  <li data-search="cme-908 object-level authorization checks (idor prevention) enforce per-object ownership and permission verification on every data access operation. before returning, modifying, or deleting any resource, the application verifies the authenticated caller owns the resource or holds explicit permission to access it. object identifiers (database ids, uuids, file paths) in api parameters are never trusted as implicit authorization — the application queries ownership metadata and compares against the caller&#39;s identity. prevents insecure direct object reference (idor) attacks where an attacker enumerates or guesses object identifiers to access resources belonging to other users. application controls harden application cwe-639 cwe-284">
+    <div>
+      <a href="entries/CME-908.html" class="sr-id">CME-908</a>
+      <a href="entries/CME-908.html">Object-Level Authorization Checks (IDOR Prevention)</a>
+      <span class="badge badge-tactic-harden">Harden</span>
+      <span class="badge badge-layer-application">Application</span>
+    </div>
+    <div class="sr-desc">Enforce per-object ownership and permission verification on every data access operation. Before returning, modifying, or deleting any resource, the ap...</div>
+  </li>
+  
+  <li data-search="cme-909 default-deny api authorization policy all api endpoints require explicit authorization by default — any endpoint without a declared authorization rule returns 403 forbidden. the authorization framework operates as a deny-by-default middleware that intercepts every incoming request and requires an explicit policy match before forwarding to the handler. only explicitly allowlisted endpoints (health checks, public landing pages) bypass authorization. prevents vulnerabilities where new endpoints are deployed without authorization checks, or where legacy endpoints silently allow unauthenticated access to sensitive functionality. application controls harden application cwe-306 cwe-862 cwe-1220">
+    <div>
+      <a href="entries/CME-909.html" class="sr-id">CME-909</a>
+      <a href="entries/CME-909.html">Default-Deny API Authorization Policy</a>
+      <span class="badge badge-tactic-harden">Harden</span>
+      <span class="badge badge-layer-application">Application</span>
+    </div>
+    <div class="sr-desc">All API endpoints require explicit authorization by default — any endpoint without a declared authorization rule returns 403 Forbidden. The authorizat...</div>
+  </li>
+  
+  <li data-search="cme-910 role separation / duty segregation structure application roles around single-responsibility privilege domains, ensuring that capabilities in one domain cannot be leveraged to gain privileges in an unrelated domain. each role governs a bounded set of operations (e.g., user management, deployment, financial operations) and cannot modify its own scope, create tokens with elevated scope, or grant itself additional roles. token and session scopes are minted to the specific capability required for each operation rather than the user&#39;s maximum privilege set. role definitions enforce mutual exclusion where domain separation requires it (e.g., the role that configures authentication policies cannot also be the role that manages user accounts). prevents privilege chaining attacks where compromising one admin capability bootstraps into full system compromise. application controls isolate application cwe-268 cwe-266 cwe-269">
+    <div>
+      <a href="entries/CME-910.html" class="sr-id">CME-910</a>
+      <a href="entries/CME-910.html">Role Separation / Duty Segregation</a>
+      <span class="badge badge-tactic-isolate">Isolate</span>
+      <span class="badge badge-layer-application">Application</span>
+    </div>
+    <div class="sr-desc">Structure application roles around single-responsibility privilege domains, ensuring that capabilities in one domain cannot be leveraged to gain privi...</div>
+  </li>
+  
+  <li data-search="cme-911 fine-grained administrative permission scoping decompose coarse-grained administrative roles into fine-grained permission sets and assign each administrator the minimum permission scope required for their operational duties. instead of granting broad management roles that bundle unrelated capabilities, the application defines atomic permissions (view-users, create-idp-mapper, assign-role, modify-client-settings) and composes them into purpose-specific administrative profiles. administrators who manage identity providers receive only idp-configuration permissions without role-assignment capability; administrators who manage user accounts receive user-management permissions without idp access. regular audits compare each administrator is effective permissions against their documented job function and revoke unnecessary grants. reduces the blast radius of compromised or malicious admin accounts by ensuring that exploiting one administrative capability does not grant access to unrelated privileged operations. application controls isolate application cwe-266 cwe-269 cwe-250 cwe-1220">
+    <div>
+      <a href="entries/CME-911.html" class="sr-id">CME-911</a>
+      <a href="entries/CME-911.html">Fine-Grained Administrative Permission Scoping</a>
+      <span class="badge badge-tactic-isolate">Isolate</span>
+      <span class="badge badge-layer-application">Application</span>
+    </div>
+    <div class="sr-desc">Decompose coarse-grained administrative roles into fine-grained permission sets and assign each administrator the minimum permission scope required fo...</div>
+  </li>
+  
   <li data-search="cme-1001 edr agent (endpoint detection &amp; response) real-time behavioral detection and automated response agent on endpoints. detects exploit patterns, lateral movement, and persistence mechanisms. can kill processes, isolate hosts, and quarantine files automatically. runtime detection detect application ">
     <div>
       <a href="entries/CME-1001.html" class="sr-id">CME-1001</a>
@@ -680,6 +730,46 @@
       <span class="badge badge-layer-os-kernel">OS/Kernel</span>
     </div>
     <div class="sr-desc">Detects unauthorized modifications to critical system files by comparing against a known-good baseline database. Scheduled or continuous monitoring of...</div>
+  </li>
+  
+  <li data-search="cme-1006 privilege change audit logging application-level audit trail that records every modification to user roles, permissions, and authorization policies. each log entry captures the actor (who made the change), the target (whose privileges changed), the before and after state (e.g., role viewer to admin), the timestamp, and the request context (ip, session, endpoint). logs authorization decision denials with sufficient context to identify privilege escalation attempts. distinct from os-level audit (cme-1002) in that it operates within the application&#39;s authorization domain and captures semantically meaningful privilege transitions invisible to syscall-level logging. enables real-time alerting on anomalous patterns such as self-promotion, bulk role changes, or privilege changes from unexpected sources. runtime detection detect application cwe-778 cwe-223">
+    <div>
+      <a href="entries/CME-1006.html" class="sr-id">CME-1006</a>
+      <a href="entries/CME-1006.html">Privilege Change Audit Logging</a>
+      <span class="badge badge-tactic-detect">Detect</span>
+      <span class="badge badge-layer-application">Application</span>
+    </div>
+    <div class="sr-desc">Application-level audit trail that records every modification to user roles, permissions, and authorization policies. Each log entry captures the acto...</div>
+  </li>
+  
+  <li data-search="cme-1007 application configuration drift detection (iac enforcement) continuously monitor application-managed configuration objects — stored in databases, apis, or runtime registries rather than filesystem files — against a declared baseline, and alert or auto-remediate when unauthorized changes appear. configuration baselines are maintained in version-controlled infrastructure-as-code repositories (terraform, ansible, helm values, keycloak realm exports). a reconciliation loop periodically exports the live application state via its management api, diffs it against the iac baseline, and either reverts the drift automatically or raises an alert for human review. prevents attackers from persisting unauthorized configuration changes — such as adding a malicious identity provider mapper, injecting a rogue oauth client, or modifying authorization policies — by ensuring that any manual change not committed to the iac repository is detected and reported within the reconciliation interval. integrity detection detect application cwe-266 cwe-284 cwe-1220 cwe-16">
+    <div>
+      <a href="entries/CME-1007.html" class="sr-id">CME-1007</a>
+      <a href="entries/CME-1007.html">Application Configuration Drift Detection (IaC Enforcement)</a>
+      <span class="badge badge-tactic-detect">Detect</span>
+      <span class="badge badge-layer-application">Application</span>
+    </div>
+    <div class="sr-desc">Continuously monitor application-managed configuration objects — stored in databases, APIs, or runtime registries rather than filesystem files — again...</div>
+  </li>
+  
+  <li data-search="cme-1008 application admin event logging (siem integration) record every administrative action performed through the application management interface into a structured, tamper-evident audit log, and forward events in real time to a centralized siem for correlation and alerting. each log entry captures the authenticated actor, the operation performed, the target resource, a before/after state diff, the source ip, and a timestamp. the siem ingests these events and evaluates them against detection rules tuned to the application threat model — for example, alerting when an identity provider mapper of type hardcoded-role-mapper is created targeting a high-privilege role, or when an oauth client redirect uri is modified. distinct from os-level audit logging (auditd, falco) which operates below the application and cannot interpret application-domain semantics such as role names, policy changes, or resource ownership. prevents attackers from making undetected administrative changes by ensuring that every privileged operation is recorded with sufficient context for security analysts to distinguish legitimate administration from exploitation. runtime detection detect application cwe-266 cwe-269 cwe-284 cwe-778">
+    <div>
+      <a href="entries/CME-1008.html" class="sr-id">CME-1008</a>
+      <a href="entries/CME-1008.html">Application Admin Event Logging (SIEM Integration)</a>
+      <span class="badge badge-tactic-detect">Detect</span>
+      <span class="badge badge-layer-application">Application</span>
+    </div>
+    <div class="sr-desc">Record every administrative action performed through the application management interface into a structured, tamper-evident audit log, and forward eve...</div>
+  </li>
+  
+  <li data-search="cme-1009 privilege assignment monitoring (role grant alerting) continuously monitor the effective set of users holding high-privilege application roles and alert when new grants are detected that do not correspond to an approved change management ticket. a scheduled job or event-driven trigger enumerates users who hold sensitive roles (realm-admin, cluster-admin, org-owner, or equivalent), compares the current membership against a known-good baseline or an allowlist maintained in a change management system, and raises an alert for any additions. detects privilege escalation after the fact — even when the escalation mechanism bypasses normal authorization checks — by monitoring the outcome (a new high-privilege user) rather than the mechanism. complements preventive rbac controls by providing a safety net when the authorization enforcement itself is the vulnerable component. runtime detection detect application cwe-266 cwe-269 cwe-284">
+    <div>
+      <a href="entries/CME-1009.html" class="sr-id">CME-1009</a>
+      <a href="entries/CME-1009.html">Privilege Assignment Monitoring (Role Grant Alerting)</a>
+      <span class="badge badge-tactic-detect">Detect</span>
+      <span class="badge badge-layer-application">Application</span>
+    </div>
+    <div class="sr-desc">Continuously monitor the effective set of users holding high-privilege application roles and alert when new grants are detected that do not correspond...</div>
   </li>
   
   <li data-search="cme-1101 automated patch management (dnf-automatic) automatically downloads and applies security updates on schedule. reduces the window between vulnerability disclosure and patch application from days/weeks to hours. patch management evict os/kernel ">
@@ -838,7 +928,7 @@
   </main>
 
   <footer class="site-footer">
-    Generated 2026-06-16 13:59 UTC &middot; 78 entries &middot;
+    Generated 2026-06-16 16:29 UTC &middot; 87 entries &middot;
     Common Mitigation Enumeration (CME)
   </footer>
 </body>
