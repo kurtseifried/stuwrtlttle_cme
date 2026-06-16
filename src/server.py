@@ -249,7 +249,86 @@ def simulate_cve_risk(
     }, indent=2)
 
 
+@mcp.tool()
+def get_mitigations_for_cvss_vector(cvss_vector: str) -> str:
+    """Find CME mitigations that attenuate metrics present in a CVSS vector string.
+
+    Parses the vector to extract metric/value pairs (e.g., AV:N, AC:L, S:C),
+    then finds CME entries whose cvss_vector_impacts modify those specific
+    metrics from those specific values.
+
+    Args:
+        cvss_vector: CVSS vector string (e.g., "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H")
+
+    Returns CME entries grouped by the metric they attenuate, with the
+    original and modified values.
+    """
+    metric_pairs = []
+    for part in cvss_vector.split("/"):
+        if ":" in part and not part.startswith("CVSS"):
+            k, v = part.split(":", 1)
+            if k in ("AV", "AC", "PR", "UI", "S", "C", "I", "A"):
+                metric_pairs.append((k, v))
+
+    if not metric_pairs:
+        return json.dumps({"error": "No valid CVSS metrics found in vector string"})
+
+    rows = db.get_mitigations_for_vector(_get_db(), metric_pairs)
+    if not rows:
+        return json.dumps({
+            "message": "No CME entries attenuate the metrics in this vector",
+            "parsed_metrics": {k: v for k, v in metric_pairs},
+        })
+
+    by_metric: dict[str, list] = {}
+    for row in rows:
+        m = row["matched_metric"]
+        by_metric.setdefault(m, []).append({
+            "cme_id": row["cme_id"],
+            "control_name": row["control_name"],
+            "from": row["from_value"],
+            "to": row["to_value"],
+            "rationale": row["impact_rationale"],
+        })
+
+    return json.dumps({
+        "parsed_metrics": {k: v for k, v in metric_pairs},
+        "mitigations_by_metric": by_metric,
+        "total_matches": len(rows),
+    }, indent=2)
+
+
+@mcp.tool()
+def get_cme_coverage_summary() -> str:
+    """Get a summary of what the CME database currently covers.
+
+    Returns CWE weakness coverage (which CWEs have CME mitigations),
+    CVSS metric coverage (which metric transitions are addressed),
+    and taxonomy statistics (entries per tactic and category).
+
+    Useful for identifying gaps in the CME taxonomy — weakness classes
+    or attack vectors that lack mitigation entries.
+    """
+    summary = db.get_coverage_summary(_get_db())
+    tactics = db.list_tactics(_get_db())
+    categories = db.list_categories(_get_db())
+    summary["tactics"] = tactics
+    summary["categories"] = categories
+    return json.dumps(summary, indent=2)
+
+
 # --- Curation Tools ---
+
+_CATEGORY_RANGES = {
+    "Kernel Hardening": 101, "Network Isolation": 201,
+    "Mandatory Access Control": 301, "Cryptographic Controls": 401,
+    "Filesystem Hardening": 501, "Syscall & BPF Controls": 601,
+    "Container Isolation": 701, "Privilege Isolation": 707,
+    "Credential Hardening": 801, "Protocol Hardening": 901,
+    "Application Controls": 904, "Runtime Detection": 1001,
+    "Integrity Detection": 1004, "Patch Management": 1101,
+    "Recovery Controls": 1201, "Application Input Validation": 1301,
+}
 
 
 def _load_schema() -> dict:
@@ -260,21 +339,41 @@ def _load_schema() -> dict:
 def _next_cme_id(category_prefix: int) -> str:
     """Find the next available CME-ID in a given number range."""
     conn = _get_db()
-    prefix_str = str(category_prefix // 100)
+    all_starts = sorted(set(_CATEGORY_RANGES.values()))
+    idx = all_starts.index(category_prefix)
+    upper = all_starts[idx + 1] - 1 if idx + 1 < len(all_starts) else category_prefix + 99
+
     if config.DB_BACKEND == "postgres":
         rows = conn.execute(
-            "SELECT cme_id FROM cme_entries WHERE cme_id LIKE %(pat)s ORDER BY cme_id",
-            {"pat": f"CME-{prefix_str}%"},
+            """SELECT cme_id FROM cme_entries
+               WHERE CAST(SUBSTRING(cme_id FROM 5) AS INTEGER) BETWEEN %(lo)s AND %(hi)s""",
+            {"lo": category_prefix, "hi": upper},
         ).fetchall()
     else:
         rows = conn.execute(
-            "SELECT cme_id FROM cme_entries WHERE cme_id LIKE ? ORDER BY cme_id",
-            (f"CME-{prefix_str}%",),
+            """SELECT cme_id FROM cme_entries
+               WHERE CAST(SUBSTR(cme_id, 5) AS INTEGER) BETWEEN ? AND ?""",
+            (category_prefix, upper),
         ).fetchall()
-    if not rows:
+
+    used = {int(r["cme_id"].split("-")[1]) for r in rows}
+
+    # Also check pending proposals to avoid collisions within a session
+    PROPOSALS_DIR.mkdir(parents=True, exist_ok=True)
+    for path in PROPOSALS_DIR.glob("CME-*.json"):
+        num = int(path.stem.split("-")[1])
+        if category_prefix <= num <= upper:
+            used.add(num)
+
+    if not used:
         return f"CME-{category_prefix}"
-    max_num = max(int(r["cme_id"].split("-")[1]) for r in rows)
-    return f"CME-{max_num + 1}"
+    next_num = max(used) + 1
+    if next_num > upper:
+        raise ValueError(
+            f"Category range {category_prefix}-{upper} is full "
+            f"({len(used)} IDs used). Expand the range or create a new category."
+        )
+    return f"CME-{next_num}"
 
 
 @mcp.tool()
@@ -312,17 +411,7 @@ def propose_cme_entry(
 
     Returns the proposed entry with a suggested CME-ID and file path.
     """
-    category_ranges = {
-        "Kernel Hardening": 101, "Network Isolation": 201,
-        "Mandatory Access Control": 301, "Cryptographic Controls": 401,
-        "Filesystem Hardening": 501, "Syscall & BPF Controls": 601,
-        "Container Isolation": 701, "Privilege Isolation": 707,
-        "Credential Hardening": 801, "Protocol Hardening": 901,
-        "Application Controls": 904, "Runtime Detection": 1001,
-        "Integrity Detection": 1004, "Patch Management": 1101,
-        "Recovery Controls": 1201, "Application Input Validation": 1301,
-    }
-    prefix = category_ranges.get(category, 101)
+    prefix = _CATEGORY_RANGES.get(category, 101)
     suggested_id = _next_cme_id(prefix)
 
     try:

@@ -208,6 +208,53 @@ def list_categories(conn: sqlite3.Connection) -> list[dict]:
     return [dict(r) for r in rows]
 
 
+def get_mitigations_for_vector(
+    conn: sqlite3.Connection,
+    metric_pairs: list[tuple[str, str]],
+) -> list[dict]:
+    """Find CME entries whose CVSS impacts match any of the given (metric, value) pairs."""
+    if not metric_pairs:
+        return []
+    clauses = []
+    params: list[str] = []
+    for metric, value in metric_pairs:
+        clauses.append("(v.metric = ? AND v.from_value = ?)")
+        params.extend([metric, value])
+    where = " OR ".join(clauses)
+    rows = conn.execute(
+        f"""SELECT DISTINCT e.*, v.metric AS matched_metric,
+                   v.from_value, v.to_value, v.rationale AS impact_rationale
+            FROM cme_entries e
+            JOIN cvss_vector_impacts v ON e.cme_id = v.cme_id
+            WHERE {where}
+            ORDER BY v.metric, e.cme_id""",
+        params,
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_coverage_summary(conn: sqlite3.Connection) -> dict:
+    """Return a summary of CWE and CVSS metric coverage across all CME entries."""
+    cwe_rows = conn.execute(
+        """SELECT cwe_id, COUNT(DISTINCT cme_id) as entry_count
+           FROM cwe_relationships GROUP BY cwe_id ORDER BY entry_count DESC"""
+    ).fetchall()
+
+    cvss_rows = conn.execute(
+        """SELECT metric, from_value, to_value, COUNT(DISTINCT cme_id) as entry_count
+           FROM cvss_vector_impacts GROUP BY metric, from_value, to_value
+           ORDER BY metric, from_value"""
+    ).fetchall()
+
+    total = conn.execute("SELECT COUNT(*) as count FROM cme_entries").fetchone()
+
+    return {
+        "total_entries": total["count"],
+        "cwe_coverage": [dict(r) for r in cwe_rows],
+        "cvss_coverage": [dict(r) for r in cvss_rows],
+    }
+
+
 def _hydrate(conn: sqlite3.Connection, entry: dict) -> dict:
     cme_id = entry["cme_id"]
     entry["platforms"] = json.loads(entry.pop("platforms_json") or "[]")
