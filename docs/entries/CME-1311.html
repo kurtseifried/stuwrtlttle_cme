@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CME-1311: Input Size and Quantity Bounds Enforcement — Common Mitigation Enumeration</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../index.html" class="logo">CME <span>Common Mitigation Enumeration</span></a>
+      <nav>
+        <a href="../index.html" >Home</a>
+        <a href="../by-tactic.html" >By Tactic</a>
+        <a href="../by-cwe.html" >By CWE</a>
+        <a href="../search.html" >Search</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    
+<div class="entry-header">
+  <div class="entry-id">CME-1311</div>
+  <h1>Input Size and Quantity Bounds Enforcement</h1>
+  <div class="entry-meta">
+    <span class="badge badge-tactic-harden">Harden</span>
+    <span class="badge badge-layer-application">Application</span>
+    
+    <span class="badge badge-confidence-high">High Confidence</span>
+    
+  </div>
+</div>
+
+<div class="entry-body">
+  <div class="entry-main">
+
+    <section>
+      <h2>Description</h2>
+      <p class="entry-description">Validation that user-supplied quantities — sizes, counts, lengths, offsets, indices, and repetition factors — fall within expected bounds before they are used in memory allocation, loop iteration, or buffer operations. Rejects values that are negative, zero when unexpected, or exceed a configured maximum. Applied at the protocol parsing layer before data reaches processing logic. This prevents integer overflow chains (where an oversized count wraps to a small value and bypasses bounds checks) and resource exhaustion attacks (where an unbounded count causes excessive allocation or iteration). The root cause control for vulnerabilities where the attacker controls a size or count field in a binary protocol, serialized format, or API parameter.</p>
+    </section>
+
+    <section>
+      <h2>CVSS Vector Impacts</h2>
+      <table class="cvss-table">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Transition</th>
+            <th>Rationale</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td><strong>Attack Complexity</strong> (AC)</td>
+            <td>
+              <span class="cvss-from">L</span>
+              <span class="cvss-arrow">&rarr;</span>
+              <span class="cvss-to">H</span>
+            </td>
+            <td class="cvss-rationale">Malicious size or count values are rejected before reaching allocation or copy operations; the attacker must find a quantity field that bypasses validation or an alternative code path that does not enforce bounds</td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </section>
+
+    
+    <section>
+      <h2>CWE Relationships</h2>
+      <div class="cwe-list">
+        
+        <a href="https://cwe.mitre.org/data/definitions/1284.html"
+           class="cwe-link" target="_blank" rel="noopener">CWE-1284</a>
+        
+        <a href="https://cwe.mitre.org/data/definitions/20.html"
+           class="cwe-link" target="_blank" rel="noopener">CWE-20</a>
+        
+        <a href="https://cwe.mitre.org/data/definitions/1285.html"
+           class="cwe-link" target="_blank" rel="noopener">CWE-1285</a>
+        
+        <a href="https://cwe.mitre.org/data/definitions/190.html"
+           class="cwe-link" target="_blank" rel="noopener">CWE-190</a>
+        
+        <a href="https://cwe.mitre.org/data/definitions/131.html"
+           class="cwe-link" target="_blank" rel="noopener">CWE-131</a>
+        
+      </div>
+    </section>
+    
+
+    
+    <section>
+      <h2>Verification</h2>
+      
+      <p class="verification-method">Verify that the application enforces maximum size limits on user-supplied quantity fields and rejects values outside expected ranges</p>
+      
+      
+      <div class="verification-cmd">
+        <span class="cmd-prompt">$</span> curl -s -o /dev/null -w &#34;%{http_code}&#34; -H &#34;Content-Length: 999999999&#34; -d @/dev/null https://app/api/upload
+        
+        <br><span class="cmd-expected"># Expected: 413 (Payload Too Large)</span>
+        
+      </div>
+      
+      <div class="cmd-platform">Platform: linux</div>
+      
+      
+      <div class="verification-cmd">
+        <span class="cmd-prompt">$</span> grep -r &#34;max_.*size\|MAX_.*SIZE\|max_.*length\|MAX_.*LEN\|max_.*count\|MAX_.*COUNT&#34; /etc/nginx/nginx.conf /etc/httpd/conf/httpd.conf 2&gt;/dev/null | head -5
+        
+        <br><span class="cmd-expected"># Expected: configured size limits present</span>
+        
+      </div>
+      
+      <div class="cmd-platform">Platform: linux</div>
+      
+      
+    </section>
+    
+
+    
+
+    <div class="entry-nav">
+      
+      <a href="CME-1310.html">&larr; CME-1310: File Upload Validation (Content Inspection and Extension Allowlist)</a>
+      
+      <span></span>
+    </div>
+  </div>
+
+  <aside class="entry-sidebar">
+    <section>
+      <h3>Category</h3>
+      <p>Application Input Validation</p>
+    </section>
+
+    
+
+    
+    <section>
+      <h3>Platforms</h3>
+      <ul class="sidebar-list">
+        
+        <li>RHEL 9</li>
+        
+        <li>RHEL 10</li>
+        
+        <li>Ubuntu 24.04</li>
+        
+        <li>Fedora</li>
+        
+      </ul>
+    </section>
+    
+
+    <section>
+      <h3>Quick Reference</h3>
+      <ul class="sidebar-list">
+        <li><strong>ID:</strong> CME-1311</li>
+        <li><strong>Tactic:</strong> Harden</li>
+        <li><strong>Layer:</strong> Application</li>
+        <li><strong>CWEs:</strong> 5</li>
+        <li><strong>CVSS Mods:</strong> 1</li>
+      </ul>
+    </section>
+  </aside>
+</div>
+
+  </main>
+
+  <footer class="site-footer">
+    Generated 2026-06-17 18:30 UTC &middot; 91 entries &middot;
+    Common Mitigation Enumeration (CME)
+  </footer>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CME-1306: XSS Prevention (Context-Aware Output Encoding) — Common Mitigation Enumeration</title>
+  <title>CME-1310: File Upload Validation (Content Inspection and Extension Allowlist) — Common Mitigation Enumeration</title>
   <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -22,8 +22,8 @@
   <main class="container">
     
 <div class="entry-header">
-  <div class="entry-id">CME-1306</div>
-  <h1>XSS Prevention (Context-Aware Output Encoding)</h1>
+  <div class="entry-id">CME-1310</div>
+  <h1>File Upload Validation (Content Inspection and Extension Allowlist)</h1>
   <div class="entry-meta">
     <span class="badge badge-tactic-harden">Harden</span>
     <span class="badge badge-layer-application">Application</span>
@@ -38,7 +38,7 @@
 
     <section>
       <h2>Description</h2>
-      <p class="entry-description">Application applies context-aware output encoding to all user-controlled data before rendering in HTML, JavaScript, CSS, or URL contexts. Uses framework auto-escaping (Django, Jinja2 autoescape, React JSX) rather than manual sanitization. Combined with CSP headers (CME-905), provides defense-in-depth against XSS.</p>
+      <p class="entry-description">Server-side validation of uploaded files using content inspection (magic byte verification), extension allowlisting, and size limits before the file is written to storage or processed. Rejects uploads whose actual content type does not match the declared MIME type, whose extension is not on the allowlist, or whose size exceeds configured limits. Files are stored outside the web root with randomized names to prevent direct execution. This prevents attackers from uploading executable payloads (web shells, scripts, malicious binaries) disguised as benign file types.</p>
     </section>
 
     <section>
@@ -60,7 +60,7 @@
               <span class="cvss-arrow">&rarr;</span>
               <span class="cvss-to">H</span>
             </td>
-            <td class="cvss-rationale">XSS payloads are HTML-encoded and rendered as text, not executed</td>
+            <td class="cvss-rationale">Attacker must bypass content-type inspection, extension allowlist, and storage isolation to execute an uploaded payload; simple extension renaming or MIME spoofing is insufficient</td>
           </tr>
           
           <tr>
@@ -70,7 +70,7 @@
               <span class="cvss-arrow">&rarr;</span>
               <span class="cvss-to">L</span>
             </td>
-            <td class="cvss-rationale">Cannot inject scripts to modify page behavior or steal session tokens</td>
+            <td class="cvss-rationale">Uploaded files are confined to a non-executable storage directory with randomized names; the attacker cannot overwrite existing application files or place executable content in the web root</td>
           </tr>
           
         </tbody>
@@ -82,8 +82,14 @@
       <h2>CWE Relationships</h2>
       <div class="cwe-list">
         
-        <a href="https://cwe.mitre.org/data/definitions/79.html"
-           class="cwe-link" target="_blank" rel="noopener">CWE-79</a>
+        <a href="https://cwe.mitre.org/data/definitions/434.html"
+           class="cwe-link" target="_blank" rel="noopener">CWE-434</a>
+        
+        <a href="https://cwe.mitre.org/data/definitions/20.html"
+           class="cwe-link" target="_blank" rel="noopener">CWE-20</a>
+        
+        <a href="https://cwe.mitre.org/data/definitions/646.html"
+           class="cwe-link" target="_blank" rel="noopener">CWE-646</a>
         
       </div>
     </section>
@@ -93,17 +99,27 @@
     <section>
       <h2>Verification</h2>
       
-      <p class="verification-method">Verify template engine auto-escaping is enabled and no raw/safe bypasses for user-controlled data</p>
+      <p class="verification-method">Verify that the application rejects uploads with disallowed extensions and mismatched content types, and that upload storage is outside the document root</p>
       
       
       <div class="verification-cmd">
-        <span class="cmd-prompt">$</span> grep -rn &#39;autoescape\|AUTOESCAPE&#39; &lt;app_source&gt;/
+        <span class="cmd-prompt">$</span> curl -s -o /dev/null -w &#34;%{http_code}&#34; -F &#34;file=@/tmp/test.php&#34; https://app/upload
         
-        <br><span class="cmd-expected"># Expected: Auto-escaping enabled in template config</span>
+        <br><span class="cmd-expected"># Expected: 400 or 403 (rejected)</span>
         
       </div>
       
-      <div class="cmd-platform">Platform: any</div>
+      <div class="cmd-platform">Platform: linux</div>
+      
+      
+      <div class="verification-cmd">
+        <span class="cmd-prompt">$</span> ls -la /var/www/html/uploads/ 2&gt;/dev/null || echo &#34;no uploads in web root&#34;
+        
+        <br><span class="cmd-expected"># Expected: directory should not exist inside web root</span>
+        
+      </div>
+      
+      <div class="cmd-platform">Platform: linux</div>
       
       
     </section>
@@ -113,10 +129,10 @@
 
     <div class="entry-nav">
       
-      <a href="CME-1305.html">&larr; CME-1305: SQL Injection Prevention (Parameterized Queries)</a>
+      <a href="CME-1309.html">&larr; CME-1309: Script Engine Restriction (Sandbox / Disable)</a>
       
       
-      <a href="CME-1307.html">CME-1307: Command Injection Prevention (No Shell Invocation) &rarr;</a>
+      <a href="CME-1311.html">CME-1311: Input Size and Quantity Bounds Enforcement &rarr;</a>
       
     </div>
   </div>
@@ -134,7 +150,11 @@
       <h3>Platforms</h3>
       <ul class="sidebar-list">
         
-        <li>Any</li>
+        <li>RHEL 9</li>
+        
+        <li>RHEL 10</li>
+        
+        <li>Ubuntu 24.04</li>
         
       </ul>
     </section>
@@ -143,10 +163,10 @@
     <section>
       <h3>Quick Reference</h3>
       <ul class="sidebar-list">
-        <li><strong>ID:</strong> CME-1306</li>
+        <li><strong>ID:</strong> CME-1310</li>
         <li><strong>Tactic:</strong> Harden</li>
         <li><strong>Layer:</strong> Application</li>
-        <li><strong>CWEs:</strong> 1</li>
+        <li><strong>CWEs:</strong> 3</li>
         <li><strong>CVSS Mods:</strong> 2</li>
       </ul>
     </section>

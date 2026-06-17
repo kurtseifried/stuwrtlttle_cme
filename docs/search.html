@@ -162,6 +162,16 @@
     <div class="sr-desc">Hardware or compiler-enforced control flow integrity that validates indirect branch targets match expected types, blocking ROP/JOP chains. On ARM64, s...</div>
   </li>
   
+  <li data-search="cme-116 fortify_source (buffer overflow detection) compile-time and runtime detection of buffer overflows in common c library functions (memcpy, strcpy, sprintf, read, etc.). at compile time, the compiler replaces standard library calls with bounds-checked variants when buffer sizes are known. at runtime, remaining checks abort the process when a buffer overflow is detected. fortify_source level 2 checks all detectable overflows; level 3 (gcc 12+) extends coverage to dynamically-sized buffers and flexible array members. catches many integer-overflow-to-buffer-overflow chains where the overflowed size value is passed to a libc copy function. kernel hardening harden os/kernel cwe-119 cwe-120 cwe-122 cwe-787 cwe-190">
+    <div>
+      <a href="entries/CME-116.html" class="sr-id">CME-116</a>
+      <a href="entries/CME-116.html">FORTIFY_SOURCE (Buffer Overflow Detection)</a>
+      <span class="badge badge-tactic-harden">Harden</span>
+      <span class="badge badge-layer-os-kernel">OS/Kernel</span>
+    </div>
+    <div class="sr-desc">Compile-time and runtime detection of buffer overflows in common C library functions (memcpy, strcpy, sprintf, read, etc.). At compile time, the compi...</div>
+  </li>
+  
   <li data-search="cme-201 zero trust gateway / identity-aware proxy all network access requires authenticated identity verification. no implicit trust from network position. every request is authenticated and authorized regardless of source network. network isolation isolate network cwe-284 cwe-306 cwe-287">
     <div>
       <a href="entries/CME-201.html" class="sr-id">CME-201</a>
@@ -912,6 +922,26 @@
     <div class="sr-desc">Restricts or disables application-embedded scripting and expression language engines to prevent arbitrary code execution. Covers three postures: (1) d...</div>
   </li>
   
+  <li data-search="cme-1310 file upload validation (content inspection and extension allowlist) server-side validation of uploaded files using content inspection (magic byte verification), extension allowlisting, and size limits before the file is written to storage or processed. rejects uploads whose actual content type does not match the declared mime type, whose extension is not on the allowlist, or whose size exceeds configured limits. files are stored outside the web root with randomized names to prevent direct execution. this prevents attackers from uploading executable payloads (web shells, scripts, malicious binaries) disguised as benign file types. application input validation harden application cwe-434 cwe-20 cwe-646">
+    <div>
+      <a href="entries/CME-1310.html" class="sr-id">CME-1310</a>
+      <a href="entries/CME-1310.html">File Upload Validation (Content Inspection and Extension Allowlist)</a>
+      <span class="badge badge-tactic-harden">Harden</span>
+      <span class="badge badge-layer-application">Application</span>
+    </div>
+    <div class="sr-desc">Server-side validation of uploaded files using content inspection (magic byte verification), extension allowlisting, and size limits before the file i...</div>
+  </li>
+  
+  <li data-search="cme-1311 input size and quantity bounds enforcement validation that user-supplied quantities — sizes, counts, lengths, offsets, indices, and repetition factors — fall within expected bounds before they are used in memory allocation, loop iteration, or buffer operations. rejects values that are negative, zero when unexpected, or exceed a configured maximum. applied at the protocol parsing layer before data reaches processing logic. this prevents integer overflow chains (where an oversized count wraps to a small value and bypasses bounds checks) and resource exhaustion attacks (where an unbounded count causes excessive allocation or iteration). the root cause control for vulnerabilities where the attacker controls a size or count field in a binary protocol, serialized format, or api parameter. application input validation harden application cwe-1284 cwe-20 cwe-1285 cwe-190 cwe-131">
+    <div>
+      <a href="entries/CME-1311.html" class="sr-id">CME-1311</a>
+      <a href="entries/CME-1311.html">Input Size and Quantity Bounds Enforcement</a>
+      <span class="badge badge-tactic-harden">Harden</span>
+      <span class="badge badge-layer-application">Application</span>
+    </div>
+    <div class="sr-desc">Validation that user-supplied quantities — sizes, counts, lengths, offsets, indices, and repetition factors — fall within expected bounds before they ...</div>
+  </li>
+  
 </ul>
 
 <script>
@@ -938,7 +968,7 @@
   </main>
 
   <footer class="site-footer">
-    Generated 2026-06-16 20:38 UTC &middot; 88 entries &middot;
+    Generated 2026-06-17 18:30 UTC &middot; 91 entries &middot;
     Common Mitigation Enumeration (CME)
   </footer>
 </body>

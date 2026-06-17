@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CME-102: NX/XD Bit (Non-Executable Memory) — Common Mitigation Enumeration</title>
+  <title>CME-116: FORTIFY_SOURCE (Buffer Overflow Detection) — Common Mitigation Enumeration</title>
   <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -22,8 +22,8 @@
   <main class="container">
     
 <div class="entry-header">
-  <div class="entry-id">CME-102</div>
-  <h1>NX/XD Bit (Non-Executable Memory)</h1>
+  <div class="entry-id">CME-116</div>
+  <h1>FORTIFY_SOURCE (Buffer Overflow Detection)</h1>
   <div class="entry-meta">
     <span class="badge badge-tactic-harden">Harden</span>
     <span class="badge badge-layer-os-kernel">OS/Kernel</span>
@@ -38,7 +38,7 @@
 
     <section>
       <h2>Description</h2>
-      <p class="entry-description">Hardware-enforced memory page permissions that prevent execution of code in data regions (stack, heap), blocking classic code injection.</p>
+      <p class="entry-description">Compile-time and runtime detection of buffer overflows in common C library functions (memcpy, strcpy, sprintf, read, etc.). At compile time, the compiler replaces standard library calls with bounds-checked variants when buffer sizes are known. At runtime, remaining checks abort the process when a buffer overflow is detected. FORTIFY_SOURCE level 2 checks all detectable overflows; level 3 (GCC 12+) extends coverage to dynamically-sized buffers and flexible array members. Catches many integer-overflow-to-buffer-overflow chains where the overflowed size value is passed to a libc copy function.</p>
     </section>
 
     <section>
@@ -60,7 +60,7 @@
               <span class="cvss-arrow">&rarr;</span>
               <span class="cvss-to">H</span>
             </td>
-            <td class="cvss-rationale">Attacker must use ROP/JOP instead of direct shellcode injection</td>
+            <td class="cvss-rationale">Buffer overflows in instrumented libc functions are detected and the process is terminated before attacker-controlled data overwrites adjacent memory; exploitation requires finding an uninstrumented copy path or a non-libc buffer operation</td>
           </tr>
           
         </tbody>
@@ -72,11 +72,20 @@
       <h2>CWE Relationships</h2>
       <div class="cwe-list">
         
-        <a href="https://cwe.mitre.org/data/definitions/94.html"
-           class="cwe-link" target="_blank" rel="noopener">CWE-94</a>
-        
         <a href="https://cwe.mitre.org/data/definitions/119.html"
            class="cwe-link" target="_blank" rel="noopener">CWE-119</a>
+        
+        <a href="https://cwe.mitre.org/data/definitions/120.html"
+           class="cwe-link" target="_blank" rel="noopener">CWE-120</a>
+        
+        <a href="https://cwe.mitre.org/data/definitions/122.html"
+           class="cwe-link" target="_blank" rel="noopener">CWE-122</a>
+        
+        <a href="https://cwe.mitre.org/data/definitions/787.html"
+           class="cwe-link" target="_blank" rel="noopener">CWE-787</a>
+        
+        <a href="https://cwe.mitre.org/data/definitions/190.html"
+           class="cwe-link" target="_blank" rel="noopener">CWE-190</a>
         
       </div>
     </section>
@@ -86,13 +95,23 @@
     <section>
       <h2>Verification</h2>
       
-      <p class="verification-method">Check CPU supports NX bit and kernel has it enabled</p>
+      <p class="verification-method">Check that system packages are compiled with _FORTIFY_SOURCE=2 or higher</p>
       
       
       <div class="verification-cmd">
-        <span class="cmd-prompt">$</span> grep -q nx /proc/cpuinfo &amp;&amp; echo &#39;NX enabled&#39;
+        <span class="cmd-prompt">$</span> rpm -q --queryformat &#34;%{OPTFLAGS}&#34; redhat-rpm-config 2&gt;/dev/null | grep -o &#34;_FORTIFY_SOURCE=[0-9]&#34;
         
-        <br><span class="cmd-expected"># Expected: NX enabled</span>
+        <br><span class="cmd-expected"># Expected: _FORTIFY_SOURCE=2</span>
+        
+      </div>
+      
+      <div class="cmd-platform">Platform: rhel</div>
+      
+      
+      <div class="verification-cmd">
+        <span class="cmd-prompt">$</span> readelf -s /usr/bin/ls | grep -c __.*_chk
+        
+        <br><span class="cmd-expected"># Expected: non-zero count indicates fortified functions</span>
         
       </div>
       
@@ -100,9 +119,9 @@
       
       
       <div class="verification-cmd">
-        <span class="cmd-prompt">$</span> dmesg | grep -i &#39;NX.*protection&#39;
+        <span class="cmd-prompt">$</span> objdump -d /usr/bin/coreutils 2&gt;/dev/null | grep -c __memcpy_chk || objdump -d /usr/bin/ls | grep -c __memcpy_chk
         
-        <br><span class="cmd-expected"># Expected: NX (Execute Disable) protection: active</span>
+        <br><span class="cmd-expected"># Expected: non-zero count</span>
         
       </div>
       
@@ -116,10 +135,10 @@
 
     <div class="entry-nav">
       
-      <a href="CME-101.html">&larr; CME-101: ASLR (Address Space Layout Randomization)</a>
+      <a href="CME-113.html">&larr; CME-113: Control Flow Integrity (CFI / Shadow Call Stack)</a>
       
       
-      <a href="CME-103.html">CME-103: Stack Canaries (Stack Protector) &rarr;</a>
+      <a href="CME-201.html">CME-201: Zero Trust Gateway / Identity-Aware Proxy &rarr;</a>
       
     </div>
   </div>
@@ -131,27 +150,21 @@
     </section>
 
     
-    <section>
-      <h3>D3FEND Mapping</h3>
-      <a href="https://d3fend.mitre.org/technique/D3-EHPV/"
-         class="d3fend-link" target="_blank" rel="noopener">
-        D3-EHPV &mdash; Exception Handler Pointer Validation
-      </a>
-    </section>
-    
 
     
     <section>
       <h3>Platforms</h3>
       <ul class="sidebar-list">
         
-        <li>RHEL 9</li>
-        
         <li>RHEL 8</li>
         
-        <li>Ubuntu 24.04</li>
+        <li>RHEL 9</li>
         
-        <li>SLES 15</li>
+        <li>RHEL 10</li>
+        
+        <li>Fedora</li>
+        
+        <li>Ubuntu 24.04</li>
         
       </ul>
     </section>
@@ -160,10 +173,10 @@
     <section>
       <h3>Quick Reference</h3>
       <ul class="sidebar-list">
-        <li><strong>ID:</strong> CME-102</li>
+        <li><strong>ID:</strong> CME-116</li>
         <li><strong>Tactic:</strong> Harden</li>
         <li><strong>Layer:</strong> OS/Kernel</li>
-        <li><strong>CWEs:</strong> 2</li>
+        <li><strong>CWEs:</strong> 5</li>
         <li><strong>CVSS Mods:</strong> 1</li>
       </ul>
     </section>
