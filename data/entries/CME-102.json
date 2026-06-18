@@ -15,7 +15,8 @@
   ],
   "cwe_relationships": [
     "CWE-94",
-    "CWE-119"
+    "CWE-119",
+    "CWE-416"
   ],
   "verification": {
     "method": "Check CPU supports NX bit and kernel has it enabled",

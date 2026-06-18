@@ -16,7 +16,8 @@
   "cwe_relationships": [
     "CWE-119",
     "CWE-120",
-    "CWE-787"
+    "CWE-787",
+    "CWE-416"
   ],
   "verification": {
     "method": "Check binary for Full RELRO and PIE",

@@ -32,7 +32,7 @@
 
 <ul class="search-results" id="search-results">
   
-  <li data-search="cme-101 aslr (address space layout randomization) randomizes memory layout of processes, making memory corruption exploits significantly harder by requiring the attacker to guess or leak addresses. kernel hardening harden os/kernel cwe-119 cwe-120 cwe-122 cwe-787 cwe-125">
+  <li data-search="cme-101 aslr (address space layout randomization) randomizes memory layout of processes, making memory corruption exploits significantly harder by requiring the attacker to guess or leak addresses. kernel hardening harden os/kernel cwe-119 cwe-120 cwe-122 cwe-787 cwe-125 cwe-416 cwe-415">
     <div>
       <a href="entries/CME-101.html" class="sr-id">CME-101</a>
       <a href="entries/CME-101.html">ASLR (Address Space Layout Randomization)</a>
@@ -42,7 +42,7 @@
     <div class="sr-desc">Randomizes memory layout of processes, making memory corruption exploits significantly harder by requiring the attacker to guess or leak addresses.</div>
   </li>
   
-  <li data-search="cme-102 nx/xd bit (non-executable memory) hardware-enforced memory page permissions that prevent execution of code in data regions (stack, heap), blocking classic code injection. kernel hardening harden os/kernel cwe-94 cwe-119">
+  <li data-search="cme-102 nx/xd bit (non-executable memory) hardware-enforced memory page permissions that prevent execution of code in data regions (stack, heap), blocking classic code injection. kernel hardening harden os/kernel cwe-94 cwe-119 cwe-416">
     <div>
       <a href="entries/CME-102.html" class="sr-id">CME-102</a>
       <a href="entries/CME-102.html">NX/XD Bit (Non-Executable Memory)</a>
@@ -142,7 +142,7 @@
     <div class="sr-desc">Firmware-level verification that only signed bootloaders and kernels execute, preventing boot-level rootkits and unauthorized kernel replacement.</div>
   </li>
   
-  <li data-search="cme-112 relro and pie (full) compiler/linker hardening that makes the global offset table read-only after relocation (full relro) and builds position-independent executables (pie), working with aslr to randomize all code sections. kernel hardening harden os/kernel cwe-119 cwe-120 cwe-787">
+  <li data-search="cme-112 relro and pie (full) compiler/linker hardening that makes the global offset table read-only after relocation (full relro) and builds position-independent executables (pie), working with aslr to randomize all code sections. kernel hardening harden os/kernel cwe-119 cwe-120 cwe-787 cwe-416">
     <div>
       <a href="entries/CME-112.html" class="sr-id">CME-112</a>
       <a href="entries/CME-112.html">RELRO and PIE (Full)</a>
@@ -152,7 +152,7 @@
     <div class="sr-desc">Compiler/linker hardening that makes the Global Offset Table read-only after relocation (Full RELRO) and builds position-independent executables (PIE)...</div>
   </li>
   
-  <li data-search="cme-113 control flow integrity (cfi / shadow call stack) hardware or compiler-enforced control flow integrity that validates indirect branch targets match expected types, blocking rop/jop chains. on arm64, shadow call stack protects return addresses in a separate stack. kernel hardening harden os/kernel cwe-119 cwe-120 cwe-787">
+  <li data-search="cme-113 control flow integrity (cfi / shadow call stack) hardware or compiler-enforced control flow integrity that validates indirect branch targets match expected types, blocking rop/jop chains. on arm64, shadow call stack protects return addresses in a separate stack. kernel hardening harden os/kernel cwe-119 cwe-120 cwe-787 cwe-416">
     <div>
       <a href="entries/CME-113.html" class="sr-id">CME-113</a>
       <a href="entries/CME-113.html">Control Flow Integrity (CFI / Shadow Call Stack)</a>
@@ -170,6 +170,16 @@
       <span class="badge badge-layer-os-kernel">OS/Kernel</span>
     </div>
     <div class="sr-desc">Compile-time and runtime detection of buffer overflows in common C library functions (memcpy, strcpy, sprintf, read, etc.). At compile time, the compi...</div>
+  </li>
+  
+  <li data-search="cme-117 heap allocator hardening (glibc safe-linking and metadata protection) enable and verify glibc heap allocator safety features that specifically target use-after-free and double-free exploitation. modern glibc (2.32+) includes safe-linking, which encrypts singly-linked list pointers in malloc metadata using a per-thread random key xored with the storage location. an attacker who corrupts a freed chunk&#39;s forward pointer must know both the random key and the chunk address to forge a valid pointer, defeating the standard tcache-poisoning technique used in most heap exploitation. tcache key verification detects double-free by storing a per-thread random value in freed tcache entries and checking it on subsequent frees; a second free of the same pointer is detected and the process is aborted. on older glibc (2.28, rhel 8), setting malloc_perturb_ to a nonzero value fills freed memory with a byte pattern, causing use-after-free reads to return garbage instead of previously valid data, breaking exploitation chains that depend on reading stale heap content. kernel hardening harden os/kernel cwe-416 cwe-415 cwe-825 cwe-122">
+    <div>
+      <a href="entries/CME-117.html" class="sr-id">CME-117</a>
+      <a href="entries/CME-117.html">Heap Allocator Hardening (glibc Safe-Linking and Metadata Protection)</a>
+      <span class="badge badge-tactic-harden">Harden</span>
+      <span class="badge badge-layer-os-kernel">OS/Kernel</span>
+    </div>
+    <div class="sr-desc">Enable and verify glibc heap allocator safety features that specifically target use-after-free and double-free exploitation. Modern glibc (2.32+) incl...</div>
   </li>
   
   <li data-search="cme-201 zero trust gateway / identity-aware proxy all network access requires authenticated identity verification. no implicit trust from network position. every request is authenticated and authorized regardless of source network. network isolation isolate network cwe-284 cwe-306 cwe-287">
@@ -612,7 +622,7 @@
     <div class="sr-desc">Disables and masks unnecessary listening services (rpcbind, avahi-daemon, cups, postfix on non-mail servers). Each removed service eliminates an attac...</div>
   </li>
   
-  <li data-search="cme-903 kernel network hardening (sysctl) kernel network stack hardening via sysctl: enable syn cookies (tcp syn flood protection), disable ip forwarding, reject source-routed packets, ignore icmp redirects, enable reverse path filtering. protocol hardening harden network cwe-284">
+  <li data-search="cme-903 kernel network hardening (sysctl) kernel network stack hardening via sysctl: enable syn cookies (tcp syn flood protection), disable ip forwarding, reject source-routed packets, ignore icmp redirects, enable reverse path filtering. protocol hardening harden network cwe-284 cwe-940 cwe-350">
     <div>
       <a href="entries/CME-903.html" class="sr-id">CME-903</a>
       <a href="entries/CME-903.html">Kernel Network Hardening (sysctl)</a>
@@ -700,6 +710,16 @@
       <span class="badge badge-layer-application">Application</span>
     </div>
     <div class="sr-desc">Decompose coarse-grained administrative roles into fine-grained permission sets and assign each administrator the minimum permission scope required fo...</div>
+  </li>
+  
+  <li data-search="cme-912 http header normalization and request smuggling prevention enforce strict http header parsing on all http intermediaries (proxies, load balancers, reverse proxies, web servers) to prevent request smuggling via header desynchronization. the control requires: (1) rejecting requests containing both content-length and transfer-encoding headers per rfc 7230 section 3.3.3, (2) rejecting requests with duplicate content-length headers carrying differing values, (3) disabling relaxed header parsing modes that tolerate whitespace or encoding variations in transfer-encoding values, and (4) normalizing or rejecting header values containing illegal characters (bare cr, bare lf, nul bytes). these measures eliminate the primary desynchronization vectors that enable an attacker to inject smuggled requests across the proxy-backend boundary. application controls harden application cwe-444 cwe-113 cwe-436">
+    <div>
+      <a href="entries/CME-912.html" class="sr-id">CME-912</a>
+      <a href="entries/CME-912.html">HTTP Header Normalization and Request Smuggling Prevention</a>
+      <span class="badge badge-tactic-harden">Harden</span>
+      <span class="badge badge-layer-application">Application</span>
+    </div>
+    <div class="sr-desc">Enforce strict HTTP header parsing on all HTTP intermediaries (proxies, load balancers, reverse proxies, web servers) to prevent request smuggling via...</div>
   </li>
   
   <li data-search="cme-1001 edr agent (endpoint detection &amp; response) real-time behavioral detection and automated response agent on endpoints. detects exploit patterns, lateral movement, and persistence mechanisms. can kill processes, isolate hosts, and quarantine files automatically. runtime detection detect application ">
@@ -968,7 +988,7 @@
   </main>
 
   <footer class="site-footer">
-    Generated 2026-06-17 18:30 UTC &middot; 91 entries &middot;
+    Generated 2026-06-18 15:22 UTC &middot; 93 entries &middot;
     Common Mitigation Enumeration (CME)
   </footer>
 </body>

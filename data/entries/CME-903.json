@@ -14,7 +14,9 @@
     }
   ],
   "cwe_relationships": [
-    "CWE-284"
+    "CWE-284",
+    "CWE-940",
+    "CWE-350"
   ],
   "verification": {
     "method": "Check network hardening sysctls",
