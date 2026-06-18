@@ -29,7 +29,7 @@
 <div class="tactic-section">
   <h2>
     <span class="badge badge-tactic-harden">Harden</span>
-    Harden (58)
+    Harden (68)
   </h2>
   <table class="data-table">
     <thead>
@@ -146,6 +146,60 @@
         <td>3</td>
       </tr>
       
+      <tr>
+        <td class="cme-id-cell"><a href="entries/CME-913.html">CME-913</a></td>
+        <td><a href="entries/CME-913.html">CSRF Protection (Anti-CSRF Token &amp; SameSite Cookie Enforcement)</a></td>
+        <td>Application Controls</td>
+        <td><span class="badge badge-layer-application">Application</span></td>
+        <td>
+          
+          <span class="cvss-from">AC:L</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">H</span>
+          
+        </td>
+        <td>2</td>
+      </tr>
+      
+      <tr>
+        <td class="cme-id-cell"><a href="entries/CME-914.html">CME-914</a></td>
+        <td><a href="entries/CME-914.html">Strict CORS Origin Allowlist Enforcement</a></td>
+        <td>Application Controls</td>
+        <td><span class="badge badge-layer-application">Application</span></td>
+        <td>
+          
+          <span class="cvss-from">AC:L</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">H</span>, 
+          
+          <span class="cvss-from">C:H</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">L</span>
+          
+        </td>
+        <td>2</td>
+      </tr>
+      
+      <tr>
+        <td class="cme-id-cell"><a href="entries/CME-915.html">CME-915</a></td>
+        <td><a href="entries/CME-915.html">Cross-Origin Request Restriction (Reverse Proxy Origin Enforcement)</a></td>
+        <td>Application Controls</td>
+        <td><span class="badge badge-layer-application">Application</span></td>
+        <td>
+          
+          <span class="cvss-from">AC:L</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">H</span>
+          
+        </td>
+        <td>4</td>
+      </tr>
+      
+      <tr>
+        <td class="cme-id-cell"><a href="entries/CME-916.html">CME-916</a></td>
+        <td><a href="entries/CME-916.html">SameSite Cookie Attribute Enforcement</a></td>
+        <td>Application Controls</td>
+        <td><span class="badge badge-layer-application">Application</span></td>
+        <td>
+          
+          <span class="cvss-from">AC:L</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">H</span>
+          
+        </td>
+        <td>3</td>
+      </tr>
+      
       
       
       <tr>
@@ -237,6 +291,19 @@
           <span class="cvss-from">I:H</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">L</span>, 
           
           <span class="cvss-from">S:C</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">U</span>
+          
+        </td>
+        <td>2</td>
+      </tr>
+      
+      <tr>
+        <td class="cme-id-cell"><a href="entries/CME-1308.html">CME-1308</a></td>
+        <td><a href="entries/CME-1308.html">Origin and CORS Validation Enforcement</a></td>
+        <td>Application Input Validation</td>
+        <td><span class="badge badge-layer-application">Application</span></td>
+        <td>
+          
+          <span class="cvss-from">AC:L</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">H</span>
           
         </td>
         <td>2</td>
@@ -451,6 +518,19 @@
         <td>2</td>
       </tr>
       
+      <tr>
+        <td class="cme-id-cell"><a href="entries/CME-407.html">CME-407</a></td>
+        <td><a href="entries/CME-407.html">Data-at-Rest Encryption (LUKS/dm-crypt)</a></td>
+        <td>Cryptographic Controls</td>
+        <td><span class="badge badge-layer-data">Data</span></td>
+        <td>
+          
+          <span class="cvss-from">C:H</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">L</span>
+          
+        </td>
+        <td>3</td>
+      </tr>
+      
       
       
       <tr>
@@ -500,6 +580,19 @@
         <td>
           
           <span class="cvss-from">I:H</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">L</span>
+          
+        </td>
+        <td>2</td>
+      </tr>
+      
+      <tr>
+        <td class="cme-id-cell"><a href="entries/CME-507.html">CME-507</a></td>
+        <td><a href="entries/CME-507.html">Secure Dynamic Linker Configuration (LD_PRELOAD/PATH Hardening)</a></td>
+        <td>Filesystem Hardening</td>
+        <td><span class="badge badge-layer-os-kernel">OS/Kernel</span></td>
+        <td>
+          
+          <span class="cvss-from">AC:L</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">H</span>
           
         </td>
         <td>2</td>
@@ -685,6 +778,19 @@
       </tr>
       
       <tr>
+        <td class="cme-id-cell"><a href="entries/CME-114.html">CME-114</a></td>
+        <td><a href="entries/CME-114.html">Process Resource Limits (ulimit/prlimit)</a></td>
+        <td>Kernel Hardening</td>
+        <td><span class="badge badge-layer-os-kernel">OS/Kernel</span></td>
+        <td>
+          
+          <span class="cvss-from">A:H</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">L</span>
+          
+        </td>
+        <td>4</td>
+      </tr>
+      
+      <tr>
         <td class="cme-id-cell"><a href="entries/CME-116.html">CME-116</a></td>
         <td><a href="entries/CME-116.html">FORTIFY_SOURCE (Buffer Overflow Detection)</a></td>
         <td>Kernel Hardening</td>
@@ -700,6 +806,19 @@
       <tr>
         <td class="cme-id-cell"><a href="entries/CME-117.html">CME-117</a></td>
         <td><a href="entries/CME-117.html">Heap Allocator Hardening (glibc Safe-Linking and Metadata Protection)</a></td>
+        <td>Kernel Hardening</td>
+        <td><span class="badge badge-layer-os-kernel">OS/Kernel</span></td>
+        <td>
+          
+          <span class="cvss-from">AC:L</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">H</span>
+          
+        </td>
+        <td>4</td>
+      </tr>
+      
+      <tr>
+        <td class="cme-id-cell"><a href="entries/CME-118.html">CME-118</a></td>
+        <td><a href="entries/CME-118.html">Protected File Links (Kernel Symlink/Hardlink Protection)</a></td>
         <td>Kernel Hardening</td>
         <td><span class="badge badge-layer-os-kernel">OS/Kernel</span></td>
         <td>
@@ -765,6 +884,21 @@
           <span class="cvss-from">S:C</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">U</span>, 
           
           <span class="cvss-from">C:H</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">L</span>
+          
+        </td>
+        <td>2</td>
+      </tr>
+      
+      
+      
+      <tr>
+        <td class="cme-id-cell"><a href="entries/CME-207.html">CME-207</a></td>
+        <td><a href="entries/CME-207.html">DNS Rebinding Protection</a></td>
+        <td>Network Isolation</td>
+        <td><span class="badge badge-layer-network">Network</span></td>
+        <td>
+          
+          <span class="cvss-from">AV:N</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">L</span>
           
         </td>
         <td>2</td>
@@ -1220,7 +1354,7 @@
 <div class="tactic-section">
   <h2>
     <span class="badge badge-tactic-detect">Detect</span>
-    Detect (8)
+    Detect (9)
   </h2>
   <table class="data-table">
     <thead>
@@ -1303,6 +1437,19 @@
           
         </td>
         <td>0</td>
+      </tr>
+      
+      <tr>
+        <td class="cme-id-cell"><a href="entries/CME-1005.html">CME-1005</a></td>
+        <td><a href="entries/CME-1005.html">Runtime Memory Error Detection (KASAN/HWASan)</a></td>
+        <td>Runtime Detection</td>
+        <td><span class="badge badge-layer-os-kernel">OS/Kernel</span></td>
+        <td>
+          
+          <span class="cvss-from">AC:L</span><span class="cvss-arrow">&rarr;</span><span class="cvss-to">H</span>
+          
+        </td>
+        <td>7</td>
       </tr>
       
       <tr>
@@ -1488,7 +1635,7 @@
   </main>
 
   <footer class="site-footer">
-    Generated 2026-06-18 15:22 UTC &middot; 93 entries &middot;
+    Generated 2026-06-18 15:39 UTC &middot; 104 entries &middot;
     Common Mitigation Enumeration (CME)
   </footer>
 </body>

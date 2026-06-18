@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CME-914: Strict CORS Origin Allowlist Enforcement — Common Mitigation Enumeration</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../index.html" class="logo">CME <span>Common Mitigation Enumeration</span></a>
+      <nav>
+        <a href="../index.html" >Home</a>
+        <a href="../by-tactic.html" >By Tactic</a>
+        <a href="../by-cwe.html" >By CWE</a>
+        <a href="../search.html" >Search</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    
+<div class="entry-header">
+  <div class="entry-id">CME-914</div>
+  <h1>Strict CORS Origin Allowlist Enforcement</h1>
+  <div class="entry-meta">
+    <span class="badge badge-tactic-harden">Harden</span>
+    <span class="badge badge-layer-application">Application</span>
+    
+    <span class="badge badge-confidence-high">High Confidence</span>
+    
+  </div>
+</div>
+
+<div class="entry-body">
+  <div class="entry-main">
+
+    <section>
+      <h2>Description</h2>
+      <p class="entry-description">Server-side enforcement of a strict, explicitly enumerated origin allowlist for Cross-Origin Resource Sharing (CORS). The server validates the Origin header of every cross-origin request against a fixed allowlist and only responds with Access-Control-Allow-Origin for approved origins. Critically, the server never reflects the request&#39;s Origin header verbatim, never uses wildcard (*) with Access-Control-Allow-Credentials: true, and never relies on partial string matching or regex patterns that can be bypassed with attacker-controlled subdomains. For endpoints that handle credentials or session-sensitive data, Access-Control-Allow-Credentials is only set when the origin is explicitly trusted. This prevents cross-origin JavaScript from reading authenticated responses, exfiltrating session tokens, or making credentialed API calls from attacker-controlled pages.</p>
+    </section>
+
+    <section>
+      <h2>CVSS Vector Impacts</h2>
+      <table class="cvss-table">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Transition</th>
+            <th>Rationale</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td><strong>Attack Complexity</strong> (AC)</td>
+            <td>
+              <span class="cvss-from">L</span>
+              <span class="cvss-arrow">&rarr;</span>
+              <span class="cvss-to">H</span>
+            </td>
+            <td class="cvss-rationale">Cross-origin credentialed reads go from trivially possible (wildcard or reflected-origin CORS) to requiring the attacker to compromise an explicitly allowed origin or find a CORS bypass. The mechanism is the server-side origin validation gate that rejects unapproved origins before including permissive CORS headers.</td>
+          </tr>
+          
+          <tr>
+            <td><strong>Confidentiality</strong> (C)</td>
+            <td>
+              <span class="cvss-from">H</span>
+              <span class="cvss-arrow">&rarr;</span>
+              <span class="cvss-to">L</span>
+            </td>
+            <td class="cvss-rationale">The primary attack vector for CORS-based CWE-940 vulnerabilities is cross-origin data exfiltration via credentialed fetch/XHR. Strict CORS blocks the browser from delivering authenticated response data to the attacker&#39;s JavaScript, limiting confidentiality impact to data obtainable without credentials.</td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </section>
+
+    
+    <section>
+      <h2>CWE Relationships</h2>
+      <div class="cwe-list">
+        
+        <a href="https://cwe.mitre.org/data/definitions/940.html"
+           class="cwe-link" target="_blank" rel="noopener">CWE-940</a>
+        
+        <a href="https://cwe.mitre.org/data/definitions/346.html"
+           class="cwe-link" target="_blank" rel="noopener">CWE-346</a>
+        
+      </div>
+    </section>
+    
+
+    
+    <section>
+      <h2>Verification</h2>
+      
+      <p class="verification-method">Test that the server rejects unapproved origins and does not reflect arbitrary Origin headers in CORS response headers</p>
+      
+      
+      <div class="verification-cmd">
+        <span class="cmd-prompt">$</span> curl -sI -H &#39;Origin: https://evil.example.com&#39; http://localhost:8080/api/v1/user | grep -i &#39;access-control-allow&#39;
+        
+        <br><span class="cmd-expected"># Expected: No Access-Control-Allow-Origin header, or not reflecting evil.example.com</span>
+        
+      </div>
+      
+      <div class="cmd-platform">Platform: any</div>
+      
+      
+      <div class="verification-cmd">
+        <span class="cmd-prompt">$</span> curl -sI -H &#39;Origin: https://trusted.example.com&#39; http://localhost:8080/api/v1/user | grep -i &#39;access-control-allow&#39;
+        
+        <br><span class="cmd-expected"># Expected: Access-Control-Allow-Origin: https://trusted.example.com</span>
+        
+      </div>
+      
+      <div class="cmd-platform">Platform: any</div>
+      
+      
+    </section>
+    
+
+    
+
+    <div class="entry-nav">
+      
+      <a href="CME-913.html">&larr; CME-913: CSRF Protection (Anti-CSRF Token &amp; SameSite Cookie Enforcement)</a>
+      
+      
+      <a href="CME-915.html">CME-915: Cross-Origin Request Restriction (Reverse Proxy Origin Enforcement) &rarr;</a>
+      
+    </div>
+  </div>
+
+  <aside class="entry-sidebar">
+    <section>
+      <h3>Category</h3>
+      <p>Application Controls</p>
+    </section>
+
+    
+
+    
+    <section>
+      <h3>Platforms</h3>
+      <ul class="sidebar-list">
+        
+        <li>Any</li>
+        
+      </ul>
+    </section>
+    
+
+    <section>
+      <h3>Quick Reference</h3>
+      <ul class="sidebar-list">
+        <li><strong>ID:</strong> CME-914</li>
+        <li><strong>Tactic:</strong> Harden</li>
+        <li><strong>Layer:</strong> Application</li>
+        <li><strong>CWEs:</strong> 2</li>
+        <li><strong>CVSS Mods:</strong> 2</li>
+      </ul>
+    </section>
+  </aside>
+</div>
+
+  </main>
+
+  <footer class="site-footer">
+    Generated 2026-06-18 15:39 UTC &middot; 104 entries &middot;
+    Common Mitigation Enumeration (CME)
+  </footer>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CME-913: CSRF Protection (Anti-CSRF Token &amp; SameSite Cookie Enforcement) — Common Mitigation Enumeration</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../index.html" class="logo">CME <span>Common Mitigation Enumeration</span></a>
+      <nav>
+        <a href="../index.html" >Home</a>
+        <a href="../by-tactic.html" >By Tactic</a>
+        <a href="../by-cwe.html" >By CWE</a>
+        <a href="../search.html" >Search</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    
+<div class="entry-header">
+  <div class="entry-id">CME-913</div>
+  <h1>CSRF Protection (Anti-CSRF Token &amp; SameSite Cookie Enforcement)</h1>
+  <div class="entry-meta">
+    <span class="badge badge-tactic-harden">Harden</span>
+    <span class="badge badge-layer-application">Application</span>
+    
+    <span class="badge badge-confidence-high">High Confidence</span>
+    
+  </div>
+</div>
+
+<div class="entry-body">
+  <div class="entry-main">
+
+    <section>
+      <h2>Description</h2>
+      <p class="entry-description">Server-side enforcement of anti-CSRF tokens (synchronizer tokens or double-submit cookies) combined with SameSite=Strict or SameSite=Lax cookie attributes on session cookies. For every state-changing HTTP request (POST, PUT, DELETE, PATCH), the server generates a cryptographically random token bound to the user&#39;s session, embeds it in forms or response headers, and rejects requests that do not present a valid token. The SameSite cookie attribute provides defense-in-depth by instructing the browser not to send cookies with cross-origin requests. Together, these controls prevent cross-site request forgery by ensuring that state-changing requests originate from the application&#39;s own pages, not from attacker-controlled sites.</p>
+    </section>
+
+    <section>
+      <h2>CVSS Vector Impacts</h2>
+      <table class="cvss-table">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Transition</th>
+            <th>Rationale</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td><strong>Attack Complexity</strong> (AC)</td>
+            <td>
+              <span class="cvss-from">L</span>
+              <span class="cvss-arrow">&rarr;</span>
+              <span class="cvss-to">H</span>
+            </td>
+            <td class="cvss-rationale">The anti-CSRF token is a per-session or per-request cryptographic random value that the attacker cannot predict or obtain cross-origin (blocked by same-origin policy). Exploitation now requires a separate vulnerability (XSS, subdomain takeover) to extract the token, transforming a trivial cross-site form submission into a multi-step attack chain.</td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </section>
+
+    
+    <section>
+      <h2>CWE Relationships</h2>
+      <div class="cwe-list">
+        
+        <a href="https://cwe.mitre.org/data/definitions/940.html"
+           class="cwe-link" target="_blank" rel="noopener">CWE-940</a>
+        
+        <a href="https://cwe.mitre.org/data/definitions/352.html"
+           class="cwe-link" target="_blank" rel="noopener">CWE-352</a>
+        
+      </div>
+    </section>
+    
+
+    
+    <section>
+      <h2>Verification</h2>
+      
+      <p class="verification-method">Check that the application framework&#39;s CSRF middleware is enabled and that session cookies carry the SameSite attribute</p>
+      
+      
+      <div class="verification-cmd">
+        <span class="cmd-prompt">$</span> grep -rn &#39;csrf\|CsrfViewMiddleware\|csrf_protect\|@csrf_exempt\|antiforgery\|ValidateAntiForgeryToken\|csrftoken&#39; &lt;app_source&gt;/
+        
+        <br><span class="cmd-expected"># Expected: CSRF middleware or token generation present in application code</span>
+        
+      </div>
+      
+      <div class="cmd-platform">Platform: any</div>
+      
+      
+      <div class="verification-cmd">
+        <span class="cmd-prompt">$</span> curl -sI http://localhost:8080/login | grep -i &#39;set-cookie.*samesite&#39;
+        
+        <br><span class="cmd-expected"># Expected: SameSite=Strict or SameSite=Lax</span>
+        
+      </div>
+      
+      <div class="cmd-platform">Platform: any</div>
+      
+      
+    </section>
+    
+
+    
+
+    <div class="entry-nav">
+      
+      <a href="CME-912.html">&larr; CME-912: HTTP Header Normalization and Request Smuggling Prevention</a>
+      
+      
+      <a href="CME-914.html">CME-914: Strict CORS Origin Allowlist Enforcement &rarr;</a>
+      
+    </div>
+  </div>
+
+  <aside class="entry-sidebar">
+    <section>
+      <h3>Category</h3>
+      <p>Application Controls</p>
+    </section>
+
+    
+
+    
+    <section>
+      <h3>Platforms</h3>
+      <ul class="sidebar-list">
+        
+        <li>Any</li>
+        
+      </ul>
+    </section>
+    
+
+    <section>
+      <h3>Quick Reference</h3>
+      <ul class="sidebar-list">
+        <li><strong>ID:</strong> CME-913</li>
+        <li><strong>Tactic:</strong> Harden</li>
+        <li><strong>Layer:</strong> Application</li>
+        <li><strong>CWEs:</strong> 2</li>
+        <li><strong>CVSS Mods:</strong> 1</li>
+      </ul>
+    </section>
+  </aside>
+</div>
+
+  </main>
+
+  <footer class="site-footer">
+    Generated 2026-06-18 15:39 UTC &middot; 104 entries &middot;
+    Common Mitigation Enumeration (CME)
+  </footer>
+</body>
+</html>

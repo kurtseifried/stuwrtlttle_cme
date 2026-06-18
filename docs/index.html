@@ -29,12 +29,12 @@
 
 <div class="stats-bar">
   <div class="stat-card">
-    <div class="stat-value">93</div>
+    <div class="stat-value">104</div>
     <div class="stat-label">Total Entries</div>
   </div>
   
   <div class="stat-card">
-    <div class="stat-value">58</div>
+    <div class="stat-value">68</div>
     <div class="stat-label">Harden</div>
   </div>
   
@@ -44,7 +44,7 @@
   </div>
   
   <div class="stat-card">
-    <div class="stat-value">8</div>
+    <div class="stat-value">9</div>
     <div class="stat-label">Detect</div>
   </div>
   
@@ -66,7 +66,7 @@
   <div class="tactic-header" style="background: var(--bg-alt);">
     <span class="badge badge-tactic-harden">Harden</span>
     <span>Harden</span>
-    <span style="margin-left: auto; font-size: 14px; color: var(--text-muted);">58 entries</span>
+    <span style="margin-left: auto; font-size: 14px; color: var(--text-muted);">68 entries</span>
   </div>
   
   <div class="category-section">
@@ -115,6 +115,30 @@
         <span class="badge badge-layer-application">Application</span>
       </li>
       
+      <li>
+        <a href="entries/CME-913.html" class="cme-id">CME-913</a>
+        <a href="entries/CME-913.html" class="entry-name">CSRF Protection (Anti-CSRF Token &amp; SameSite Cookie Enforcement)</a>
+        <span class="badge badge-layer-application">Application</span>
+      </li>
+      
+      <li>
+        <a href="entries/CME-914.html" class="cme-id">CME-914</a>
+        <a href="entries/CME-914.html" class="entry-name">Strict CORS Origin Allowlist Enforcement</a>
+        <span class="badge badge-layer-application">Application</span>
+      </li>
+      
+      <li>
+        <a href="entries/CME-915.html" class="cme-id">CME-915</a>
+        <a href="entries/CME-915.html" class="entry-name">Cross-Origin Request Restriction (Reverse Proxy Origin Enforcement)</a>
+        <span class="badge badge-layer-application">Application</span>
+      </li>
+      
+      <li>
+        <a href="entries/CME-916.html" class="cme-id">CME-916</a>
+        <a href="entries/CME-916.html" class="entry-name">SameSite Cookie Attribute Enforcement</a>
+        <span class="badge badge-layer-application">Application</span>
+      </li>
+      
     </ul>
   </div>
   
@@ -155,6 +179,12 @@
       <li>
         <a href="entries/CME-1307.html" class="cme-id">CME-1307</a>
         <a href="entries/CME-1307.html" class="entry-name">Command Injection Prevention (No Shell Invocation)</a>
+        <span class="badge badge-layer-application">Application</span>
+      </li>
+      
+      <li>
+        <a href="entries/CME-1308.html" class="cme-id">CME-1308</a>
+        <a href="entries/CME-1308.html" class="entry-name">Origin and CORS Validation Enforcement</a>
         <span class="badge badge-layer-application">Application</span>
       </li>
       
@@ -262,6 +292,12 @@
         <span class="badge badge-layer-os-kernel">OS/Kernel</span>
       </li>
       
+      <li>
+        <a href="entries/CME-407.html" class="cme-id">CME-407</a>
+        <a href="entries/CME-407.html" class="entry-name">Data-at-Rest Encryption (LUKS/dm-crypt)</a>
+        <span class="badge badge-layer-data">Data</span>
+      </li>
+      
     </ul>
   </div>
   
@@ -290,6 +326,12 @@
       <li>
         <a href="entries/CME-505.html" class="cme-id">CME-505</a>
         <a href="entries/CME-505.html" class="entry-name">IMA/EVM (Integrity Measurement Architecture)</a>
+        <span class="badge badge-layer-os-kernel">OS/Kernel</span>
+      </li>
+      
+      <li>
+        <a href="entries/CME-507.html" class="cme-id">CME-507</a>
+        <a href="entries/CME-507.html" class="entry-name">Secure Dynamic Linker Configuration (LD_PRELOAD/PATH Hardening)</a>
         <span class="badge badge-layer-os-kernel">OS/Kernel</span>
       </li>
       
@@ -379,6 +421,12 @@
       </li>
       
       <li>
+        <a href="entries/CME-114.html" class="cme-id">CME-114</a>
+        <a href="entries/CME-114.html" class="entry-name">Process Resource Limits (ulimit/prlimit)</a>
+        <span class="badge badge-layer-os-kernel">OS/Kernel</span>
+      </li>
+      
+      <li>
         <a href="entries/CME-116.html" class="cme-id">CME-116</a>
         <a href="entries/CME-116.html" class="entry-name">FORTIFY_SOURCE (Buffer Overflow Detection)</a>
         <span class="badge badge-layer-os-kernel">OS/Kernel</span>
@@ -387,6 +435,12 @@
       <li>
         <a href="entries/CME-117.html" class="cme-id">CME-117</a>
         <a href="entries/CME-117.html" class="entry-name">Heap Allocator Hardening (glibc Safe-Linking and Metadata Protection)</a>
+        <span class="badge badge-layer-os-kernel">OS/Kernel</span>
+      </li>
+      
+      <li>
+        <a href="entries/CME-118.html" class="cme-id">CME-118</a>
+        <a href="entries/CME-118.html" class="entry-name">Protected File Links (Kernel Symlink/Hardlink Protection)</a>
         <span class="badge badge-layer-os-kernel">OS/Kernel</span>
       </li>
       
@@ -419,6 +473,19 @@
         <a href="entries/CME-304.html" class="cme-id">CME-304</a>
         <a href="entries/CME-304.html" class="entry-name">AppArmor (Enforcing Profile)</a>
         <span class="badge badge-layer-os-kernel">OS/Kernel</span>
+      </li>
+      
+    </ul>
+  </div>
+  
+  <div class="category-section">
+    <div class="category-header">Network Isolation</div>
+    <ul class="entry-list">
+      
+      <li>
+        <a href="entries/CME-207.html" class="cme-id">CME-207</a>
+        <a href="entries/CME-207.html" class="entry-name">DNS Rebinding Protection</a>
+        <span class="badge badge-layer-network">Network</span>
       </li>
       
     </ul>
@@ -667,7 +734,7 @@
   <div class="tactic-header" style="background: var(--bg-alt);">
     <span class="badge badge-tactic-detect">Detect</span>
     <span>Detect</span>
-    <span style="margin-left: auto; font-size: 14px; color: var(--text-muted);">8 entries</span>
+    <span style="margin-left: auto; font-size: 14px; color: var(--text-muted);">9 entries</span>
   </div>
   
   <div class="category-section">
@@ -708,6 +775,12 @@
       <li>
         <a href="entries/CME-1003.html" class="cme-id">CME-1003</a>
         <a href="entries/CME-1003.html" class="entry-name">Falco / eBPF Runtime Security</a>
+        <span class="badge badge-layer-os-kernel">OS/Kernel</span>
+      </li>
+      
+      <li>
+        <a href="entries/CME-1005.html" class="cme-id">CME-1005</a>
+        <a href="entries/CME-1005.html" class="entry-name">Runtime Memory Error Detection (KASAN/HWASan)</a>
         <span class="badge badge-layer-os-kernel">OS/Kernel</span>
       </li>
       
@@ -811,7 +884,7 @@
   </main>
 
   <footer class="site-footer">
-    Generated 2026-06-18 15:22 UTC &middot; 93 entries &middot;
+    Generated 2026-06-18 15:39 UTC &middot; 104 entries &middot;
     Common Mitigation Enumeration (CME)
   </footer>
 </body>

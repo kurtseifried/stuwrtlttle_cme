@@ -162,6 +162,16 @@
     <div class="sr-desc">Hardware or compiler-enforced control flow integrity that validates indirect branch targets match expected types, blocking ROP/JOP chains. On ARM64, s...</div>
   </li>
   
+  <li data-search="cme-114 process resource limits (ulimit/prlimit) configures per-process resource limits via ulimit/prlimit to prevent algorithmic complexity attacks, infinite loops, and resource exhaustion from consuming unbounded system resources. key limits include rlimit_cpu (maximum cpu time), rlimit_as (maximum address space), rlimit_nproc (maximum processes), and rlimit_nofile (maximum open files). complements container-level cgroup limits (cme-704) by providing process-granularity controls that apply even outside containers. kernel hardening harden os/kernel cwe-835 cwe-400 cwe-770 cwe-834">
+    <div>
+      <a href="entries/CME-114.html" class="sr-id">CME-114</a>
+      <a href="entries/CME-114.html">Process Resource Limits (ulimit/prlimit)</a>
+      <span class="badge badge-tactic-harden">Harden</span>
+      <span class="badge badge-layer-os-kernel">OS/Kernel</span>
+    </div>
+    <div class="sr-desc">Configures per-process resource limits via ulimit/prlimit to prevent algorithmic complexity attacks, infinite loops, and resource exhaustion from cons...</div>
+  </li>
+  
   <li data-search="cme-116 fortify_source (buffer overflow detection) compile-time and runtime detection of buffer overflows in common c library functions (memcpy, strcpy, sprintf, read, etc.). at compile time, the compiler replaces standard library calls with bounds-checked variants when buffer sizes are known. at runtime, remaining checks abort the process when a buffer overflow is detected. fortify_source level 2 checks all detectable overflows; level 3 (gcc 12+) extends coverage to dynamically-sized buffers and flexible array members. catches many integer-overflow-to-buffer-overflow chains where the overflowed size value is passed to a libc copy function. kernel hardening harden os/kernel cwe-119 cwe-120 cwe-122 cwe-787 cwe-190">
     <div>
       <a href="entries/CME-116.html" class="sr-id">CME-116</a>
@@ -180,6 +190,16 @@
       <span class="badge badge-layer-os-kernel">OS/Kernel</span>
     </div>
     <div class="sr-desc">Enable and verify glibc heap allocator safety features that specifically target use-after-free and double-free exploitation. Modern glibc (2.32+) incl...</div>
+  </li>
+  
+  <li data-search="cme-118 protected file links (kernel symlink/hardlink protection) enable the kernel filesystem link protection sysctls to prevent exploitation of toctou race conditions and symlink following attacks in world-writable sticky directories. fs.protected_symlinks=1 prevents following symlinks in sticky world-writable directories (e.g., /tmp) unless the follower owns the symlink, the directory owner matches, or the symlink target owner matches. fs.protected_hardlinks=1 prevents creating hardlinks to files not owned by the caller, blocking hardlink-based toctou and privilege escalation attacks. fs.protected_regular=2 and fs.protected_fifos=2 extend protection to regular files and fifos in sticky directories. these sysctls are enabled by default on rhel 7+ but may be modified by administrators or overridden by third-party configurations. kernel hardening harden os/kernel cwe-59 cwe-61 cwe-367 cwe-362">
+    <div>
+      <a href="entries/CME-118.html" class="sr-id">CME-118</a>
+      <a href="entries/CME-118.html">Protected File Links (Kernel Symlink/Hardlink Protection)</a>
+      <span class="badge badge-tactic-harden">Harden</span>
+      <span class="badge badge-layer-os-kernel">OS/Kernel</span>
+    </div>
+    <div class="sr-desc">Enable the kernel filesystem link protection sysctls to prevent exploitation of TOCTOU race conditions and symlink following attacks in world-writable...</div>
   </li>
   
   <li data-search="cme-201 zero trust gateway / identity-aware proxy all network access requires authenticated identity verification. no implicit trust from network position. every request is authenticated and authorized regardless of source network. network isolation isolate network cwe-284 cwe-306 cwe-287">
@@ -240,6 +260,16 @@
       <span class="badge badge-layer-network">Network</span>
     </div>
     <div class="sr-desc">Kubernetes NetworkPolicy resources that restrict pod-to-pod and pod-to-external communication. Default-deny ingress/egress with explicit allowlists.</div>
+  </li>
+  
+  <li data-search="cme-207 dns rebinding protection configure dns resolvers, recursive forwarders, and network firewalls to reject dns responses that resolve public domain names to private ip addresses (rfc 1918: 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16; loopback: 127.0.0.0/8; link-local: 169.254.0.0/16; ipv6: ::1, fc00::/7, fe80::/10). dns rebinding attacks exploit the browser same-origin policy by causing an attacker-controlled domain to resolve to a private ip address after the initial page load, giving the attacker javascript access to localhost-bound services. blocking private ip resolution from public domains prevents this attack at the network layer. network isolation harden network cwe-346 cwe-350">
+    <div>
+      <a href="entries/CME-207.html" class="sr-id">CME-207</a>
+      <a href="entries/CME-207.html">DNS Rebinding Protection</a>
+      <span class="badge badge-tactic-harden">Harden</span>
+      <span class="badge badge-layer-network">Network</span>
+    </div>
+    <div class="sr-desc">Configure DNS resolvers, recursive forwarders, and network firewalls to reject DNS responses that resolve public domain names to private IP addresses ...</div>
   </li>
   
   <li data-search="cme-301 selinux (enforcing mode) mandatory access control system that confines processes to least-privilege security domains. even if a process is compromised, it cannot access files, ports, or other processes outside its policy-defined domain. mandatory access control harden os/kernel cwe-269 cwe-284 cwe-732">
@@ -342,6 +372,16 @@
     <div class="sr-desc">Rejects installation of unsigned or tampered RPM/DEB packages by validating GPG signatures against trusted keys. Prevents supply chain attacks via pac...</div>
   </li>
   
+  <li data-search="cme-407 data-at-rest encryption (luks/dm-crypt) encrypts data volumes and partitions at the block device layer using luks2/dm-crypt, ensuring that sensitive data including credentials, tokens, pii, and configuration secrets is encrypted when stored on disk. prevents unauthorized data access through physical media theft, backup exposure, or filesystem-level read vulnerabilities. combined with tpm-backed key sealing, provides boot-time integrity verification and automatic unlocking for authorized systems. cryptographic controls harden data cwe-312 cwe-311 cwe-316">
+    <div>
+      <a href="entries/CME-407.html" class="sr-id">CME-407</a>
+      <a href="entries/CME-407.html">Data-at-Rest Encryption (LUKS/dm-crypt)</a>
+      <span class="badge badge-tactic-harden">Harden</span>
+      <span class="badge badge-layer-data">Data</span>
+    </div>
+    <div class="sr-desc">Encrypts data volumes and partitions at the block device layer using LUKS2/dm-crypt, ensuring that sensitive data including credentials, tokens, PII, ...</div>
+  </li>
+  
   <li data-search="cme-501 read-only root filesystem mounts root filesystem as read-only, preventing persistent modification of system binaries, libraries, and configuration. writable areas are confined to specific tmpfs or overlay mounts. filesystem hardening isolate os/kernel cwe-284">
     <div>
       <a href="entries/CME-501.html" class="sr-id">CME-501</a>
@@ -400,6 +440,16 @@
       <span class="badge badge-layer-os-kernel">OS/Kernel</span>
     </div>
     <div class="sr-desc">Linux Security Module that allows unprivileged processes to restrict their own filesystem access. Process voluntarily drops access to paths it does no...</div>
+  </li>
+  
+  <li data-search="cme-507 secure dynamic linker configuration (ld_preload/path hardening) harden the dynamic linker search path and execution environment to prevent library injection and path manipulation attacks. verify that /etc/ld.so.conf.d/ only references trusted, non-writable library directories. for systemd-managed services, use environment=ld_preload= ld_library_path= to explicitly clear dangerous environment variables, or use environmentfile= with a whitelist of required variables. ensure no world-writable directory appears in any service path. for containers and pods, combine with nonewprivileges (security_context.allow_privilege_escalation: false) to prevent ld_preload exploitation in setuid contexts. the dynamic linker (ld-linux.so) already ignores ld_preload and ld_library_path for setuid/setgid binaries, but this does not protect non-setuid services running as root or elevated users. filesystem hardening harden os/kernel cwe-426 cwe-427">
+    <div>
+      <a href="entries/CME-507.html" class="sr-id">CME-507</a>
+      <a href="entries/CME-507.html">Secure Dynamic Linker Configuration (LD_PRELOAD/PATH Hardening)</a>
+      <span class="badge badge-tactic-harden">Harden</span>
+      <span class="badge badge-layer-os-kernel">OS/Kernel</span>
+    </div>
+    <div class="sr-desc">Harden the dynamic linker search path and execution environment to prevent library injection and PATH manipulation attacks. Verify that /etc/ld.so.con...</div>
   </li>
   
   <li data-search="cme-601 kernel-level syscall filtering (seccomp) restricts the set of system calls a process can make to the kernel. reduces kernel attack surface by blocking syscalls the application doesn&#39;t need, preventing exploitation of kernel vulnerabilities through unused syscall handlers. syscall &amp; bpf controls harden os/kernel cwe-119 cwe-78">
@@ -722,6 +772,46 @@
     <div class="sr-desc">Enforce strict HTTP header parsing on all HTTP intermediaries (proxies, load balancers, reverse proxies, web servers) to prevent request smuggling via...</div>
   </li>
   
+  <li data-search="cme-913 csrf protection (anti-csrf token &amp; samesite cookie enforcement) server-side enforcement of anti-csrf tokens (synchronizer tokens or double-submit cookies) combined with samesite=strict or samesite=lax cookie attributes on session cookies. for every state-changing http request (post, put, delete, patch), the server generates a cryptographically random token bound to the user&#39;s session, embeds it in forms or response headers, and rejects requests that do not present a valid token. the samesite cookie attribute provides defense-in-depth by instructing the browser not to send cookies with cross-origin requests. together, these controls prevent cross-site request forgery by ensuring that state-changing requests originate from the application&#39;s own pages, not from attacker-controlled sites. application controls harden application cwe-940 cwe-352">
+    <div>
+      <a href="entries/CME-913.html" class="sr-id">CME-913</a>
+      <a href="entries/CME-913.html">CSRF Protection (Anti-CSRF Token &amp; SameSite Cookie Enforcement)</a>
+      <span class="badge badge-tactic-harden">Harden</span>
+      <span class="badge badge-layer-application">Application</span>
+    </div>
+    <div class="sr-desc">Server-side enforcement of anti-CSRF tokens (synchronizer tokens or double-submit cookies) combined with SameSite=Strict or SameSite=Lax cookie attrib...</div>
+  </li>
+  
+  <li data-search="cme-914 strict cors origin allowlist enforcement server-side enforcement of a strict, explicitly enumerated origin allowlist for cross-origin resource sharing (cors). the server validates the origin header of every cross-origin request against a fixed allowlist and only responds with access-control-allow-origin for approved origins. critically, the server never reflects the request&#39;s origin header verbatim, never uses wildcard (*) with access-control-allow-credentials: true, and never relies on partial string matching or regex patterns that can be bypassed with attacker-controlled subdomains. for endpoints that handle credentials or session-sensitive data, access-control-allow-credentials is only set when the origin is explicitly trusted. this prevents cross-origin javascript from reading authenticated responses, exfiltrating session tokens, or making credentialed api calls from attacker-controlled pages. application controls harden application cwe-940 cwe-346">
+    <div>
+      <a href="entries/CME-914.html" class="sr-id">CME-914</a>
+      <a href="entries/CME-914.html">Strict CORS Origin Allowlist Enforcement</a>
+      <span class="badge badge-tactic-harden">Harden</span>
+      <span class="badge badge-layer-application">Application</span>
+    </div>
+    <div class="sr-desc">Server-side enforcement of a strict, explicitly enumerated origin allowlist for Cross-Origin Resource Sharing (CORS). The server validates the Origin ...</div>
+  </li>
+  
+  <li data-search="cme-915 cross-origin request restriction (reverse proxy origin enforcement) configure the reverse proxy or load balancer (nginx, apache httpd, haproxy) to validate the origin and referer headers on state-changing requests (post, put, delete, patch, and websocket upgrade) against an explicit allowlist of trusted origins. requests with an origin that does not match the allowlist are rejected with 403 before reaching the backend application. this provides defense-in-depth for applications that fail to validate cross-origin requests internally — the proxy enforces the same-origin boundary at the infrastructure layer. application controls harden application cwe-346 cwe-352 cwe-940 cwe-942">
+    <div>
+      <a href="entries/CME-915.html" class="sr-id">CME-915</a>
+      <a href="entries/CME-915.html">Cross-Origin Request Restriction (Reverse Proxy Origin Enforcement)</a>
+      <span class="badge badge-tactic-harden">Harden</span>
+      <span class="badge badge-layer-application">Application</span>
+    </div>
+    <div class="sr-desc">Configure the reverse proxy or load balancer (nginx, Apache httpd, HAProxy) to validate the Origin and Referer headers on state-changing requests (POS...</div>
+  </li>
+  
+  <li data-search="cme-916 samesite cookie attribute enforcement configure the web server or reverse proxy to enforce the samesite attribute (lax or strict) on all set-cookie response headers. when samesite=lax is set, browsers do not include the cookie in cross-site post, put, delete, or other state-changing requests initiated from a different origin. when samesite=strict is set, cookies are not included in any cross-site navigation. this prevents csrf attacks because the attacker cross-origin request arrives without the victim session cookie, making it unauthenticated. modern browsers default to samesite=lax for cookies that omit samesite, but applications that explicitly set samesite=none (for cross-origin api use) or legacy applications that predate the default bypass this protection. admin enforcement at the proxy layer overrides the application cookie attributes. application controls harden application cwe-346 cwe-352 cwe-1275">
+    <div>
+      <a href="entries/CME-916.html" class="sr-id">CME-916</a>
+      <a href="entries/CME-916.html">SameSite Cookie Attribute Enforcement</a>
+      <span class="badge badge-tactic-harden">Harden</span>
+      <span class="badge badge-layer-application">Application</span>
+    </div>
+    <div class="sr-desc">Configure the web server or reverse proxy to enforce the SameSite attribute (Lax or Strict) on all Set-Cookie response headers. When SameSite=Lax is s...</div>
+  </li>
+  
   <li data-search="cme-1001 edr agent (endpoint detection &amp; response) real-time behavioral detection and automated response agent on endpoints. detects exploit patterns, lateral movement, and persistence mechanisms. can kill processes, isolate hosts, and quarantine files automatically. runtime detection detect application ">
     <div>
       <a href="entries/CME-1001.html" class="sr-id">CME-1001</a>
@@ -760,6 +850,16 @@
       <span class="badge badge-layer-os-kernel">OS/Kernel</span>
     </div>
     <div class="sr-desc">Detects unauthorized modifications to critical system files by comparing against a known-good baseline database. Scheduled or continuous monitoring of...</div>
+  </li>
+  
+  <li data-search="cme-1005 runtime memory error detection (kasan/hwasan) kernel addresssanitizer (kasan) and hardware-assisted addresssanitizer (hwasan) detect memory safety violations at runtime including use-after-free, out-of-bounds access, buffer size miscalculations, and null pointer dereferences. kasan instruments kernel memory allocations with redzones and quarantine zones to detect invalid accesses. hwasan uses arm memory tagging for lower-overhead production deployments. when a violation is detected, the kernel logs a detailed report and can be configured to panic, preventing silent exploitation. runtime detection detect os/kernel cwe-416 cwe-131 cwe-193 cwe-476 cwe-787 cwe-125 cwe-120">
+    <div>
+      <a href="entries/CME-1005.html" class="sr-id">CME-1005</a>
+      <a href="entries/CME-1005.html">Runtime Memory Error Detection (KASAN/HWASan)</a>
+      <span class="badge badge-tactic-detect">Detect</span>
+      <span class="badge badge-layer-os-kernel">OS/Kernel</span>
+    </div>
+    <div class="sr-desc">Kernel AddressSanitizer (KASAN) and Hardware-assisted AddressSanitizer (HWASan) detect memory safety violations at runtime including use-after-free, o...</div>
   </li>
   
   <li data-search="cme-1006 privilege change audit logging application-level audit trail that records every modification to user roles, permissions, and authorization policies. each log entry captures the actor (who made the change), the target (whose privileges changed), the before and after state (e.g., role viewer to admin), the timestamp, and the request context (ip, session, endpoint). logs authorization decision denials with sufficient context to identify privilege escalation attempts. distinct from os-level audit (cme-1002) in that it operates within the application&#39;s authorization domain and captures semantically meaningful privilege transitions invisible to syscall-level logging. enables real-time alerting on anomalous patterns such as self-promotion, bulk role changes, or privilege changes from unexpected sources. runtime detection detect application cwe-778 cwe-223">
@@ -932,6 +1032,16 @@
     <div class="sr-desc">Application avoids invoking shell commands with user-controlled input. Uses direct process execution (subprocess with list args, no shell=True) or pur...</div>
   </li>
   
+  <li data-search="cme-1308 origin and cors validation enforcement enforces strict cross-origin resource sharing (cors) policies and origin header validation to prevent cross-origin attacks. configures cors headers (access-control-allow-origin, access-control-allow-methods, access-control-allow-credentials) with explicit domain allowlists rather than wildcards. validates the origin and referer headers on all state-changing requests, rejecting requests from unlisted origins. prevents csrf and cross-origin data leakage attacks that rely on permissive or absent origin checks. application input validation harden application cwe-346 cwe-352">
+    <div>
+      <a href="entries/CME-1308.html" class="sr-id">CME-1308</a>
+      <a href="entries/CME-1308.html">Origin and CORS Validation Enforcement</a>
+      <span class="badge badge-tactic-harden">Harden</span>
+      <span class="badge badge-layer-application">Application</span>
+    </div>
+    <div class="sr-desc">Enforces strict Cross-Origin Resource Sharing (CORS) policies and Origin header validation to prevent cross-origin attacks. Configures CORS headers (A...</div>
+  </li>
+  
   <li data-search="cme-1309 script engine restriction (sandbox / disable) restricts or disables application-embedded scripting and expression language engines to prevent arbitrary code execution. covers three postures: (1) disable unnecessary script consoles and evaluation endpoints entirely (e.g., jenkins script console, debug repls), (2) enforce a language-level sandbox that blocks dangerous operations such as file i/o, process execution, classloading, and reflection while permitting safe computation (e.g., jenkins groovy sandbox, java securitymanager for scripting), and (3) restrict expression language evaluation to a safe subset by disabling type resolution, method invocation, and class instantiation in el/template contexts. applies to groovy, ognl, spel, mvel, jinja2, el 3.0, freemarker, and similar engines embedded in java ee, ci/cd platforms, and web frameworks. application input validation harden application cwe-94 cwe-95 cwe-96 cwe-917">
     <div>
       <a href="entries/CME-1309.html" class="sr-id">CME-1309</a>
@@ -988,7 +1098,7 @@
   </main>
 
   <footer class="site-footer">
-    Generated 2026-06-18 15:22 UTC &middot; 93 entries &middot;
+    Generated 2026-06-18 15:39 UTC &middot; 104 entries &middot;
     Common Mitigation Enumeration (CME)
   </footer>
 </body>
