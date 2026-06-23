@@ -162,7 +162,7 @@
     <div class="sr-desc">Hardware or compiler-enforced control flow integrity that validates indirect branch targets match expected types, blocking ROP/JOP chains. On ARM64, s...</div>
   </li>
   
-  <li data-search="cme-114 process resource limits (ulimit/prlimit) configures per-process resource limits via ulimit/prlimit to prevent algorithmic complexity attacks, infinite loops, and resource exhaustion from consuming unbounded system resources. key limits include rlimit_cpu (maximum cpu time), rlimit_as (maximum address space), rlimit_nproc (maximum processes), and rlimit_nofile (maximum open files). complements container-level cgroup limits (cme-704) by providing process-granularity controls that apply even outside containers. kernel hardening harden os/kernel cwe-835 cwe-400 cwe-770 cwe-834">
+  <li data-search="cme-114 process resource limits (ulimit/prlimit) configures per-process resource limits via ulimit/prlimit to prevent algorithmic complexity attacks, infinite loops, and resource exhaustion from consuming unbounded system resources. key limits include rlimit_cpu (maximum cpu time), rlimit_as (maximum address space), rlimit_nproc (maximum processes), and rlimit_nofile (maximum open files). complements container-level cgroup limits (cme-704) by providing process-granularity controls that apply even outside containers. kernel hardening harden os/kernel cwe-835 cwe-400 cwe-770 cwe-834 cwe-772 cwe-401">
     <div>
       <a href="entries/CME-114.html" class="sr-id">CME-114</a>
       <a href="entries/CME-114.html">Process Resource Limits (ulimit/prlimit)</a>
@@ -522,7 +522,7 @@
     <div class="sr-desc">Containers run entirely without root privileges on the host. The container runtime, image pull, and all container processes run as an unprivileged use...</div>
   </li>
   
-  <li data-search="cme-704 cgroups v2 resource limits constrains cpu, memory, i/o, and pids for process groups using cgroups v2 unified hierarchy. prevents resource exhaustion attacks and limits blast radius of runaway or malicious processes. container isolation isolate os/kernel cwe-400 cwe-770">
+  <li data-search="cme-704 cgroups v2 resource limits constrains cpu, memory, i/o, and pids for process groups using cgroups v2 unified hierarchy. prevents resource exhaustion attacks and limits blast radius of runaway or malicious processes. container isolation isolate os/kernel cwe-400 cwe-770 cwe-772 cwe-401">
     <div>
       <a href="entries/CME-704.html" class="sr-id">CME-704</a>
       <a href="entries/CME-704.html">cgroups v2 Resource Limits</a>
@@ -812,6 +812,16 @@
     <div class="sr-desc">Configure the web server or reverse proxy to enforce the SameSite attribute (Lax or Strict) on all Set-Cookie response headers. When SameSite=Lax is s...</div>
   </li>
   
+  <li data-search="cme-917 worker process recycling (maxconnectionsperchild / max_requests) configures application servers to periodically recycle worker processes after handling a fixed number of requests, bounding the cumulative impact of per-request memory leaks. when a worker reaches its request limit, it is gracefully terminated and replaced with a fresh process, releasing all leaked memory. applicable to apache http server (maxconnectionsperchild), php-fpm (pm.max_requests), gunicorn (--max-requests with --max-requests-jitter for staggered recycling), puma (worker_timeout), and unicorn (after_fork with request counting). the recycling threshold should be set low enough to prevent oom conditions but high enough to avoid excessive process churn — typical values range from 500 to 10000 requests per worker depending on application memory profile. application controls harden application cwe-772 cwe-401">
+    <div>
+      <a href="entries/CME-917.html" class="sr-id">CME-917</a>
+      <a href="entries/CME-917.html">Worker Process Recycling (MaxConnectionsPerChild / max_requests)</a>
+      <span class="badge badge-tactic-harden">Harden</span>
+      <span class="badge badge-layer-application">Application</span>
+    </div>
+    <div class="sr-desc">Configures application servers to periodically recycle worker processes after handling a fixed number of requests, bounding the cumulative impact of p...</div>
+  </li>
+  
   <li data-search="cme-1001 edr agent (endpoint detection &amp; response) real-time behavioral detection and automated response agent on endpoints. detects exploit patterns, lateral movement, and persistence mechanisms. can kill processes, isolate hosts, and quarantine files automatically. runtime detection detect application ">
     <div>
       <a href="entries/CME-1001.html" class="sr-id">CME-1001</a>
@@ -902,6 +912,16 @@
     <div class="sr-desc">Continuously monitor the effective set of users holding high-privilege application roles and alert when new grants are detected that do not correspond...</div>
   </li>
   
+  <li data-search="cme-1010 cgroup memory pressure monitoring (memory.events / psi) monitors cgroups v2 memory pressure signals — memory.events (oom_kill, high, max counters) and pressure stall information (psi) via /proc/pressure/memory — to detect resource leaks before they exhaust system memory. when a cgroup approaches its memory limit due to a resource leak, these interfaces provide deterministic signals (memory.high threshold crossings, oom_kill increments, psi stall percentages) that monitoring systems consume to trigger alerts and automated remediation. complements cgroup memory limits (cme-704) which contain the leak by adding detection of when containment is being stressed. the memory.events counters are monotonically increasing and per-cgroup, enabling precise attribution of pressure to the leaking workload. integrity detection detect os/kernel cwe-772 cwe-401 cwe-400 cwe-770">
+    <div>
+      <a href="entries/CME-1010.html" class="sr-id">CME-1010</a>
+      <a href="entries/CME-1010.html">cgroup Memory Pressure Monitoring (memory.events / PSI)</a>
+      <span class="badge badge-tactic-detect">Detect</span>
+      <span class="badge badge-layer-os-kernel">OS/Kernel</span>
+    </div>
+    <div class="sr-desc">Monitors cgroups v2 memory pressure signals — memory.events (oom_kill, high, max counters) and Pressure Stall Information (PSI) via /proc/pressure/mem...</div>
+  </li>
+  
   <li data-search="cme-1101 automated patch management (dnf-automatic) automatically downloads and applies security updates on schedule. reduces the window between vulnerability disclosure and patch application from days/weeks to hours. patch management evict os/kernel ">
     <div>
       <a href="entries/CME-1101.html" class="sr-id">CME-1101</a>
@@ -960,6 +980,16 @@
       <span class="badge badge-layer-application">Application</span>
     </div>
     <div class="sr-desc">Active-passive or active-active multi-region deployment enabling failover when primary site is compromised or unavailable. Automated failover with def...</div>
+  </li>
+  
+  <li data-search="cme-1204 service watchdog and automatic restart (systemd watchdogsec/restart) configures systemd service units with watchdog monitoring (watchdogsec=) and automatic restart policies (restart=on-failure or restart=always, restartsec=) to recover services that become unresponsive or are killed due to resource exhaustion. when a memory leak causes the oom killer to terminate a service or the process hangs due to resource starvation, systemd automatically restarts the service from a clean state. the watchdog mechanism requires the service to periodically notify systemd (via sd_notify watchdog=1); failure to notify within the watchdogsec interval triggers a restart. combined with cgroup memory limits (cme-704), this provides both containment and recovery — the cgroup bounds the leak, and systemd restarts the service when the bound is hit. recovery controls restore os/kernel cwe-772 cwe-401 cwe-400 cwe-770 cwe-835">
+    <div>
+      <a href="entries/CME-1204.html" class="sr-id">CME-1204</a>
+      <a href="entries/CME-1204.html">Service Watchdog and Automatic Restart (systemd WatchdogSec/Restart)</a>
+      <span class="badge badge-tactic-restore">Restore</span>
+      <span class="badge badge-layer-os-kernel">OS/Kernel</span>
+    </div>
+    <div class="sr-desc">Configures systemd service units with watchdog monitoring (WatchdogSec=) and automatic restart policies (Restart=on-failure or Restart=always, Restart...</div>
   </li>
   
   <li data-search="cme-1301 path traversal prevention (canonicalization) application-level path validation that canonicalizes user-supplied paths (resolving symlinks, ../, and relative references) and verifies the resolved path falls within an allowed base directory. rejects absolute path injection and directory traversal sequences before any filesystem operation. prevents attackers from reading or writing files outside intended directories. application input validation harden application cwe-22 cwe-23 cwe-36 cwe-73">
@@ -1072,6 +1102,26 @@
     <div class="sr-desc">Validation that user-supplied quantities — sizes, counts, lengths, offsets, indices, and repetition factors — fall within expected bounds before they ...</div>
   </li>
   
+  <li data-search="cme-1312 argument injection prevention (downstream input delimiter sanitization) prevents injection of unintended arguments, options, or directives into downstream cli tools, external processes, and structured input files by sanitizing delimiter characters (newlines, option-prefix dashes, null bytes) in user-controlled input before subprocess invocation. enforces the -- end-of-options separator when passing variable input as positional arguments, uses array-based argument construction to preserve argument boundaries, and validates that input destined for downstream tool input files does not contain format-breaking delimiters. distinct from command injection prevention (cme-1307) which addresses shell metacharacter injection: this control addresses injection into the argument parser or input file format of the downstream tool itself, even when no shell is involved. application input validation harden application cwe-88 cwe-74">
+    <div>
+      <a href="entries/CME-1312.html" class="sr-id">CME-1312</a>
+      <a href="entries/CME-1312.html">Argument Injection Prevention (Downstream Input Delimiter Sanitization)</a>
+      <span class="badge badge-tactic-harden">Harden</span>
+      <span class="badge badge-layer-application">Application</span>
+    </div>
+    <div class="sr-desc">Prevents injection of unintended arguments, options, or directives into downstream CLI tools, external processes, and structured input files by saniti...</div>
+  </li>
+  
+  <li data-search="cme-1313 crlf / line injection prevention (newline sanitization for structured formats) prevents injection of carriage return (cr, \r) and line feed (lf, \n) characters into structured text formats where newlines serve as record or field delimiters. enforces single-line invariants on input fields used to construct http headers, log entries, configuration files, git refs, email headers, and protocol messages. strips or rejects input containing cr/lf before it reaches format-sensitive output contexts, preventing http response splitting, log forging, configuration file injection, and git ref manipulation. complements http header normalization (cme-912) by operating at the application input layer rather than the protocol proxy layer. application input validation harden application cwe-93 cwe-113">
+    <div>
+      <a href="entries/CME-1313.html" class="sr-id">CME-1313</a>
+      <a href="entries/CME-1313.html">CRLF / Line Injection Prevention (Newline Sanitization for Structured Formats)</a>
+      <span class="badge badge-tactic-harden">Harden</span>
+      <span class="badge badge-layer-application">Application</span>
+    </div>
+    <div class="sr-desc">Prevents injection of carriage return (CR, \r) and line feed (LF, \n) characters into structured text formats where newlines serve as record or field ...</div>
+  </li>
+  
 </ul>
 
 <script>
@@ -1098,7 +1148,7 @@
   </main>
 
   <footer class="site-footer">
-    Generated 2026-06-18 15:39 UTC &middot; 104 entries &middot;
+    Generated 2026-06-23 20:29 UTC &middot; 109 entries &middot;
     Common Mitigation Enumeration (CME)
   </footer>
 </body>

@@ -15,7 +15,9 @@
   ],
   "cwe_relationships": [
     "CWE-400",
-    "CWE-770"
+    "CWE-770",
+    "CWE-772",
+    "CWE-401"
   ],
   "verification": {
     "method": "Check cgroup v2 is mounted and limits are set",

@@ -29,12 +29,12 @@
 
 <div class="stats-bar">
   <div class="stat-card">
-    <div class="stat-value">104</div>
+    <div class="stat-value">109</div>
     <div class="stat-label">Total Entries</div>
   </div>
   
   <div class="stat-card">
-    <div class="stat-value">68</div>
+    <div class="stat-value">71</div>
     <div class="stat-label">Harden</div>
   </div>
   
@@ -44,7 +44,7 @@
   </div>
   
   <div class="stat-card">
-    <div class="stat-value">9</div>
+    <div class="stat-value">10</div>
     <div class="stat-label">Detect</div>
   </div>
   
@@ -54,7 +54,7 @@
   </div>
   
   <div class="stat-card">
-    <div class="stat-value">3</div>
+    <div class="stat-value">4</div>
     <div class="stat-label">Restore</div>
   </div>
   
@@ -66,7 +66,7 @@
   <div class="tactic-header" style="background: var(--bg-alt);">
     <span class="badge badge-tactic-harden">Harden</span>
     <span>Harden</span>
-    <span style="margin-left: auto; font-size: 14px; color: var(--text-muted);">68 entries</span>
+    <span style="margin-left: auto; font-size: 14px; color: var(--text-muted);">71 entries</span>
   </div>
   
   <div class="category-section">
@@ -139,6 +139,12 @@
         <span class="badge badge-layer-application">Application</span>
       </li>
       
+      <li>
+        <a href="entries/CME-917.html" class="cme-id">CME-917</a>
+        <a href="entries/CME-917.html" class="entry-name">Worker Process Recycling (MaxConnectionsPerChild / max_requests)</a>
+        <span class="badge badge-layer-application">Application</span>
+      </li>
+      
     </ul>
   </div>
   
@@ -203,6 +209,18 @@
       <li>
         <a href="entries/CME-1311.html" class="cme-id">CME-1311</a>
         <a href="entries/CME-1311.html" class="entry-name">Input Size and Quantity Bounds Enforcement</a>
+        <span class="badge badge-layer-application">Application</span>
+      </li>
+      
+      <li>
+        <a href="entries/CME-1312.html" class="cme-id">CME-1312</a>
+        <a href="entries/CME-1312.html" class="entry-name">Argument Injection Prevention (Downstream Input Delimiter Sanitization)</a>
+        <span class="badge badge-layer-application">Application</span>
+      </li>
+      
+      <li>
+        <a href="entries/CME-1313.html" class="cme-id">CME-1313</a>
+        <a href="entries/CME-1313.html" class="entry-name">CRLF / Line Injection Prevention (Newline Sanitization for Structured Formats)</a>
         <span class="badge badge-layer-application">Application</span>
       </li>
       
@@ -734,7 +752,7 @@
   <div class="tactic-header" style="background: var(--bg-alt);">
     <span class="badge badge-tactic-detect">Detect</span>
     <span>Detect</span>
-    <span style="margin-left: auto; font-size: 14px; color: var(--text-muted);">9 entries</span>
+    <span style="margin-left: auto; font-size: 14px; color: var(--text-muted);">10 entries</span>
   </div>
   
   <div class="category-section">
@@ -751,6 +769,12 @@
         <a href="entries/CME-1007.html" class="cme-id">CME-1007</a>
         <a href="entries/CME-1007.html" class="entry-name">Application Configuration Drift Detection (IaC Enforcement)</a>
         <span class="badge badge-layer-application">Application</span>
+      </li>
+      
+      <li>
+        <a href="entries/CME-1010.html" class="cme-id">CME-1010</a>
+        <a href="entries/CME-1010.html" class="entry-name">cgroup Memory Pressure Monitoring (memory.events / PSI)</a>
+        <span class="badge badge-layer-os-kernel">OS/Kernel</span>
       </li>
       
     </ul>
@@ -849,7 +873,7 @@
   <div class="tactic-header" style="background: var(--bg-alt);">
     <span class="badge badge-tactic-restore">Restore</span>
     <span>Restore</span>
-    <span style="margin-left: auto; font-size: 14px; color: var(--text-muted);">3 entries</span>
+    <span style="margin-left: auto; font-size: 14px; color: var(--text-muted);">4 entries</span>
   </div>
   
   <div class="category-section">
@@ -874,6 +898,12 @@
         <span class="badge badge-layer-application">Application</span>
       </li>
       
+      <li>
+        <a href="entries/CME-1204.html" class="cme-id">CME-1204</a>
+        <a href="entries/CME-1204.html" class="entry-name">Service Watchdog and Automatic Restart (systemd WatchdogSec/Restart)</a>
+        <span class="badge badge-layer-os-kernel">OS/Kernel</span>
+      </li>
+      
     </ul>
   </div>
   
@@ -884,7 +914,7 @@
   </main>
 
   <footer class="site-footer">
-    Generated 2026-06-18 15:39 UTC &middot; 104 entries &middot;
+    Generated 2026-06-23 20:29 UTC &middot; 109 entries &middot;
     Common Mitigation Enumeration (CME)
   </footer>
 </body>

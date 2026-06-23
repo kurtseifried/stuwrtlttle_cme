@@ -17,7 +17,9 @@
     "CWE-835",
     "CWE-400",
     "CWE-770",
-    "CWE-834"
+    "CWE-834",
+    "CWE-772",
+    "CWE-401"
   ],
   "confidence": "High",
   "platforms": [
