@@ -1,0 +1,27 @@
+name: Validate CME Entries
+
+# Runs the schema validator (src/validate.py) on every push and pull request.
+# Fails the build if any data/entries/*.json file is invalid, has a filename
+# that doesn't match its cme_id, or duplicates an existing CME-ID.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Validate entries against schema
+        run: uv run python -m src.validate
