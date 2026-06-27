@@ -1,0 +1,2 @@
+# Keeps the (normally empty) proposals directory tracked in git.
+# Pending CME proposals land here as CME-XXX.json before approval.

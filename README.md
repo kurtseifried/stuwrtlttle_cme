@@ -487,10 +487,12 @@ Validate all entries against the schema:
 uv run python -m src.validate
 ```
 
-This checks:
-- Every file in `data/entries/` passes the JSON schema
+This checks both `data/entries/` and `data/proposals/`:
+- Every file passes the JSON schema
 - Filenames match their `cme_id` field
-- No duplicate CME-IDs exist
+- No duplicate CME-IDs exist within a directory
+- No proposal reuses an ID that already exists as a live entry (a leftover from a
+  hand-approved entry — `approve_cme_proposal` removes the proposal automatically)
 
 ---
 
