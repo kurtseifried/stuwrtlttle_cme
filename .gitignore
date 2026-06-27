@@ -7,6 +7,3 @@ __pycache__/
 *.egg-info/
 dist/
 .claude/settings.local.json
-
-# Local AI-agent working aid; not shipped upstream
-CLAUDE.md
