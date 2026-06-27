@@ -39,7 +39,7 @@ Backend is selected by `CME_DB_BACKEND` (`sqlite` default / `postgres`); transpo
 - `src/db.py` (SQLite) and `src/db_postgres.py` (PostgreSQL) — parallel implementations of the same data-access interface. **Any schema or query change must be made in BOTH.** `server.py` imports one or the other based on `config.DB_BACKEND`.
 - `src/seed.py`, `src/validate.py`, `src/config.py` — seeding, validation, configuration.
 - `schema/cme-entry.schema.json` — JSON Schema (Draft 2020-12) for an entry; the contract validated by both `validate.py` and the MCP curation tools.
-- `build_site.py` + `templates/` (Jinja2) → `docs/` (committed static site, served via GitHub Pages).
+- `build_site.py` + `templates/` (Jinja2) → `docs/` (committed static site; a `docs/`-based GitHub Pages publish target, though Pages is not currently enabled on the repo).
 - `skills/cve-to-cme.md` — a Claude skill that maps CVE IDs to CME controls via this server's MCP tools.
 
 ## Conventions that aren't obvious

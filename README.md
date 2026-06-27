@@ -155,7 +155,7 @@ uv run python -m src.validate
 # Run the MCP server (stdio — typically launched by a client, not manually)
 uv run python -m src.server
 
-# Regenerate the static browsable site in docs/ (committed; published via GitHub Pages)
+# Regenerate the static browsable site in docs/ (committed; ready to serve via GitHub Pages)
 uv run build-site
 ```
 
@@ -700,7 +700,7 @@ cme/
 │   ├── cme.db                      # SQLite database (generated, gitignored)
 │   └── cme_seed_data.json          # Legacy single-file seed data
 ├── templates/                      # Jinja2 templates for the static site
-├── docs/                           # Generated static site (committed; published via GitHub Pages)
+├── docs/                           # Generated static site (committed; GitHub Pages target, not yet enabled)
 ├── skills/
 │   └── cve-to-cme.md               # Claude skill: map a CVE ID to applicable CME controls
 └── src/
