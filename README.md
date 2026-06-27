@@ -13,7 +13,7 @@ A structured taxonomy of defensive security controls mapped to deterministic CVS
 - [Quick Start](#quick-start)
 - [MCP Server](#mcp-server)
   - [How It Runs](#how-it-runs)
-  - [Query Tools (7)](#query-tools)
+  - [Query Tools (9)](#query-tools)
   - [Curation Tools (3)](#curation-tools)
   - [Resources (3)](#resources)
   - [Connecting to Claude Code](#connecting-to-claude-code)
@@ -35,7 +35,7 @@ A structured taxonomy of defensive security controls mapped to deterministic CVS
   - [Proposing New Entries](#proposing-new-entries)
   - [Reviewing and Approving](#reviewing-and-approving)
   - [Git-Based Team Workflow](#git-based-team-workflow)
-  - [Scaling to Shared On-Prem Deployment](#scaling-to-shared-on-prem-deployment)
+  - [Shared On-Prem Deployment](#shared-on-prem-deployment)
 - [Examples](#examples)
   - [AI Agent Risk Negotiation](#ai-agent-risk-negotiation)
   - [CWE-Based Mitigation Lookup](#cwe-based-mitigation-lookup)
@@ -154,6 +154,9 @@ uv run python -m src.validate
 
 # Run the MCP server (stdio — typically launched by a client, not manually)
 uv run python -m src.server
+
+# Regenerate the static browsable site in docs/ (committed; published via GitHub Pages)
+uv run build-site
 ```
 
 ### Multi-User (PostgreSQL + HTTP)
@@ -191,9 +194,11 @@ CME_DB_BACKEND=postgres CME_TRANSPORT=streamable-http uv run python -m src.serve
 |------|-------------|
 | `get_cme_entry` | Look up a specific CME entry by ID (e.g., `CME-601`). Returns the full entry with description, CVSS vector impacts, CWE relationships, verification commands, and references. |
 | `search_cme` | Search entries by tactic (`Harden`, `Isolate`, `Detect`, `Evict`, `Restore`), category (`Kernel Hardening`, `Network Isolation`, etc.), control layer (`Network`, `OS/Kernel`, `Application`, `Data`, `Identity`), or free-text keyword across names and descriptions. |
-| `get_mitigations_for_weakness` | Given a CWE ID (e.g., `CWE-119`), returns all CME controls that mitigate that weakness class. For CWE-119 (memory corruption), this returns 14 controls spanning ASLR, NX, SMEP, seccomp, gVisor, and more. |
+| `get_mitigations_for_weakness` | Given a CWE ID (e.g., `CWE-119`), returns all CME controls that mitigate that weakness class. For CWE-119 (memory corruption), this returns 15 controls spanning ASLR, NX, SMEP, seccomp, gVisor, and more. |
 | `calculate_attenuation` | Given a list of active CME-IDs on a system, aggregates all CVSS vector modifications. This is the core of CME: deterministic environmental scoring. |
 | `simulate_cve_risk` | The "Risk Negotiation" tool. Feed in a CVE's base score, CVSS vector string, and active CME controls — get back the modified vector showing exactly how each metric shifts. |
+| `get_mitigations_for_cvss_vector` | Given a CVSS vector string, parses its metric/value pairs and returns CME entries that attenuate those specific metrics, grouped by metric. |
+| `get_cme_coverage_summary` | Summarizes what the taxonomy currently covers — which CWEs have mitigations, which CVSS metric transitions are addressed, and per-tactic/category counts. Useful for finding gaps. |
 | `list_cme_taxonomy` | Returns the full taxonomy hierarchy: all tactics with entry counts, all categories with their tactic, control layer, and counts. |
 | `get_verification_commands` | Returns the shell commands a scanner or agent can run to verify whether a specific control is active on a target system. |
 
@@ -216,7 +221,7 @@ CME_DB_BACKEND=postgres CME_TRANSPORT=streamable-http uv run python -m src.serve
 ### Connecting to Claude Code
 
 ```bash
-claude mcp add cme -- uv run --directory /Users/jwest/projects/cme python -m src.server
+claude mcp add cme -- uv run --directory /path/to/cme python -m src.server
 ```
 
 ### Connecting to Claude Desktop
@@ -228,7 +233,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
   "mcpServers": {
     "cme": {
       "command": "uv",
-      "args": ["run", "--directory", "/Users/jwest/projects/cme", "python", "-m", "src.server"]
+      "args": ["run", "--directory", "/path/to/cme", "python", "-m", "src.server"]
     }
   }
 }
@@ -260,10 +265,10 @@ claude mcp add cme --transport http http://your-server:8000/mcp
 To test tools interactively outside of a Claude client, use the MCP Inspector:
 
 ```bash
-cd ~/projects/cme && uv run mcp dev src/server.py
+cd /path/to/cme && uv run mcp dev src/server.py
 ```
 
-This launches a web UI at `localhost:6274` where you can call all 10 tools and browse resources.
+This launches a web UI at `localhost:6274` where you can call all 12 tools and browse resources.
 
 ---
 
@@ -283,51 +288,69 @@ The taxonomy uses 5 D3FEND-aligned tactics:
 
 ### Categories and Entry Counts
 
+109 entries in total, broken down by tactic and category:
+
 ```
-Harden (43 entries)
-├── Kernel Hardening (13): ASLR, NX, Stack Canaries, KASLR, SMEP, SMAP,
-│   Module Restriction, kptr_restrict, Lockdown, KEXEC, Secure Boot, RELRO/PIE, CFI
-├── Mandatory Access Control (4): SELinux Enforcing, Confined Users, Booleans, AppArmor
-├── Cryptographic Controls (6): Crypto Policy, FIPS, TLS 1.3, Cert Pinning, DNSSEC, GPG
-├── Filesystem Hardening (4): noexec /tmp, nosuid, dm-verity, IMA/EVM
-├── Syscall & BPF Controls (4): seccomp, seccomp-bpf, BPF restriction, User Namespaces
+Harden (71 entries)
+├── Kernel Hardening (17): ASLR, NX, Stack Canaries, KASLR, SMEP, SMAP,
+│   kptr_restrict, RELRO/PIE, CFI, FORTIFY_SOURCE, and more
+├── Application Controls (12): WAF, CSP Headers, Rate Limiting, and more
+├── Application Input Validation (12): parameterized queries, output encoding,
+│   path canonicalization, and other injection/traversal defenses
+├── Cryptographic Controls (7): Crypto Policy, FIPS, TLS 1.3, Cert Pinning, DNSSEC, GPG
 ├── Credential Hardening (6): MFA, pwquality, Account Lockout, SSH Key-Only, Rotation, Kerberos
+├── Filesystem Hardening (5): noexec /tmp, nosuid, dm-verity, IMA/EVM, and more
+├── Mandatory Access Control (4): SELinux Enforcing, Confined Users, Booleans, AppArmor
+├── Syscall & BPF Controls (4): seccomp, seccomp-bpf, BPF restriction, User Namespaces
 ├── Protocol Hardening (3): SSH Hardening, Disable Services, Kernel Network sysctl
-└── Application Controls (3): WAF, CSP Headers, Rate Limiting
+└── Network Isolation (1)
 
-Isolate (17 entries)
-├── Network Isolation (6): Zero Trust, firewalld, VLANs, IPsec/WireGuard, Localhost Bind, NetworkPolicy
+Isolate (21 entries)
 ├── Container Isolation (6): gVisor, Namespaces, Rootless, cgroups v2, Dropped Capabilities, Pod Security
+├── Network Isolation (6): Zero Trust, firewalld, VLANs, IPsec/WireGuard, Localhost Bind, NetworkPolicy
 ├── Privilege Isolation (4): NoNewPrivileges, sudo Least Privilege, systemd Sandboxing, DynamicUser
-└── Filesystem Hardening (1): Read-Only Root
+├── Filesystem Hardening (2): Read-Only Root, and more
+├── Application Controls (2)
+└── Application Input Validation (1)
 
-Detect (4 entries)
-├── Runtime Detection (3): EDR, auditd, Falco
-└── Integrity Detection (1): AIDE
+Detect (10 entries)
+├── Runtime Detection (7): EDR, auditd, Falco, and more
+└── Integrity Detection (3): AIDE, and more
 
 Evict (3 entries)
 └── Patch Management (3): dnf-automatic, kpatch/livepatch, Container Image Rebuilds
 
-Restore (3 entries)
-└── Recovery Controls (3): Immutable Infrastructure, Backups, DR Failover
+Restore (4 entries)
+└── Recovery Controls (4): Immutable Infrastructure, Backups, DR Failover, and more
 ```
+
+Control layers: OS/Kernel (50), Application (38), Network (13), Identity (6), Data (2).
+Counts drift as entries are added — regenerate them from `data/entries/` rather than trusting this snapshot. The `list_cme_taxonomy` and `get_cme_coverage_summary` tools always return live counts.
 
 ### ID Numbering Convention
 
-| Range | Category |
-|-------|----------|
-| CME-100–199 | Kernel Hardening |
-| CME-200–299 | Network Isolation |
-| CME-300–399 | Mandatory Access Control (SELinux, AppArmor) |
-| CME-400–499 | Cryptographic Controls |
-| CME-500–599 | Filesystem Hardening |
-| CME-600–699 | Syscall & BPF Controls |
-| CME-700–799 | Container & Privilege Isolation |
-| CME-800–899 | Credential & Identity Hardening |
-| CME-900–999 | Network Protocol & Application Controls |
-| CME-1000–1099 | Detection & Monitoring |
-| CME-1100–1199 | Eviction & Patch Management |
-| CME-1200–1299 | Restore & Recovery |
+Each category is assigned a number band. New IDs are auto-allocated to the next free
+slot in the band by `propose_cme_entry`. The authoritative mapping is `_CATEGORY_RANGES`
+in `src/server.py`; a category's band runs from its start value up to the next start − 1:
+
+| Starts at | Category |
+|-----------|----------|
+| CME-101 | Kernel Hardening |
+| CME-201 | Network Isolation |
+| CME-301 | Mandatory Access Control |
+| CME-401 | Cryptographic Controls |
+| CME-501 | Filesystem Hardening |
+| CME-601 | Syscall & BPF Controls |
+| CME-701 | Container Isolation |
+| CME-707 | Privilege Isolation |
+| CME-801 | Credential Hardening |
+| CME-901 | Protocol Hardening |
+| CME-904 | Application Controls |
+| CME-1001 | Runtime Detection |
+| CME-1004 | Integrity Detection |
+| CME-1101 | Patch Management |
+| CME-1201 | Recovery Controls |
+| CME-1301 | Application Input Validation |
 
 ### CVSS Attenuation Quick Reference
 
@@ -380,7 +403,7 @@ The database is generated from individual JSON entry files:
 uv run python -m src.seed
 ```
 
-Output: `data/cme.db` (SQLite, ~100KB for 71 entries)
+Output: `data/cme.db` (SQLite, generated from the 109 entry files; gitignored)
 
 ### Querying Directly
 
@@ -611,7 +634,7 @@ When a CVE's root cause is known (e.g., CWE-119 Memory Corruption), query for al
 ```
 Tool:   get_mitigations_for_weakness("CWE-119")
 
-Result: 14 controls
+Result: 15 controls
   CME-101: ASLR                    [AC:L → AC:H]
   CME-102: NX/XD Bit              [AC:L → AC:H]
   CME-104: KASLR                   [AC:L → AC:H]
@@ -620,6 +643,7 @@ Result: 14 controls
   CME-108: kptr_restrict           [AC:L → AC:H]
   CME-112: RELRO and PIE          [AC:L → AC:H]
   CME-113: CFI / Shadow Call Stack [AC:L → AC:H]
+  CME-116: FORTIFY_SOURCE          [AC:L → AC:H]
   CME-601: seccomp                 [S:C → S:U, I:H → I:L]
   CME-602: seccomp-bpf Profile    [S:C → S:U, AC:L → AC:H]
   CME-603: Unprivileged BPF Disabled [PR:L → PR:H]
@@ -653,22 +677,30 @@ The effective risk drops dramatically — the attacker needs high privileges, hi
 ## Project Structure
 
 ```
-~/projects/cme/
+cme/
 ├── pyproject.toml                  # Python project config, dependencies
 ├── README.md                       # This file
 ├── Dockerfile                      # Container image for multi-user deployment
 ├── docker-compose.yml              # PostgreSQL + MCP server stack
+├── build_site.py                   # Generates the static docs/ site from data/entries/
 ├── .dockerignore
+├── .github/
+│   └── workflows/
+│       └── validate.yml            # CI: runs src/validate.py on push/PR
 ├── schema/
 │   └── cme-entry.schema.json       # JSON Schema for CME entries
 ├── data/
 │   ├── entries/                    # Source of truth: one JSON file per CME entry
 │   │   ├── CME-101.json
 │   │   ├── CME-102.json
-│   │   └── ... (71 files)
+│   │   └── ... (109 files)
 │   ├── proposals/                  # Pending proposals awaiting review
 │   ├── cme.db                      # SQLite database (generated, gitignored)
 │   └── cme_seed_data.json          # Legacy single-file seed data
+├── templates/                      # Jinja2 templates for the static site
+├── docs/                           # Generated static site (committed; published via GitHub Pages)
+├── skills/
+│   └── cve-to-cme.md               # Claude skill: map a CVE ID to applicable CME controls
 └── src/
     ├── __init__.py
     ├── config.py                   # Environment-based configuration
@@ -676,7 +708,7 @@ The effective risk drops dramatically — the attacker needs high privileges, hi
     ├── db_postgres.py              # PostgreSQL database backend
     ├── seed.py                     # Loads data/entries/*.json into either backend
     ├── validate.py                 # Schema validation for all entry files
-    └── server.py                   # MCP server: 10 tools, 3 resources, dual transport
+    └── server.py                   # MCP server: 12 tools, 3 resources, dual transport
 ```
 
 ---
