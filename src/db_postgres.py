@@ -37,7 +37,9 @@ def init_db(conn: psycopg.Connection) -> None:
             confidence      TEXT CHECK(confidence IN ('High','Medium','Low')),
             platforms_json  TEXT,
             d3fend_technique_id   TEXT,
-            d3fend_technique_name TEXT
+            d3fend_technique_name TEXT,
+            cve_schema_version    TEXT,
+            cve_affected_json     TEXT
         )
     """)
     conn.execute("""
@@ -95,10 +97,12 @@ def insert_entry(conn: psycopg.Connection, entry: dict) -> None:
     conn.execute(
         """INSERT INTO cme_entries
            (cme_id, control_name, description, tactic, category, control_layer,
-            confidence, platforms_json, d3fend_technique_id, d3fend_technique_name)
+            confidence, platforms_json, d3fend_technique_id, d3fend_technique_name,
+            cve_schema_version, cve_affected_json)
            VALUES (%(cme_id)s, %(control_name)s, %(description)s, %(tactic)s, %(category)s,
                    %(control_layer)s, %(confidence)s, %(platforms_json)s,
-                   %(d3fend_technique_id)s, %(d3fend_technique_name)s)
+                   %(d3fend_technique_id)s, %(d3fend_technique_name)s,
+                   %(cve_schema_version)s, %(cve_affected_json)s)
            ON CONFLICT (cme_id) DO UPDATE SET
                control_name = EXCLUDED.control_name,
                description = EXCLUDED.description,
@@ -108,7 +112,9 @@ def insert_entry(conn: psycopg.Connection, entry: dict) -> None:
                confidence = EXCLUDED.confidence,
                platforms_json = EXCLUDED.platforms_json,
                d3fend_technique_id = EXCLUDED.d3fend_technique_id,
-               d3fend_technique_name = EXCLUDED.d3fend_technique_name""",
+               d3fend_technique_name = EXCLUDED.d3fend_technique_name,
+               cve_schema_version = EXCLUDED.cve_schema_version,
+               cve_affected_json = EXCLUDED.cve_affected_json""",
         {
             "cme_id": entry["cme_id"],
             "control_name": entry["control_name"],
@@ -120,6 +126,8 @@ def insert_entry(conn: psycopg.Connection, entry: dict) -> None:
             "platforms_json": json.dumps(entry.get("platforms", [])),
             "d3fend_technique_id": entry.get("d3fend_mapping", {}).get("technique_id"),
             "d3fend_technique_name": entry.get("d3fend_mapping", {}).get("technique_name"),
+            "cve_schema_version": entry.get("cve_schema_version"),
+            "cve_affected_json": json.dumps(entry["cve_affected"]) if entry.get("cve_affected") else None,
         },
     )
 
@@ -288,9 +296,25 @@ def get_coverage_summary(conn: psycopg.Connection) -> dict:
     }
 
 
+def get_entries_with_cve_affected(conn: psycopg.Connection) -> list[dict]:
+    rows = conn.execute(
+        """SELECT * FROM cme_entries
+           WHERE cve_affected_json IS NOT NULL
+           ORDER BY cme_id"""
+    ).fetchall()
+    return [_hydrate(conn, dict(r)) for r in rows]
+
+
 def _hydrate(conn: psycopg.Connection, entry: dict) -> dict:
     cme_id = entry["cme_id"]
     entry["platforms"] = json.loads(entry.pop("platforms_json") or "[]")
+
+    cve_affected_raw = entry.pop("cve_affected_json", None)
+    if cve_affected_raw:
+        entry["cve_affected"] = json.loads(cve_affected_raw)
+    schema_version = entry.pop("cve_schema_version", None)
+    if schema_version:
+        entry["cve_schema_version"] = schema_version
 
     if entry.get("d3fend_technique_id"):
         entry["d3fend_mapping"] = {

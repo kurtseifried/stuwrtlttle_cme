@@ -299,6 +299,93 @@ def get_mitigations_for_cvss_vector(cvss_vector: str) -> str:
 
 
 @mcp.tool()
+def get_mitigations_for_product(
+    cpe: str = "",
+    purl: str = "",
+    vendor: str = "",
+    product: str = "",
+    platform: str = "",
+) -> str:
+    """Find CME controls applicable to a specific product, enabling structural joins with CVE records.
+
+    Searches entries that have cve_affected[] populated (CVE 5.x affected[] shape).
+    Accepts any combination of identifiers — the more specific, the more precise.
+
+    Args:
+        cpe: CPE string to match (prefix match, e.g., "cpe:2.3:o:redhat:enterprise_linux:9")
+        purl: Package URL to match (e.g., "pkg:rpm/redhat/kernel")
+        vendor: Vendor name to match (e.g., "redhat", "microsoft")
+        product: Product name to match (e.g., "enterprise_linux", "windows")
+        platform: Platform string to match within cve_affected[].platforms[] (e.g., "x86_64", "Windows")
+
+    Returns CME entries whose cve_affected[] matches the given criteria,
+    with the matched product highlighted. Use with CVE affected[] data to
+    find which controls apply to a specific vulnerable product.
+    """
+    if not any([cpe, purl, vendor, product, platform]):
+        return json.dumps({"error": "At least one filter parameter is required"})
+
+    entries = db.get_entries_with_cve_affected(_get_db())
+    if not entries:
+        return json.dumps({"message": "No entries have cve_affected data yet"})
+
+    results = []
+    for entry in entries:
+        matched_products = []
+        for prod in entry.get("cve_affected", []):
+            match = False
+
+            if cpe:
+                for entry_cpe in prod.get("cpes", []):
+                    if entry_cpe.startswith(cpe) or cpe.startswith(entry_cpe):
+                        match = True
+                        break
+
+            if purl and not match:
+                entry_purl = prod.get("packageURL", "")
+                if entry_purl and (entry_purl == purl or purl.startswith(entry_purl)):
+                    match = True
+
+            if vendor and product and not match:
+                if (prod.get("vendor", "").lower() == vendor.lower() and
+                        prod.get("product", "").lower() == product.lower()):
+                    match = True
+
+            if platform and not match:
+                prod_platforms = prod.get("platforms", [])
+                if prod_platforms:
+                    if any(platform.lower() == p.lower() for p in prod_platforms):
+                        match = True
+
+            if match:
+                matched_products.append(prod)
+
+        if matched_products:
+            results.append({
+                "cme_id": entry["cme_id"],
+                "control_name": entry["control_name"],
+                "tactic": entry["tactic"],
+                "category": entry["category"],
+                "control_layer": entry["control_layer"],
+                "matched_products": matched_products,
+                "cvss_vector_impacts": entry.get("cvss_vector_impacts", []),
+                "cwe_relationships": entry.get("cwe_relationships", []),
+            })
+
+    if not results:
+        return json.dumps({
+            "message": "No CME entries match the given product criteria",
+            "filters": {"cpe": cpe, "purl": purl, "vendor": vendor, "product": product, "platform": platform},
+        })
+
+    return json.dumps({
+        "total_matches": len(results),
+        "filters": {"cpe": cpe, "purl": purl, "vendor": vendor, "product": product, "platform": platform},
+        "entries": results,
+    }, indent=2)
+
+
+@mcp.tool()
 def get_cme_coverage_summary() -> str:
     """Get a summary of what the CME database currently covers.
 

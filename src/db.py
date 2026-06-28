@@ -28,7 +28,9 @@ def init_db(conn: sqlite3.Connection) -> None:
             confidence      TEXT CHECK(confidence IN ('High','Medium','Low')),
             platforms_json  TEXT,   -- JSON array
             d3fend_technique_id   TEXT,
-            d3fend_technique_name TEXT
+            d3fend_technique_name TEXT,
+            cve_schema_version    TEXT,
+            cve_affected_json     TEXT   -- JSON array, CVE 5.x affected[] shape
         );
 
         CREATE TABLE IF NOT EXISTS cvss_vector_impacts (
@@ -76,8 +78,9 @@ def insert_entry(conn: sqlite3.Connection, entry: dict) -> None:
     conn.execute(
         """INSERT OR REPLACE INTO cme_entries
            (cme_id, control_name, description, tactic, category, control_layer,
-            confidence, platforms_json, d3fend_technique_id, d3fend_technique_name)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            confidence, platforms_json, d3fend_technique_id, d3fend_technique_name,
+            cve_schema_version, cve_affected_json)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (
             entry["cme_id"],
             entry["control_name"],
@@ -89,6 +92,8 @@ def insert_entry(conn: sqlite3.Connection, entry: dict) -> None:
             json.dumps(entry.get("platforms", [])),
             entry.get("d3fend_mapping", {}).get("technique_id"),
             entry.get("d3fend_mapping", {}).get("technique_name"),
+            entry.get("cve_schema_version"),
+            json.dumps(entry["cve_affected"]) if entry.get("cve_affected") else None,
         ),
     )
 
@@ -255,9 +260,25 @@ def get_coverage_summary(conn: sqlite3.Connection) -> dict:
     }
 
 
+def get_entries_with_cve_affected(conn: sqlite3.Connection) -> list[dict]:
+    rows = conn.execute(
+        """SELECT * FROM cme_entries
+           WHERE cve_affected_json IS NOT NULL
+           ORDER BY cme_id"""
+    ).fetchall()
+    return [_hydrate(conn, dict(r)) for r in rows]
+
+
 def _hydrate(conn: sqlite3.Connection, entry: dict) -> dict:
     cme_id = entry["cme_id"]
     entry["platforms"] = json.loads(entry.pop("platforms_json") or "[]")
+
+    cve_affected_raw = entry.pop("cve_affected_json", None)
+    if cve_affected_raw:
+        entry["cve_affected"] = json.loads(cve_affected_raw)
+    schema_version = entry.pop("cve_schema_version", None)
+    if schema_version:
+        entry["cve_schema_version"] = schema_version
 
     if entry.get("d3fend_technique_id"):
         entry["d3fend_mapping"] = {

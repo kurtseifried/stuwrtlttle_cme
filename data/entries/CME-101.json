@@ -58,5 +58,61 @@
     "Ubuntu 24.04",
     "SLES 15",
     "Fedora"
+  ],
+  "cve_schema_version": "5.2.0",
+  "cve_affected": [
+    {
+      "vendor": "redhat",
+      "product": "enterprise_linux",
+      "cpes": [
+        "cpe:2.3:o:redhat:enterprise_linux:9:*:*:*:*:*:*:*",
+        "cpe:2.3:o:redhat:enterprise_linux:8:*:*:*:*:*:*:*"
+      ],
+      "platforms": ["x86_64", "aarch64", "s390x", "ppc64le"],
+      "defaultStatus": "applicable"
+    },
+    {
+      "vendor": "suse",
+      "product": "sle-module-basesystem",
+      "cpes": [
+        "cpe:2.3:o:suse:sles:15:*:*:*:*:*:*:*"
+      ],
+      "defaultStatus": "applicable"
+    },
+    {
+      "vendor": "canonical",
+      "product": "ubuntu_linux",
+      "cpes": [
+        "cpe:2.3:o:canonical:ubuntu_linux:24.04:*:*:*:lts:*:*:*"
+      ],
+      "defaultStatus": "applicable"
+    },
+    {
+      "vendor": "fedoraproject",
+      "product": "fedora",
+      "cpes": [
+        "cpe:2.3:o:fedoraproject:fedora:*:*:*:*:*:*:*:*"
+      ],
+      "defaultStatus": "applicable"
+    },
+    {
+      "vendor": "microsoft",
+      "product": "windows",
+      "cpes": [
+        "cpe:2.3:o:microsoft:windows_10:*:*:*:*:*:*:*:*",
+        "cpe:2.3:o:microsoft:windows_11:*:*:*:*:*:*:*:*",
+        "cpe:2.3:o:microsoft:windows_server_2019:*:*:*:*:*:*:*",
+        "cpe:2.3:o:microsoft:windows_server_2022:*:*:*:*:*:*:*"
+      ],
+      "defaultStatus": "applicable"
+    },
+    {
+      "vendor": "apple",
+      "product": "macos",
+      "cpes": [
+        "cpe:2.3:o:apple:macos:*:*:*:*:*:*:*:*"
+      ],
+      "defaultStatus": "applicable"
+    }
   ]
 }

@@ -11,13 +11,15 @@ A structured taxonomy of defensive security controls mapped to deterministic CVS
 - [How It Relates to D3FEND](#how-it-relates-to-d3fend)
 - [Architecture](#architecture)
 - [Quick Start](#quick-start)
+- [Public Deployment](#public-deployment)
 - [MCP Server](#mcp-server)
   - [How It Runs](#how-it-runs)
-  - [Query Tools (9)](#query-tools)
+  - [Query Tools (10)](#query-tools)
   - [Curation Tools (3)](#curation-tools)
   - [Resources (3)](#resources)
-  - [Connecting to Claude Code](#connecting-to-claude-code)
-  - [Connecting to Claude Desktop](#connecting-to-claude-desktop)
+  - [Connecting to the Public Server](#connecting-to-the-public-server)
+  - [Connecting Locally (stdio)](#connecting-locally-stdio)
+  - [Connecting to a Self-Hosted HTTP Server](#connecting-to-a-self-hosted-http-server)
   - [MCP Inspector (Manual Testing)](#mcp-inspector)
 - [Taxonomy Structure](#taxonomy-structure)
   - [Tactics](#tactics)
@@ -30,6 +32,7 @@ A structured taxonomy of defensive security controls mapped to deterministic CVS
   - [Querying Directly](#querying-directly)
 - [JSON Schema](#json-schema)
   - [Entry Structure](#entry-structure)
+  - [Product Applicability (`cve_affected`)](#product-applicability-cve_affected)
   - [Validation](#validation)
 - [Multi-User Workflow](#multi-user-workflow)
   - [Proposing New Entries](#proposing-new-entries)
@@ -40,6 +43,7 @@ A structured taxonomy of defensive security controls mapped to deterministic CVS
   - [AI Agent Risk Negotiation](#ai-agent-risk-negotiation)
   - [CWE-Based Mitigation Lookup](#cwe-based-mitigation-lookup)
   - [CVE Risk Simulation](#cve-risk-simulation)
+- [Static Website](#static-website)
 - [Project Structure](#project-structure)
 - [Sources and References](#sources-and-references)
 
@@ -102,7 +106,7 @@ data/entries/              src/server.py              Client
   CME-102.json        │   CME MCP Server    │     Claude Code
   CME-103.json        │   (FastMCP, stdio)  │ <── Claude Desktop
   ...                 │         |           │
-  CME-1203.json       │    ┌────┴────┐      │
+  CME-1309.json       │    ┌────┴────┐      │
        |              │    │ SQLite  │      │
        |              │    │ cme.db  │      │
   schema/             │    └─────────┘      │
@@ -123,7 +127,7 @@ data/entries/              docker-compose.yml              Clients
   CME-102.json        │  CME MCP Server          │    Claude Code
   CME-103.json        │  (FastMCP, HTTP :8000)    │    Claude Desktop
   ...                 │         |                 │ <──AI Agents
-  CME-1203.json       │    ┌────┴──────────┐      │    Scanners
+  CME-1309.json       │    ┌────┴──────────┐      │    Scanners
        |              │    │  PostgreSQL   │      │    Wiz / CrowdStrike
        |              │    │  (persistent) │      │
   schema/             │    └───────────────┘      │
@@ -174,6 +178,17 @@ To reset: `docker compose down -v && docker compose up -d`.
 
 ---
 
+## Public Deployment
+
+The CME taxonomy is publicly available at **https://cmetaxonomy.org**:
+
+- **Static site** — Browse all 109 entries, search by tactic/category/CWE, view CVSS attenuation details
+- **MCP server** — Connect AI agents and tools to the live CME database at `https://cmetaxonomy.org/mcp`
+
+The site is generated from entry JSON files by `build_site.py` and served via nginx. The MCP server runs as a Docker Compose stack (PostgreSQL + FastMCP) behind an nginx reverse proxy with TLS.
+
+---
+
 ## MCP Server
 
 ### How It Runs
@@ -194,13 +209,14 @@ CME_DB_BACKEND=postgres CME_TRANSPORT=streamable-http uv run python -m src.serve
 |------|-------------|
 | `get_cme_entry` | Look up a specific CME entry by ID (e.g., `CME-601`). Returns the full entry with description, CVSS vector impacts, CWE relationships, verification commands, and references. |
 | `search_cme` | Search entries by tactic (`Harden`, `Isolate`, `Detect`, `Evict`, `Restore`), category (`Kernel Hardening`, `Network Isolation`, etc.), control layer (`Network`, `OS/Kernel`, `Application`, `Data`, `Identity`), or free-text keyword across names and descriptions. |
-| `get_mitigations_for_weakness` | Given a CWE ID (e.g., `CWE-119`), returns all CME controls that mitigate that weakness class. For CWE-119 (memory corruption), this returns 15 controls spanning ASLR, NX, SMEP, seccomp, gVisor, and more. |
+| `get_mitigations_for_weakness` | Given a CWE ID (e.g., `CWE-119`), returns all CME controls that mitigate that weakness class (memory corruption returns 15+ controls spanning ASLR, NX, SMEP, seccomp, gVisor, and more). |
+| `get_mitigations_for_cvss_vector` | Given a CVSS vector string, finds all CME entries whose impacts attenuate metrics that are set to high-severity values in that vector. |
 | `calculate_attenuation` | Given a list of active CME-IDs on a system, aggregates all CVSS vector modifications. This is the core of CME: deterministic environmental scoring. |
 | `simulate_cve_risk` | The "Risk Negotiation" tool. Feed in a CVE's base score, CVSS vector string, and active CME controls — get back the modified vector showing exactly how each metric shifts. |
-| `get_mitigations_for_cvss_vector` | Given a CVSS vector string, parses its metric/value pairs and returns CME entries that attenuate those specific metrics, grouped by metric. |
-| `get_cme_coverage_summary` | Summarizes what the taxonomy currently covers — which CWEs have mitigations, which CVSS metric transitions are addressed, and per-tactic/category counts. Useful for finding gaps. |
 | `list_cme_taxonomy` | Returns the full taxonomy hierarchy: all tactics with entry counts, all categories with their tactic, control layer, and counts. |
 | `get_verification_commands` | Returns the shell commands a scanner or agent can run to verify whether a specific control is active on a target system. |
+| `get_cme_coverage_summary` | Returns aggregate coverage statistics: CWE IDs covered with counts, CVSS metric transitions, per-tactic and per-category breakdowns. |
+| `get_mitigations_for_product` | Given a product identifier (CPE, PURL, vendor/product, or platform), finds all CME entries applicable to that product via structural join against `cve_affected` data. The flagship cross-referencing tool for CVE-to-CME matching. |
 
 ### Curation Tools
 
@@ -218,16 +234,37 @@ CME_DB_BACKEND=postgres CME_TRANSPORT=streamable-http uv run python -m src.serve
 | `cme://entry/{cme_id}` | A specific CME entry by ID |
 | `cme://schema` | The CME JSON schema |
 
-### Connecting to Claude Code
+### Connecting to the Public Server
 
+The easiest way to use CME — connect to the hosted instance at `cmetaxonomy.org`:
+
+**Claude Code:**
+```bash
+claude mcp add cme --transport http https://cmetaxonomy.org/mcp
+```
+
+**Claude Desktop** (`claude_desktop_config.json`):
+```json
+{
+  "mcpServers": {
+    "cme": {
+      "transport": "http",
+      "url": "https://cmetaxonomy.org/mcp"
+    }
+  }
+}
+```
+
+### Connecting Locally (stdio)
+
+Run the MCP server locally from a clone of this repo:
+
+**Claude Code:**
 ```bash
 claude mcp add cme -- uv run --directory /path/to/cme python -m src.server
 ```
 
-### Connecting to Claude Desktop
-
-Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
-
+**Claude Desktop** (`claude_desktop_config.json`):
 ```json
 {
   "mcpServers": {
@@ -239,9 +276,9 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 }
 ```
 
-### Connecting to Shared HTTP Server (Multi-User)
+### Connecting to a Self-Hosted HTTP Server
 
-When the server is running in HTTP mode (via Docker Compose or manually), configure clients to connect over HTTP instead of stdio:
+When running the server in HTTP mode (via Docker Compose or manually):
 
 **Claude Code:**
 ```bash
@@ -268,7 +305,7 @@ To test tools interactively outside of a Claude client, use the MCP Inspector:
 cd /path/to/cme && uv run mcp dev src/server.py
 ```
 
-This launches a web UI at `localhost:6274` where you can call all 12 tools and browse resources.
+This launches a web UI at `localhost:6274` where you can call all 13 tools and browse resources.
 
 ---
 
@@ -293,35 +330,41 @@ The taxonomy uses 5 D3FEND-aligned tactics:
 ```
 Harden (71 entries)
 ├── Kernel Hardening (17): ASLR, NX, Stack Canaries, KASLR, SMEP, SMAP,
-│   kptr_restrict, RELRO/PIE, CFI, FORTIFY_SOURCE, and more
-├── Application Controls (12): WAF, CSP Headers, Rate Limiting, and more
-├── Application Input Validation (12): parameterized queries, output encoding,
-│   path canonicalization, and other injection/traversal defenses
-├── Cryptographic Controls (7): Crypto Policy, FIPS, TLS 1.3, Cert Pinning, DNSSEC, GPG
+│   Module Restriction, kptr_restrict, Lockdown, KEXEC, Secure Boot, RELRO/PIE,
+│   CFI, Resource Limits, FORTIFY_SOURCE, Heap Allocator Hardening, Protected File Links
+├── Application Controls (12): WAF, CSP Headers, Rate Limiting, App-Layer RBAC,
+│   IDOR Prevention, Default-Deny API Auth, HTTP Header Normalization,
+│   CSRF Protection, CORS Allowlist, Cross-Origin Restriction, SameSite Cookies
+├── Application Input Validation (12): Path Traversal Prevention, Deserialization Allowlist,
+│   SSRF Prevention, SQL Injection Prevention, XSS Prevention, Command Injection Prevention,
+│   Origin/CORS Validation, Script Engine Restriction, File Upload Validation, Input Bounds
+├── Cryptographic Controls (7): Crypto Policy, FIPS, TLS 1.3, Cert Pinning, DNSSEC, GPG,
+│   Data-at-Rest Encryption (LUKS)
 ├── Credential Hardening (6): MFA, pwquality, Account Lockout, SSH Key-Only, Rotation, Kerberos
-├── Filesystem Hardening (5): noexec /tmp, nosuid, dm-verity, IMA/EVM, and more
+├── Filesystem Hardening (5): noexec /tmp, nosuid, dm-verity, IMA/EVM, Secure Dynamic Linker
 ├── Mandatory Access Control (4): SELinux Enforcing, Confined Users, Booleans, AppArmor
 ├── Syscall & BPF Controls (4): seccomp, seccomp-bpf, BPF restriction, User Namespaces
 ├── Protocol Hardening (3): SSH Hardening, Disable Services, Kernel Network sysctl
-└── Network Isolation (1)
+└── Network Isolation (1): DNS Rebinding Protection
 
 Isolate (21 entries)
-├── Container Isolation (6): gVisor, Namespaces, Rootless, cgroups v2, Dropped Capabilities, Pod Security
 ├── Network Isolation (6): Zero Trust, firewalld, VLANs, IPsec/WireGuard, Localhost Bind, NetworkPolicy
+├── Container Isolation (6): gVisor, Namespaces, Rootless, cgroups v2, Dropped Capabilities, Pod Security
 ├── Privilege Isolation (4): NoNewPrivileges, sudo Least Privilege, systemd Sandboxing, DynamicUser
-├── Filesystem Hardening (2): Read-Only Root, and more
-├── Application Controls (2)
-└── Application Input Validation (1)
+├── Filesystem Hardening (2): Read-Only Root, Landlock LSM
+├── Application Controls (2): Role Separation, Fine-Grained Admin Permission Scoping
+└── Application Input Validation (1): App-Level Filesystem Access Confinement
 
 Detect (10 entries)
-├── Runtime Detection (7): EDR, auditd, Falco, and more
-└── Integrity Detection (3): AIDE, and more
+├── Runtime Detection (7): EDR, auditd, Falco, KASAN/HWASan, Privilege Change Audit,
+│   App Admin Event Logging, Privilege Assignment Monitoring
+└── Integrity Detection (3): AIDE, Configuration Drift Detection
 
 Evict (3 entries)
 └── Patch Management (3): dnf-automatic, kpatch/livepatch, Container Image Rebuilds
 
 Restore (4 entries)
-└── Recovery Controls (4): Immutable Infrastructure, Backups, DR Failover, and more
+└── Recovery Controls (4): Immutable Infrastructure, Backups, DR Failover
 ```
 
 Control layers: OS/Kernel (50), Application (38), Network (13), Identity (6), Data (2).
@@ -403,7 +446,7 @@ The database is generated from individual JSON entry files:
 uv run python -m src.seed
 ```
 
-Output: `data/cme.db` (SQLite, generated from the 109 entry files; gitignored)
+Output: `data/cme.db` (SQLite, generated from 109 entries)
 
 ### Querying Directly
 
@@ -477,6 +520,91 @@ Each CME entry follows the schema at `schema/cme-entry.schema.json`. The core st
     }
   ]
 }
+```
+
+### Product Applicability (`cve_affected`)
+
+CME entries can optionally declare which products they apply to using the `cve_affected` field — a structured product identity container that reuses the [CVE 5.x `affected[]` schema](https://github.com/CVEProject/cve-schema). This enables the flagship use case: **structural join against CVE records** to answer "which CME controls help with this CVE on this system?"
+
+#### Schema alignment
+
+| CME field | CVE equivalent | Purpose |
+|-----------|---------------|---------|
+| `cve_affected` | `affected[]` | Array of product objects with vendor, product, CPE, PURL, version ranges, platforms |
+| `cve_schema_version` | `dataVersion` | Pinned CVE Record Format version (e.g., `"5.2.0"`) so parsers know which schema to expect |
+
+The `cve_schema_version` field is **required** whenever `cve_affected` is present (enforced via `dependentRequired`).
+
+#### Status semantics
+
+CVE uses `status: "affected" | "unaffected" | "unknown"` to describe vulnerability state. CME repurposes the same shape with different semantics:
+
+| CME status | Meaning |
+|-----------|---------|
+| `applicable` | This control applies to this product |
+| `not-applicable` | This control does not apply to this product |
+| `unknown` | Applicability has not been determined |
+
+Using distinct string values (not reinterpreting "affected") prevents accidental misuse when the same codebase handles both CVE and CME records.
+
+#### Example: CME-101 (ASLR) — cross-platform applicability
+
+```json
+{
+  "cme_id": "CME-101",
+  "control_name": "ASLR (Address Space Layout Randomization)",
+  "cve_schema_version": "5.2.0",
+  "cve_affected": [
+    {
+      "vendor": "redhat",
+      "product": "enterprise_linux",
+      "cpes": [
+        "cpe:2.3:o:redhat:enterprise_linux:9:*:*:*:*:*:*:*",
+        "cpe:2.3:o:redhat:enterprise_linux:8:*:*:*:*:*:*:*"
+      ],
+      "platforms": ["x86_64", "aarch64", "s390x", "ppc64le"],
+      "defaultStatus": "applicable"
+    },
+    {
+      "vendor": "microsoft",
+      "product": "windows",
+      "cpes": [
+        "cpe:2.3:o:microsoft:windows_10:*:*:*:*:*:*:*:*",
+        "cpe:2.3:o:microsoft:windows_11:*:*:*:*:*:*:*:*"
+      ],
+      "defaultStatus": "applicable"
+    },
+    {
+      "vendor": "apple",
+      "product": "macos",
+      "cpes": ["cpe:2.3:o:apple:macos:*:*:*:*:*:*:*:*"],
+      "defaultStatus": "applicable"
+    }
+  ]
+}
+```
+
+The legacy `platforms` string array (e.g., `["RHEL 9", "Ubuntu 24.04"]`) remains for backward compatibility. `cve_affected` is the structured successor — entries without it continue to work in all query paths.
+
+#### Structural join with CVE records
+
+The `get_mitigations_for_product` MCP tool performs the structural join. Given a product identifier from a CVE record, it finds all CME entries whose `cve_affected[]` matches:
+
+1. **CPE prefix match** — most precise, standard in vulnerability management
+2. **PURL match** — for package-level controls (npm, PyPI, container images)
+3. **vendor + product exact match** — fallback when CPE/PURL aren't populated
+4. **platforms overlap** — loosest match, for architecture-specific controls
+
+```
+Tool:   get_mitigations_for_product(vendor="redhat", product="enterprise_linux")
+
+Result: CME-101 (ASLR), CME-301 (SELinux), ...
+```
+
+```
+Tool:   get_mitigations_for_product(cpe="cpe:2.3:o:microsoft:windows_10:*:*:*:*:*:*:*:*")
+
+Result: CME-101 (ASLR)
 ```
 
 ### Validation
@@ -676,6 +804,33 @@ The effective risk drops dramatically — the attacker needs high privileges, hi
 
 ---
 
+## Static Website
+
+The static site at [cmetaxonomy.org](https://cmetaxonomy.org) is generated from entry JSON files:
+
+```bash
+uv run python build_site.py
+```
+
+This reads all `data/entries/*.json` files and produces HTML pages in `docs/`:
+- `docs/index.html` — searchable index of all entries
+- `docs/entries/CME-XXX.html` — individual entry detail pages
+- `docs/by-tactic.html` — entries organized by tactic/category
+- `docs/by-cwe.html` — CWE-to-CME cross-reference
+- `docs/search.html` — full-text search
+
+Templates are in `templates/` using Jinja2. To update the public site after adding entries:
+
+```bash
+uv run python build_site.py   # regenerate HTML
+git add docs/ && git commit    # commit generated pages
+git push                       # push to GitHub
+# Then on the VPS:
+cd ~/cme && git pull && docker compose up -d --build
+```
+
+---
+
 ## Project Structure
 
 ```
@@ -684,25 +839,32 @@ cme/
 ├── README.md                       # This file
 ├── Dockerfile                      # Container image for multi-user deployment
 ├── docker-compose.yml              # PostgreSQL + MCP server stack
-├── build_site.py                   # Generates the static docs/ site from data/entries/
+├── build_site.py                   # Static site generator (JSON → HTML)
 ├── .dockerignore
 ├── .github/
 │   └── workflows/
 │       └── validate.yml            # CI: runs src/validate.py on push/PR
 ├── schema/
 │   └── cme-entry.schema.json       # JSON Schema for CME entries
-├── data/
-│   ├── entries/                    # Source of truth: one JSON file per CME entry
-│   │   ├── CME-101.json
-│   │   ├── CME-102.json
-│   │   └── ... (109 files)
-│   ├── proposals/                  # Pending proposals awaiting review
-│   ├── cme.db                      # SQLite database (generated, gitignored)
-│   └── cme_seed_data.json          # Legacy single-file seed data
 ├── templates/                      # Jinja2 templates for the static site
-├── docs/                           # Generated static site (committed; GitHub Pages target, not yet enabled)
-├── skills/
-│   └── cve-to-cme.md               # Claude skill: map a CVE ID to applicable CME controls
+│   ├── base.html
+│   ├── index.html
+│   ├── entry.html
+│   ├── by_tactic.html
+│   ├── by_cwe.html
+│   ├── search.html
+│   └── static/                     # CSS/JS assets
+├── docs/                           # Generated static site (served at cmetaxonomy.org)
+│   ├── index.html
+│   ├── entries/
+│   ├── by-tactic.html
+│   ├── by-cwe.html
+│   ├── search.html
+│   └── style.css
+├── data/
+│   ├── entries/                    # Source of truth: one JSON file per CME entry (109 files)
+│   ├── proposals/                  # Pending proposals awaiting review
+│   └── cme.db                     # SQLite database (generated, gitignored)
 └── src/
     ├── __init__.py
     ├── config.py                   # Environment-based configuration
@@ -710,7 +872,7 @@ cme/
     ├── db_postgres.py              # PostgreSQL database backend
     ├── seed.py                     # Loads data/entries/*.json into either backend
     ├── validate.py                 # Schema validation for all entry files
-    └── server.py                   # MCP server: 12 tools, 3 resources, dual transport
+    └── server.py                   # MCP server: 13 tools, 3 resources, dual transport
 ```
 
 ---
@@ -723,4 +885,4 @@ cme/
 - **CIS Benchmarks**: CIS Red Hat Enterprise Linux 9 Benchmark — verification commands and configuration standards
 - **NIST SP 800-53**: Security and Privacy Controls for Information Systems
 - **CVSS v4.0 Specification**: FIRST CVSS v4.0 — base metric definitions and environmental scoring
-- **CVE JSON 5.1 Schema**: CVE record format for integration context
+- **CVE JSON 5.x Schema**: https://github.com/CVEProject/cve-schema — CVE Record Format; `cve_affected` reuses the `affected[]/product` definition

@@ -1,10 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://cme.example.org/schema/cme-entry.schema.json",
+  "$id": "https://cmetaxonomy.org/schema/cme-entry.schema.json",
   "title": "Common Mitigation Enumeration (CME) Entry",
   "description": "A structured defensive control entry in the CME taxonomy, designed to complement CVE/CWE by identifying mitigations and mapping their deterministic impact on CVSS environmental scoring.",
   "type": "object",
   "required": ["cme_id", "control_name", "description", "tactic", "category", "control_layer", "cvss_vector_impacts"],
+  "dependentRequired": {
+    "cve_affected": ["cve_schema_version"]
+  },
   "properties": {
     "cme_id": {
       "type": "string",
@@ -71,7 +74,7 @@
               },
               "platform": {
                 "type": "string",
-                "enum": ["linux", "rhel", "debian", "kubernetes", "any"],
+                "enum": ["linux", "rhel", "debian", "kubernetes", "windows", "macos", "any"],
                 "description": "Platform this check applies to"
               }
             },
@@ -119,7 +122,20 @@
       "items": {
         "type": "string"
       },
-      "description": "Platforms where this control is applicable (e.g., RHEL 9, Ubuntu 24.04, Kubernetes)"
+      "description": "Legacy platform applicability list. Use cve_affected for structured product identity with CPE/PURL support."
+    },
+    "cve_schema_version": {
+      "type": "string",
+      "pattern": "^5\\.(0|[1-9][0-9]*)(\\.(0|[1-9][0-9]*))?$",
+      "description": "CVE Record Format schema version that cve_affected conforms to (e.g., '5.1', '5.2.0'). Pinned explicitly so parsers don't have to detect it. Required when cve_affected is present."
+    },
+    "cve_affected": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/cme_product"
+      },
+      "description": "Products and platforms where this control is applicable, using the CVE 5.x affected[] container shape. Enables structural joins against CVE records for product-scoped mitigation queries."
     }
   },
   "$defs": {
@@ -143,6 +159,181 @@
         "rationale": {
           "type": "string",
           "description": "Technical justification for this specific attenuation"
+        }
+      }
+    },
+    "cme_status": {
+      "type": "string",
+      "enum": ["applicable", "not-applicable", "unknown"],
+      "description": "Whether this control is applicable to the product. Analogous to CVE status (affected/unaffected/unknown) but with CME-specific semantics: 'applicable' means the control can be deployed on this product."
+    },
+    "cme_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "description": "A version string, following the CVE 5.x version definition."
+    },
+    "cme_product": {
+      "$comment": "Mirrors CVE Record Format 5.2.0 #/definitions/product. Status enum changed from affected/unaffected/unknown to applicable/not-applicable/unknown. See https://github.com/CVEProject/cve-schema",
+      "type": "object",
+      "anyOf": [
+        { "required": ["vendor", "product"] },
+        { "required": ["collectionURL", "packageName"] }
+      ],
+      "properties": {
+        "vendor": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "description": "Name of the organization that created or maintains this product"
+        },
+        "product": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "description": "Name of the product where this control is applicable"
+        },
+        "collectionURL": {
+          "type": "string",
+          "format": "uri",
+          "minLength": 1,
+          "maxLength": 2048,
+          "description": "URL identifying a package collection (determines the meaning of packageName)"
+        },
+        "packageName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "description": "Name or identifier of the package as used in the package collection"
+        },
+        "packageURL": {
+          "type": "string",
+          "format": "uri",
+          "minLength": 1,
+          "maxLength": 2048,
+          "description": "Package URL (PURL) for the product, without version (e.g., pkg:rpm/redhat/kernel)"
+        },
+        "cpes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048,
+            "pattern": "([c][pP][eE]:/[AHOaho]?(:[A-Za-z0-9._\\-~%]*){0,6})|(cpe:2\\.3:[aho*\\-](:[A-Za-z0-9._\\-~%*]*){0,12})"
+          },
+          "description": "CPE identifiers for this product (CPE 2.2 or 2.3 format)"
+        },
+        "modules": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "description": "Affected components, features, modules, or sub-components"
+        },
+        "platforms": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "maxLength": 1024
+          },
+          "description": "Platforms where this control applies to this product (e.g., x86_64, ARM, 64 bit). Absent means all platforms."
+        },
+        "programFiles": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "description": "Source code files relevant to this control on this product"
+        },
+        "programRoutines": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Program routines relevant to this control"
+        },
+        "repo": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL of the source code repository"
+        },
+        "defaultStatus": {
+          "$ref": "#/$defs/cme_status",
+          "description": "Default applicability status for versions not listed in the versions array. Defaults to 'unknown' if omitted."
+        },
+        "versions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "required": ["version", "status"],
+            "properties": {
+              "version": {
+                "$ref": "#/$defs/cme_version",
+                "description": "The single version being described, or the start of a version range"
+              },
+              "status": {
+                "$ref": "#/$defs/cme_status",
+                "description": "Applicability status for this version or range"
+              },
+              "versionType": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "description": "The version numbering system (e.g., semver, rpm, custom, git)"
+              },
+              "lessThan": {
+                "$ref": "#/$defs/cme_version",
+                "description": "Non-inclusive upper limit of the version range"
+              },
+              "lessThanOrEqual": {
+                "$ref": "#/$defs/cme_version",
+                "description": "Inclusive upper limit of the version range"
+              },
+              "changes": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "object",
+                  "required": ["at", "status"],
+                  "properties": {
+                    "at": {
+                      "$ref": "#/$defs/cme_version",
+                      "description": "The version at which a status change occurs"
+                    },
+                    "status": {
+                      "$ref": "#/$defs/cme_status",
+                      "description": "The new applicability status starting at this version"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "description": "Status changes within the version range"
+              }
+            }
+          },
+          "description": "Version ranges where this control is applicable"
         }
       }
     }

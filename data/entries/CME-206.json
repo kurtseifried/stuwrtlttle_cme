@@ -37,5 +37,39 @@
   "platforms": [
     "Kubernetes",
     "OpenShift"
+  ],
+  "cve_schema_version": "5.2.0",
+  "cve_affected": [
+    {
+      "vendor": "kubernetes",
+      "product": "kubernetes",
+      "cpes": [
+        "cpe:2.3:a:kubernetes:kubernetes:*:*:*:*:*:*:*:*"
+      ],
+      "defaultStatus": "applicable"
+    },
+    {
+      "vendor": "redhat",
+      "product": "openshift_container_platform",
+      "cpes": [
+        "cpe:2.3:a:redhat:openshift_container_platform:4:*:*:*:*:*:*:*"
+      ],
+      "defaultStatus": "applicable"
+    },
+    {
+      "vendor": "google",
+      "product": "google_kubernetes_engine",
+      "defaultStatus": "applicable"
+    },
+    {
+      "vendor": "amazon",
+      "product": "elastic_kubernetes_service",
+      "defaultStatus": "applicable"
+    },
+    {
+      "vendor": "microsoft",
+      "product": "azure_kubernetes_service",
+      "defaultStatus": "applicable"
+    }
   ]
 }

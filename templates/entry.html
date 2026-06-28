@@ -80,6 +80,41 @@
     </section>
     {% endif %}
 
+    {% if entry.cve_affected %}
+    <section>
+      <h2>Applicability (CVE {{ entry.cve_schema_version }} Schema)</h2>
+      <table class="cvss-table">
+        <thead>
+          <tr>
+            <th>Vendor</th>
+            <th>Product</th>
+            <th>CPEs</th>
+            <th>Platforms</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for prod in entry.cve_affected %}
+          <tr>
+            <td>{{ prod.vendor | default(prod.get('collectionURL', '')) }}</td>
+            <td>{{ prod.product | default(prod.get('packageName', '')) }}</td>
+            <td class="cpe-cell">
+              {% for cpe in prod.get('cpes', []) %}
+              <code class="cpe-string">{{ cpe }}</code>{% if not loop.last %}<br>{% endif %}
+              {% endfor %}
+            </td>
+            <td>{{ prod.get('platforms', []) | join(', ') | default('All', true) }}</td>
+            <td><span class="badge badge-confidence-high">{{ prod.get('defaultStatus', 'applicable') }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% if entry.get('cve_affected', [])[0].get('packageURL') %}
+      <p class="purl-note">Package URLs (PURL) available for programmatic lookups.</p>
+      {% endif %}
+    </section>
+    {% endif %}
+
     {% if entry.references %}
     <section>
       <h2>References</h2>
