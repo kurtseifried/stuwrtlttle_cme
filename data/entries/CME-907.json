@@ -28,7 +28,9 @@
   ],
   "confidence": "High",
   "platforms": [
-    "Any"
+    "Any",
+    "Windows Server 2019",
+    "Windows Server 2022"
   ],
   "verification": {
     "method": "Inspect application source for role-based authorization checks on privileged endpoints; test that unprivileged authenticated users receive 403 on admin endpoints",

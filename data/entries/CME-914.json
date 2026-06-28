@@ -25,7 +25,9 @@
   ],
   "confidence": "High",
   "platforms": [
-    "Any"
+    "Any",
+    "Windows Server 2019",
+    "Windows Server 2022"
   ],
   "verification": {
     "method": "Test that the server rejects unapproved origins and does not reflect arbitrary Origin headers in CORS response headers",

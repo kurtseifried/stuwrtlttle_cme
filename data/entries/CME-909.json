@@ -26,7 +26,9 @@
   ],
   "confidence": "High",
   "platforms": [
-    "Any"
+    "Any",
+    "Windows Server 2019",
+    "Windows Server 2022"
   ],
   "verification": {
     "method": "Verify that unauthenticated requests to non-public endpoints are rejected; inspect framework configuration for default-deny authorization policy",

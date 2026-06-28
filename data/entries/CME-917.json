@@ -22,7 +22,9 @@
     "RHEL 9",
     "RHEL 10",
     "Ubuntu 24.04",
-    "Fedora"
+    "Fedora",
+    "Windows Server 2019",
+    "Windows Server 2022"
   ],
   "verification": {
     "method": "Check that application server worker recycling is configured with a finite request limit",

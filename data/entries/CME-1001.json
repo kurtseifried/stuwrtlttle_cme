@@ -21,11 +21,35 @@
         "command": "systemctl is-active falcon-sensor 2>/dev/null || systemctl is-active mdatp 2>/dev/null",
         "expected": "active",
         "platform": "linux"
+      },
+      {
+        "command": "Get-Service 'Sense' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Status",
+        "expected": "Running",
+        "platform": "windows"
+      },
+      {
+        "command": "(Get-MpComputerStatus).RealTimeProtectionEnabled",
+        "expected": "True",
+        "platform": "windows"
       }
     ]
   },
   "confidence": "Medium",
   "platforms": [
     "Any"
+  ],
+  "cve_schema_version": "5.2.0",
+  "cve_affected": [
+    {
+      "vendor": "microsoft",
+      "product": "windows",
+      "cpes": [
+        "cpe:2.3:o:microsoft:windows_10:*:*:*:*:*:*:*:*",
+        "cpe:2.3:o:microsoft:windows_11:*:*:*:*:*:*:*:*",
+        "cpe:2.3:o:microsoft:windows_server_2019:*:*:*:*:*:*:*",
+        "cpe:2.3:o:microsoft:windows_server_2022:*:*:*:*:*:*:*"
+      ],
+      "defaultStatus": "applicable"
+    }
   ]
 }

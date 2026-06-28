@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CME-407: Data-at-Rest Encryption (LUKS/dm-crypt) — Common Mitigation Enumeration</title>
+  <title>CME-407: Data-at-Rest Encryption (LUKS/dm-crypt / BitLocker) — Common Mitigation Enumeration</title>
   <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -23,7 +23,7 @@
     
 <div class="entry-header">
   <div class="entry-id">CME-407</div>
-  <h1>Data-at-Rest Encryption (LUKS/dm-crypt)</h1>
+  <h1>Data-at-Rest Encryption (LUKS/dm-crypt / BitLocker)</h1>
   <div class="entry-meta">
     <span class="badge badge-tactic-harden">Harden</span>
     <span class="badge badge-layer-data">Data</span>
@@ -102,9 +102,66 @@
       <div class="cmd-platform">Platform: linux</div>
       
       
+      <div class="verification-cmd">
+        <span class="cmd-prompt">$</span> (Get-BitLockerVolume -MountPoint &#39;C:&#39;).ProtectionStatus
+        
+        <br><span class="cmd-expected"># Expected: On</span>
+        
+      </div>
+      
+      <div class="cmd-platform">Platform: windows</div>
+      
+      
+      <div class="verification-cmd">
+        <span class="cmd-prompt">$</span> (Get-BitLockerVolume -MountPoint &#39;C:&#39;).EncryptionMethod
+        
+        <br><span class="cmd-expected"># Expected: XtsAes256</span>
+        
+      </div>
+      
+      <div class="cmd-platform">Platform: windows</div>
+      
+      
     </section>
     
 
+    
+    <section>
+      <h2>Applicability (CVE 5.2.0 Schema)</h2>
+      <table class="cvss-table">
+        <thead>
+          <tr>
+            <th>Vendor</th>
+            <th>Product</th>
+            <th>CPEs</th>
+            <th>Platforms</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td>microsoft</td>
+            <td>windows</td>
+            <td class="cpe-cell">
+              
+              <code class="cpe-string">cpe:2.3:o:microsoft:windows_10:*:*:*:*:*:*:*:*</code><br>
+              
+              <code class="cpe-string">cpe:2.3:o:microsoft:windows_11:*:*:*:*:*:*:*:*</code><br>
+              
+              <code class="cpe-string">cpe:2.3:o:microsoft:windows_server_2019:*:*:*:*:*:*:*</code><br>
+              
+              <code class="cpe-string">cpe:2.3:o:microsoft:windows_server_2022:*:*:*:*:*:*:*</code>
+              
+            </td>
+            <td>All</td>
+            <td><span class="badge badge-confidence-high">applicable</span></td>
+          </tr>
+          
+        </tbody>
+      </table>
+      
+    </section>
     
 
     
@@ -138,6 +195,12 @@
         
         <li>Fedora 40</li>
         
+        <li>Windows 10</li>
+        
+        <li>Windows 11</li>
+        
+        <li>Windows Server 2022</li>
+        
       </ul>
     </section>
     
@@ -158,7 +221,7 @@
   </main>
 
   <footer class="site-footer">
-    Generated 2026-06-28 19:53 UTC &middot; 109 entries &middot;
+    Generated 2026-06-28 20:13 UTC &middot; 109 entries &middot;
     Common Mitigation Enumeration (CME)
   </footer>
 </body>

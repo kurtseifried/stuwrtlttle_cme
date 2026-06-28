@@ -20,7 +20,9 @@
   ],
   "confidence": "High",
   "platforms": [
-    "Any"
+    "Any",
+    "Windows Server 2019",
+    "Windows Server 2022"
   ],
   "verification": {
     "method": "Inspect application role definitions for single-responsibility scoping; verify that no role can modify its own permission grants; test that token scopes are operation-bounded",

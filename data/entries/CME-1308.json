@@ -20,7 +20,9 @@
   "confidence": "High",
   "platforms": [
     "RHEL 9",
-    "Ubuntu 24.04"
+    "Ubuntu 24.04",
+    "Windows Server 2019",
+    "Windows Server 2022"
   ],
   "verification": {
     "method": "Check that CORS headers do not allow wildcard origins",

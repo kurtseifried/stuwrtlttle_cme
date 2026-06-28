@@ -35,6 +35,8 @@
   },
   "confidence": "Medium",
   "platforms": [
-    "Any"
+    "Any",
+    "Windows Server 2019",
+    "Windows Server 2022"
   ]
 }

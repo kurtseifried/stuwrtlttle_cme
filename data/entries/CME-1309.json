@@ -33,7 +33,9 @@
   ],
   "confidence": "High",
   "platforms": [
-    "Any"
+    "Any",
+    "Windows Server 2019",
+    "Windows Server 2022"
   ],
   "verification": {
     "method": "Verify script consoles are disabled or sandboxed, and expression language evaluation is restricted",

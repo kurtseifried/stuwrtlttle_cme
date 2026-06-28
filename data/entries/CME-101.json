@@ -34,6 +34,16 @@
         "command": "sysctl kernel.randomize_va_space",
         "expected": "kernel.randomize_va_space = 2",
         "platform": "linux"
+      },
+      {
+        "command": "(Get-ProcessMitigation -System).ASLR.ForceRelocateImages",
+        "expected": "ON",
+        "platform": "windows"
+      },
+      {
+        "command": "(Get-ProcessMitigation -System).ASLR.BottomUp",
+        "expected": "ON",
+        "platform": "windows"
       }
     ]
   },
@@ -57,7 +67,10 @@
     "RHEL 8",
     "Ubuntu 24.04",
     "SLES 15",
-    "Fedora"
+    "Fedora",
+    "Windows 10",
+    "Windows 11",
+    "Windows Server 2022"
   ],
   "cve_schema_version": "5.2.0",
   "cve_affected": [
@@ -68,7 +81,12 @@
         "cpe:2.3:o:redhat:enterprise_linux:9:*:*:*:*:*:*:*",
         "cpe:2.3:o:redhat:enterprise_linux:8:*:*:*:*:*:*:*"
       ],
-      "platforms": ["x86_64", "aarch64", "s390x", "ppc64le"],
+      "platforms": [
+        "x86_64",
+        "aarch64",
+        "s390x",
+        "ppc64le"
+      ],
       "defaultStatus": "applicable"
     },
     {

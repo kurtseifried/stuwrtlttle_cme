@@ -19,7 +19,9 @@
   ],
   "confidence": "High",
   "platforms": [
-    "Any"
+    "Any",
+    "Windows Server 2019",
+    "Windows Server 2022"
   ],
   "verification": {
     "method": "Check that the application framework's CSRF middleware is enabled and that session cookies carry the SameSite attribute",

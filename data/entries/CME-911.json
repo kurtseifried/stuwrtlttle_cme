@@ -27,7 +27,9 @@
   ],
   "confidence": "High",
   "platforms": [
-    "any"
+    "any",
+    "Windows Server 2019",
+    "Windows Server 2022"
   ],
   "verification": {
     "method": "Verify that administrative roles are decomposed into atomic permissions and each admin account holds only the permissions required for their role. Attempt a cross-domain action (e.g., IdP admin trying to assign a realm-admin role) and confirm it is rejected.",

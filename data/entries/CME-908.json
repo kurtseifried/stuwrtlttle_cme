@@ -25,7 +25,9 @@
   ],
   "confidence": "High",
   "platforms": [
-    "Any"
+    "Any",
+    "Windows Server 2019",
+    "Windows Server 2022"
   ],
   "verification": {
     "method": "Inspect application source for object-level ownership checks; test that authenticated users cannot access resources belonging to other users by manipulating object identifiers",

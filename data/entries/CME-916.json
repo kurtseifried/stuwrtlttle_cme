@@ -23,7 +23,9 @@
     "RHEL 8",
     "RHEL 9",
     "RHEL 10",
-    "OpenShift 4"
+    "OpenShift 4",
+    "Windows Server 2019",
+    "Windows Server 2022"
   ],
   "verification": {
     "method": "Verify that all Set-Cookie response headers include SameSite=Lax or SameSite=Strict. Check web server or reverse proxy configuration for cookie attribute enforcement directives.",

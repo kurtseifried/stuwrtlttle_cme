@@ -124,6 +124,26 @@
       <div class="cmd-platform">Platform: linux</div>
       
       
+      <div class="verification-cmd">
+        <span class="cmd-prompt">$</span> (Get-ProcessMitigation -System).ASLR.ForceRelocateImages
+        
+        <br><span class="cmd-expected"># Expected: ON</span>
+        
+      </div>
+      
+      <div class="cmd-platform">Platform: windows</div>
+      
+      
+      <div class="verification-cmd">
+        <span class="cmd-prompt">$</span> (Get-ProcessMitigation -System).ASLR.BottomUp
+        
+        <br><span class="cmd-expected"># Expected: ON</span>
+        
+      </div>
+      
+      <div class="cmd-platform">Platform: windows</div>
+      
+      
     </section>
     
 
@@ -286,6 +306,12 @@
         
         <li>Fedora</li>
         
+        <li>Windows 10</li>
+        
+        <li>Windows 11</li>
+        
+        <li>Windows Server 2022</li>
+        
       </ul>
     </section>
     
@@ -306,7 +332,7 @@
   </main>
 
   <footer class="site-footer">
-    Generated 2026-06-28 19:53 UTC &middot; 109 entries &middot;
+    Generated 2026-06-28 20:13 UTC &middot; 109 entries &middot;
     Common Mitigation Enumeration (CME)
   </footer>
 </body>

@@ -24,11 +24,33 @@
         "command": "chage -l <user> | grep 'Maximum'",
         "expected": "Maximum number of days between password change : 90",
         "platform": "linux"
+      },
+      {
+        "command": "net accounts | Select-String 'Maximum password age'",
+        "expected": "Maximum password age (days)              90",
+        "platform": "windows"
       }
     ]
   },
   "confidence": "Medium",
   "platforms": [
-    "Any"
+    "Any",
+    "Windows 10",
+    "Windows 11",
+    "Windows Server 2022"
+  ],
+  "cve_schema_version": "5.2.0",
+  "cve_affected": [
+    {
+      "vendor": "microsoft",
+      "product": "windows",
+      "cpes": [
+        "cpe:2.3:o:microsoft:windows_10:*:*:*:*:*:*:*:*",
+        "cpe:2.3:o:microsoft:windows_11:*:*:*:*:*:*:*:*",
+        "cpe:2.3:o:microsoft:windows_server_2019:*:*:*:*:*:*:*",
+        "cpe:2.3:o:microsoft:windows_server_2022:*:*:*:*:*:*:*"
+      ],
+      "defaultStatus": "applicable"
+    }
   ]
 }
