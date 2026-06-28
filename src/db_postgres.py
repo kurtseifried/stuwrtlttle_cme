@@ -26,8 +26,12 @@ def get_connection() -> psycopg.Connection:
 
 
 def init_db(conn: psycopg.Connection) -> None:
+    for table in ["references_", "verification_commands", "cwe_relationships",
+                  "cvss_vector_impacts", "cme_entries"]:
+        conn.execute(f"DROP TABLE IF EXISTS {table} CASCADE")
+
     conn.execute("""
-        CREATE TABLE IF NOT EXISTS cme_entries (
+        CREATE TABLE cme_entries (
             cme_id          TEXT PRIMARY KEY,
             control_name    TEXT NOT NULL,
             description     TEXT NOT NULL,
@@ -43,7 +47,7 @@ def init_db(conn: psycopg.Connection) -> None:
         )
     """)
     conn.execute("""
-        CREATE TABLE IF NOT EXISTS cvss_vector_impacts (
+        CREATE TABLE cvss_vector_impacts (
             id          SERIAL PRIMARY KEY,
             cme_id      TEXT NOT NULL REFERENCES cme_entries(cme_id) ON DELETE CASCADE,
             metric      TEXT NOT NULL CHECK(metric IN ('AV','AC','PR','UI','S','C','I','A')),
@@ -53,14 +57,14 @@ def init_db(conn: psycopg.Connection) -> None:
         )
     """)
     conn.execute("""
-        CREATE TABLE IF NOT EXISTS cwe_relationships (
+        CREATE TABLE cwe_relationships (
             id      SERIAL PRIMARY KEY,
             cme_id  TEXT NOT NULL REFERENCES cme_entries(cme_id) ON DELETE CASCADE,
             cwe_id  TEXT NOT NULL
         )
     """)
     conn.execute("""
-        CREATE TABLE IF NOT EXISTS verification_commands (
+        CREATE TABLE verification_commands (
             id          SERIAL PRIMARY KEY,
             cme_id      TEXT NOT NULL REFERENCES cme_entries(cme_id) ON DELETE CASCADE,
             method      TEXT,
@@ -70,7 +74,7 @@ def init_db(conn: psycopg.Connection) -> None:
         )
     """)
     conn.execute("""
-        CREATE TABLE IF NOT EXISTS references_ (
+        CREATE TABLE references_ (
             id      SERIAL PRIMARY KEY,
             cme_id  TEXT NOT NULL REFERENCES cme_entries(cme_id) ON DELETE CASCADE,
             source  TEXT NOT NULL,
