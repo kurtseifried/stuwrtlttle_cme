@@ -4,6 +4,7 @@
   "description": "Fine-grained SELinux policy toggles that disable risky inter-domain interactions. Examples: httpd_can_network_connect=off prevents web servers from making outbound connections; container_manage_cgroup=off restricts container cgroup access.",
   "tactic": "Harden",
   "category": "Mandatory Access Control",
+  "category_id": "mandatory-access-control",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

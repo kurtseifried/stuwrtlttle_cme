@@ -4,6 +4,7 @@
   "description": "Sets the no_new_privs process flag, preventing any child process from gaining new privileges via execve (SUID bits, file capabilities, setuid transitions). Inherited across fork/exec.",
   "tactic": "Isolate",
   "category": "Privilege Isolation",
+  "category_id": "privilege-isolation",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

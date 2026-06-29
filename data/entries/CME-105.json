@@ -4,6 +4,7 @@
   "description": "CPU feature preventing the kernel from executing code in userspace pages. Blocks ret2usr attacks where kernel exploit redirects execution to attacker-controlled userspace code.",
   "tactic": "Harden",
   "category": "Kernel Hardening",
+  "category_id": "kernel-hardening",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

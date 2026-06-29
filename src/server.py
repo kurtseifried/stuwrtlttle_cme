@@ -18,6 +18,7 @@ PROJECT_ROOT = Path(__file__).parent.parent
 ENTRIES_DIR = PROJECT_ROOT / "data" / "entries"
 PROPOSALS_DIR = PROJECT_ROOT / "data" / "proposals"
 SCHEMA_PATH = PROJECT_ROOT / "schema" / "cme-entry.schema.json"
+CATEGORIES_PATH = PROJECT_ROOT / "data" / "categories.json"
 
 mcp = FastMCP(
     "CME — Common Mitigation Enumeration",
@@ -61,6 +62,7 @@ def get_cme_entry(cme_id: str) -> str:
 def search_cme(
     tactic: str = "",
     category: str = "",
+    category_id: str = "",
     control_layer: str = "",
     keyword: str = "",
 ) -> str:
@@ -68,16 +70,23 @@ def search_cme(
 
     Args:
         tactic: Filter by D3FEND-aligned tactic (Harden, Isolate, Detect, Evict, Restore)
-        category: Filter by sub-category (e.g., "Kernel Hardening", "Network Isolation")
+        category: Filter by sub-category name (e.g., "Kernel Hardening", "Network Isolation")
+        category_id: Filter by category slug (e.g., "kernel-hardening", "network-isolation")
         control_layer: Filter by technology layer (Network, OS/Kernel, Application, Data, Identity)
         keyword: Free-text search across control name and description
 
     Returns matching CME entries with full details.
     """
+    resolved_category = category or None
+    if not resolved_category and category_id:
+        cats = _load_categories()
+        if category_id in cats:
+            resolved_category = cats[category_id]["name"]
+
     results = db.search_entries(
         _get_db(),
         tactic=tactic or None,
-        category=category or None,
+        category=resolved_category,
         control_layer=control_layer or None,
         keyword=keyword or None,
     )
@@ -160,11 +169,17 @@ def calculate_attenuation(active_cme_ids: list[str]) -> str:
 def list_cme_taxonomy() -> str:
     """List the full CME taxonomy structure — all tactics and categories with entry counts.
 
-    Returns a hierarchical view of the taxonomy for navigation and discovery.
+    Returns a hierarchical view of the taxonomy including category registry metadata
+    (descriptions, expected coverage scope) for navigation, discovery, and gap analysis.
     """
     tactics = db.list_tactics(_get_db())
     categories = db.list_categories(_get_db())
-    return json.dumps({"tactics": tactics, "categories": categories}, indent=2)
+    category_registry = _load_categories()
+    return json.dumps({
+        "tactics": tactics,
+        "categories": categories,
+        "category_registry": category_registry,
+    }, indent=2)
 
 
 @mcp.tool()
@@ -406,16 +421,15 @@ def get_cme_coverage_summary() -> str:
 
 # --- Curation Tools ---
 
-_CATEGORY_RANGES = {
-    "Kernel Hardening": 101, "Network Isolation": 201,
-    "Mandatory Access Control": 301, "Cryptographic Controls": 401,
-    "Filesystem Hardening": 501, "Syscall & BPF Controls": 601,
-    "Container Isolation": 701, "Privilege Isolation": 707,
-    "Credential Hardening": 801, "Protocol Hardening": 901,
-    "Application Controls": 904, "Runtime Detection": 1001,
-    "Integrity Detection": 1004, "Patch Management": 1101,
-    "Recovery Controls": 1201, "Application Input Validation": 1301,
-}
+_categories_cache = None
+
+
+def _load_categories() -> dict:
+    global _categories_cache
+    if _categories_cache is None:
+        with open(CATEGORIES_PATH) as f:
+            _categories_cache = json.load(f)
+    return _categories_cache
 
 
 def _load_schema() -> dict:
@@ -426,7 +440,8 @@ def _load_schema() -> dict:
 def _next_cme_id(category_prefix: int) -> str:
     """Find the next available CME-ID in a given number range."""
     conn = _get_db()
-    all_starts = sorted(set(_CATEGORY_RANGES.values()))
+    cats = _load_categories()
+    all_starts = sorted({c["id_range_start"] for c in cats.values()})
     idx = all_starts.index(category_prefix)
     upper = all_starts[idx + 1] - 1 if idx + 1 < len(all_starts) else category_prefix + 99
 
@@ -468,9 +483,10 @@ def propose_cme_entry(
     control_name: str,
     description: str,
     tactic: str,
-    category: str,
-    control_layer: str,
-    cvss_impacts_json: str,
+    category: str = "",
+    category_id: str = "",
+    control_layer: str = "",
+    cvss_impacts_json: str = "",
     cwe_ids: list[str] = [],
     verification_method: str = "",
     verification_commands_json: str = "[]",
@@ -487,7 +503,8 @@ def propose_cme_entry(
         control_name: Formal name (e.g., "Kernel-Level Syscall Filtering (seccomp)")
         description: Technical description of what the control does
         tactic: D3FEND tactic (Harden, Isolate, Detect, Evict, Restore)
-        category: Sub-category (e.g., "Kernel Hardening", "Network Isolation")
+        category: Sub-category name (e.g., "Kernel Hardening", "Network Isolation")
+        category_id: Category slug (e.g., "kernel-hardening"). If provided, category name is derived from registry.
         control_layer: Technology layer (Network, OS/Kernel, Application, Data, Identity)
         cvss_impacts_json: JSON array of impacts, e.g. [{"metric":"AC","from":"L","to":"H","rationale":"..."}]
         cwe_ids: List of CWE IDs this mitigates (e.g., ["CWE-119", "CWE-78"])
@@ -498,7 +515,25 @@ def propose_cme_entry(
 
     Returns the proposed entry with a suggested CME-ID and file path.
     """
-    prefix = _CATEGORY_RANGES.get(category, 101)
+    cats = _load_categories()
+
+    resolved_category_id = category_id
+    resolved_category = category
+
+    if category_id and category_id in cats:
+        resolved_category = cats[category_id]["name"]
+        resolved_category_id = category_id
+    elif category:
+        for cid, cdata in cats.items():
+            if cdata["name"] == category:
+                resolved_category_id = cid
+                break
+        if not resolved_category_id:
+            return json.dumps({"error": f"Unknown category '{category}'. Valid categories: {list(cats.keys())}"})
+    else:
+        return json.dumps({"error": "Either category or category_id is required"})
+
+    prefix = cats[resolved_category_id]["id_range_start"]
     suggested_id = _next_cme_id(prefix)
 
     try:
@@ -516,7 +551,8 @@ def propose_cme_entry(
         "control_name": control_name,
         "description": description,
         "tactic": tactic,
-        "category": category,
+        "category": resolved_category,
+        "category_id": resolved_category_id,
         "control_layer": control_layer,
         "cvss_vector_impacts": cvss_impacts,
         "cwe_relationships": cwe_ids,

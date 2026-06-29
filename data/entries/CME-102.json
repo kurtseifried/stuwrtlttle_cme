@@ -4,6 +4,7 @@
   "description": "Hardware-enforced memory page permissions that prevent execution of code in data regions (stack, heap), blocking classic code injection.",
   "tactic": "Harden",
   "category": "Kernel Hardening",
+  "category_id": "kernel-hardening",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

@@ -1,4 +1,4 @@
-"""Validate CME entry files against the JSON schema."""
+"""Validate CME entry files against the JSON schema and category registry."""
 
 import json
 import sys
@@ -13,13 +13,50 @@ def load_schema() -> dict:
         return json.load(f)
 
 
+def load_categories() -> dict:
+    categories_path = Path(__file__).parent.parent / "data" / "categories.json"
+    with open(categories_path) as f:
+        return json.load(f)
+
+
 def validate_entry(entry: dict, validator: Draft202012Validator) -> list[str]:
     return [e.message for e in validator.iter_errors(entry)]
 
 
-def validate_dir(files: list[Path], validator: Draft202012Validator) -> tuple[bool, dict[str, str]]:
-    """Validate a set of CME JSON files against the schema, checking filename↔cme_id
-    match and duplicate IDs within the set. Returns (errors_found, {cme_id: filename})."""
+def validate_categories(categories: dict) -> bool:
+    errors_found = False
+    seen_starts: dict[int, str] = {}
+    seen_names: dict[str, str] = {}
+    valid_tactics = {"Harden", "Isolate", "Detect", "Evict", "Restore"}
+
+    for cat_id, cat_data in categories.items():
+        name = cat_data.get("name", "")
+        tactic = cat_data.get("tactic", "")
+        start = cat_data.get("id_range_start")
+
+        if tactic not in valid_tactics:
+            print(f"FAIL categories.json: '{cat_id}' has invalid tactic '{tactic}'")
+            errors_found = True
+
+        if start in seen_starts:
+            print(f"FAIL categories.json: '{cat_id}' has duplicate id_range_start {start} (also '{seen_starts[start]}')")
+            errors_found = True
+        seen_starts[start] = cat_id
+
+        if name in seen_names:
+            print(f"FAIL categories.json: '{cat_id}' has duplicate name '{name}' (also '{seen_names[name]}')")
+            errors_found = True
+        seen_names[name] = cat_id
+
+    return errors_found
+
+
+def validate_dir(
+    files: list[Path],
+    validator: Draft202012Validator,
+    categories: dict,
+) -> tuple[bool, dict[str, str]]:
+    """Validate a set of CME JSON files against the schema and category registry."""
     errors_found = False
     seen_ids: dict[str, str] = {}
 
@@ -27,27 +64,46 @@ def validate_dir(files: list[Path], validator: Draft202012Validator) -> tuple[bo
         with open(path) as f:
             entry = json.load(f)
 
-        # Check filename matches cme_id
         expected_id = path.stem
         if entry.get("cme_id") != expected_id:
             print(f"FAIL {path.name}: cme_id '{entry.get('cme_id')}' does not match filename '{expected_id}'")
             errors_found = True
 
-        # Check for duplicate IDs within this directory
         cme_id = entry.get("cme_id", "unknown")
         if cme_id in seen_ids:
             print(f"FAIL {path.name}: duplicate cme_id '{cme_id}' (also in {seen_ids[cme_id]})")
             errors_found = True
         seen_ids[cme_id] = path.name
 
-        # Schema validation
         errs = validate_entry(entry, validator)
         if errs:
             errors_found = True
             for e in errs:
                 print(f"FAIL {path.name}: {e}")
+            continue
+
+        cat_id = entry.get("category_id", "")
+        category = entry.get("category", "")
+
+        if cat_id not in categories:
+            print(f"FAIL {path.name}: category_id '{cat_id}' not found in categories.json")
+            errors_found = True
+        elif categories[cat_id]["name"] != category:
+            print(
+                f"FAIL {path.name}: category '{category}' does not match "
+                f"categories.json name '{categories[cat_id]['name']}' for category_id '{cat_id}'"
+            )
+            errors_found = True
         else:
-            print(f"  OK {path.name}")
+            num = int(cme_id.split("-")[1])
+            expected_start = categories[cat_id]["id_range_start"]
+            all_starts = sorted({c["id_range_start"] for c in categories.values()})
+            idx = all_starts.index(expected_start)
+            upper = all_starts[idx + 1] - 1 if idx + 1 < len(all_starts) else expected_start + 99
+            if not (expected_start <= num <= upper):
+                print(f"WARN {path.name}: ID {num} outside expected range {expected_start}-{upper} for '{cat_id}'")
+
+        print(f"  OK {path.name}")
 
     return errors_found, seen_ids
 
@@ -55,6 +111,7 @@ def validate_dir(files: list[Path], validator: Draft202012Validator) -> tuple[bo
 def main():
     schema = load_schema()
     validator = Draft202012Validator(schema)
+    categories = load_categories()
 
     data_dir = Path(__file__).parent.parent / "data"
     entry_files = sorted((data_dir / "entries").glob("CME-*.json"))
@@ -66,18 +123,21 @@ def main():
 
     errors_found = False
 
-    print(f"Validating {len(entry_files)} entries in data/entries/ ...")
-    entry_errors, entry_ids = validate_dir(entry_files, validator)
+    print("Validating categories.json ...")
+    cat_errors = validate_categories(categories)
+    errors_found |= cat_errors
+    if not cat_errors:
+        print(f"  OK {len(categories)} categories")
+
+    print(f"\nValidating {len(entry_files)} entries in data/entries/ ...")
+    entry_errors, entry_ids = validate_dir(entry_files, validator, categories)
     errors_found |= entry_errors
 
     if proposal_files:
         print(f"\nValidating {len(proposal_files)} proposals in data/proposals/ ...")
-        proposal_errors, proposal_ids = validate_dir(proposal_files, validator)
+        proposal_errors, proposal_ids = validate_dir(proposal_files, validator, categories)
         errors_found |= proposal_errors
 
-        # A proposal whose ID already exists as a live entry is an orphan: approval
-        # via approve_cme_proposal removes the proposal, so a leftover means it was
-        # approved by hand and the stale proposal should be deleted.
         for cme_id, fname in proposal_ids.items():
             if cme_id in entry_ids:
                 print(
@@ -86,7 +146,7 @@ def main():
                 )
                 errors_found = True
 
-    summary = f"Validated {len(entry_files)} entries"
+    summary = f"Validated {len(categories)} categories and {len(entry_files)} entries"
     if proposal_files:
         summary += f" and {len(proposal_files)} proposals"
     print(f"\n{summary}.")

@@ -4,6 +4,7 @@
   "description": "Restricts or disables application-embedded scripting and expression language engines to prevent arbitrary code execution. Covers three postures: (1) disable unnecessary script consoles and evaluation endpoints entirely (e.g., Jenkins Script Console, debug REPLs), (2) enforce a language-level sandbox that blocks dangerous operations such as file I/O, process execution, classloading, and reflection while permitting safe computation (e.g., Jenkins Groovy Sandbox, Java SecurityManager for scripting), and (3) restrict expression language evaluation to a safe subset by disabling type resolution, method invocation, and class instantiation in EL/template contexts. Applies to Groovy, OGNL, SpEL, MVEL, Jinja2, EL 3.0, Freemarker, and similar engines embedded in Java EE, CI/CD platforms, and web frameworks.",
   "tactic": "Harden",
   "category": "Application Input Validation",
+  "category_id": "application-input-validation",
   "control_layer": "Application",
   "cvss_vector_impacts": [
     {

@@ -4,6 +4,7 @@
   "description": "Configure DNS resolvers, recursive forwarders, and network firewalls to reject DNS responses that resolve public domain names to private IP addresses (RFC 1918: 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16; loopback: 127.0.0.0/8; link-local: 169.254.0.0/16; IPv6: ::1, fc00::/7, fe80::/10). DNS rebinding attacks exploit the browser same-origin policy by causing an attacker-controlled domain to resolve to a private IP address after the initial page load, giving the attacker JavaScript access to localhost-bound services. Blocking private IP resolution from public domains prevents this attack at the network layer.",
   "tactic": "Harden",
   "category": "Network Isolation",
+  "category_id": "network-isolation",
   "control_layer": "Network",
   "cvss_vector_impacts": [
     {

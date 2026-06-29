@@ -4,6 +4,7 @@
   "description": "Mounts partitions like /tmp, /var, /home with nosuid, preventing SUID/SGID binaries from taking effect, blocking a privilege escalation vector.",
   "tactic": "Harden",
   "category": "Filesystem Hardening",
+  "category_id": "filesystem-hardening",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

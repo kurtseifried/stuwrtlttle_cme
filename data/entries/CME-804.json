@@ -4,6 +4,7 @@
   "description": "Disables password-based SSH login entirely, requiring public key authentication. Eliminates remote brute force against SSH as an attack vector.",
   "tactic": "Harden",
   "category": "Credential Hardening",
+  "category_id": "credential-hardening",
   "control_layer": "Identity",
   "cvss_vector_impacts": [
     {

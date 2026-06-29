@@ -4,6 +4,7 @@
   "description": "Enforces minimum password complexity (length, character classes, dictionary checks) via pam_pwquality, making brute force and dictionary attacks impractical.",
   "tactic": "Harden",
   "category": "Credential Hardening",
+  "category_id": "credential-hardening",
   "control_layer": "Identity",
   "cvss_vector_impacts": [
     {

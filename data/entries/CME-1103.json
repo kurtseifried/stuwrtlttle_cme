@@ -4,6 +4,7 @@
   "description": "CI/CD pipeline automatically rebuilds and redeploys container images when base image CVEs are published. Running containers are replaced with patched versions without manual intervention.",
   "tactic": "Evict",
   "category": "Patch Management",
+  "category_id": "patch-management",
   "control_layer": "Application",
   "cvss_vector_impacts": [
     {

@@ -4,6 +4,7 @@
   "description": "Configures services to listen only on 127.0.0.1/::1, eliminating remote network attack vector entirely. Remote access must go through a reverse proxy or tunnel.",
   "tactic": "Isolate",
   "category": "Network Isolation",
+  "category_id": "network-isolation",
   "control_layer": "Network",
   "cvss_vector_impacts": [
     {

@@ -4,6 +4,7 @@
   "description": "Requires multiple authentication factors (password + TOTP/FIDO2/smart card), preventing credential-only compromise. Even stolen passwords are insufficient for access.",
   "tactic": "Harden",
   "category": "Credential Hardening",
+  "category_id": "credential-hardening",
   "control_layer": "Identity",
   "cvss_vector_impacts": [
     {

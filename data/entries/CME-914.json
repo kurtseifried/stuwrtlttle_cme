@@ -4,6 +4,7 @@
   "description": "Server-side enforcement of a strict, explicitly enumerated origin allowlist for Cross-Origin Resource Sharing (CORS). The server validates the Origin header of every cross-origin request against a fixed allowlist and only responds with Access-Control-Allow-Origin for approved origins. Critically, the server never reflects the request's Origin header verbatim, never uses wildcard (*) with Access-Control-Allow-Credentials: true, and never relies on partial string matching or regex patterns that can be bypassed with attacker-controlled subdomains. For endpoints that handle credentials or session-sensitive data, Access-Control-Allow-Credentials is only set when the origin is explicitly trusted. This prevents cross-origin JavaScript from reading authenticated responses, exfiltrating session tokens, or making credentialed API calls from attacker-controlled pages.",
   "tactic": "Harden",
   "category": "Application Controls",
+  "category_id": "application-controls",
   "control_layer": "Application",
   "cvss_vector_impacts": [
     {

@@ -4,6 +4,7 @@
   "description": "Kernel network stack hardening via sysctl: enable SYN cookies (TCP SYN flood protection), disable IP forwarding, reject source-routed packets, ignore ICMP redirects, enable reverse path filtering.",
   "tactic": "Harden",
   "category": "Protocol Hardening",
+  "category_id": "protocol-hardening",
   "control_layer": "Network",
   "cvss_vector_impacts": [
     {

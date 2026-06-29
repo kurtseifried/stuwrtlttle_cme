@@ -4,6 +4,7 @@
   "description": "Disables dynamic kernel module loading at runtime, preventing insertion of rootkits or malicious kernel code after boot.",
   "tactic": "Harden",
   "category": "Kernel Hardening",
+  "category_id": "kernel-hardening",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

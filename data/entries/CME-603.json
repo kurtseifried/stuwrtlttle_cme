@@ -4,6 +4,7 @@
   "description": "Prevents unprivileged users from loading BPF programs into the kernel. BPF programs run in kernel context and vulnerabilities in the BPF verifier have been a frequent source of privilege escalation.",
   "tactic": "Harden",
   "category": "Syscall & BPF Controls",
+  "category_id": "syscall-bpf-controls",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

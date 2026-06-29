@@ -4,6 +4,7 @@
   "description": "Hides kernel pointer addresses from unprivileged users, denying the address leaks needed to exploit kernel vulnerabilities when KASLR is active.",
   "tactic": "Harden",
   "category": "Kernel Hardening",
+  "category_id": "kernel-hardening",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

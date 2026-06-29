@@ -4,6 +4,7 @@
   "description": "Active-passive or active-active multi-region deployment enabling failover when primary site is compromised or unavailable. Automated failover with defined RTO/RPO.",
   "tactic": "Restore",
   "category": "Recovery Controls",
+  "category_id": "recovery-controls",
   "control_layer": "Application",
   "cvss_vector_impacts": [
     {

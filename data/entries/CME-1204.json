@@ -4,6 +4,7 @@
   "description": "Configures systemd service units with watchdog monitoring (WatchdogSec=) and automatic restart policies (Restart=on-failure or Restart=always, RestartSec=) to recover services that become unresponsive or are killed due to resource exhaustion. When a memory leak causes the OOM killer to terminate a service or the process hangs due to resource starvation, systemd automatically restarts the service from a clean state. The watchdog mechanism requires the service to periodically notify systemd (via sd_notify WATCHDOG=1); failure to notify within the WatchdogSec interval triggers a restart. Combined with cgroup memory limits (CME-704), this provides both containment and recovery \u2014 the cgroup bounds the leak, and systemd restarts the service when the bound is hit.",
   "tactic": "Restore",
   "category": "Recovery Controls",
+  "category_id": "recovery-controls",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

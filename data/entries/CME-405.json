@@ -4,6 +4,7 @@
   "description": "Validates DNS responses using cryptographic signatures, preventing DNS spoofing, cache poisoning, and DNS-based redirection attacks.",
   "tactic": "Harden",
   "category": "Cryptographic Controls",
+  "category_id": "cryptographic-controls",
   "control_layer": "Network",
   "cvss_vector_impacts": [
     {

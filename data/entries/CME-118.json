@@ -4,6 +4,7 @@
   "description": "Enable the kernel filesystem link protection sysctls to prevent exploitation of TOCTOU race conditions and symlink following attacks in world-writable sticky directories. fs.protected_symlinks=1 prevents following symlinks in sticky world-writable directories (e.g., /tmp) unless the follower owns the symlink, the directory owner matches, or the symlink target owner matches. fs.protected_hardlinks=1 prevents creating hardlinks to files not owned by the caller, blocking hardlink-based TOCTOU and privilege escalation attacks. fs.protected_regular=2 and fs.protected_fifos=2 extend protection to regular files and FIFOs in sticky directories. These sysctls are enabled by default on RHEL 7+ but may be modified by administrators or overridden by third-party configurations.",
   "tactic": "Harden",
   "category": "Kernel Hardening",
+  "category_id": "kernel-hardening",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

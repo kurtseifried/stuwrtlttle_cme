@@ -4,6 +4,7 @@
   "description": "Applies the default OCI/Docker/Podman seccomp-bpf profile which blocks ~44 dangerous syscalls including kexec_load, mount, reboot, and others. Basis for container isolation.",
   "tactic": "Harden",
   "category": "Syscall & BPF Controls",
+  "category_id": "syscall-bpf-controls",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

@@ -4,6 +4,7 @@
   "description": "LSM that restricts kernel features allowing arbitrary code execution or direct hardware access from userspace. Integrity mode blocks module parameters, ACPI tables, and iopl/ioperm. Confidentiality mode additionally blocks /dev/mem, kprobes, and BPF reads.",
   "tactic": "Harden",
   "category": "Kernel Hardening",
+  "category_id": "kernel-hardening",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

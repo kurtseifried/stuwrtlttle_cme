@@ -4,6 +4,7 @@
   "description": "Application-level path validation that canonicalizes user-supplied paths (resolving symlinks, ../, and relative references) and verifies the resolved path falls within an allowed base directory. Rejects absolute path injection and directory traversal sequences before any filesystem operation. Prevents attackers from reading or writing files outside intended directories.",
   "tactic": "Harden",
   "category": "Application Input Validation",
+  "category_id": "application-input-validation",
   "control_layer": "Application",
   "cvss_vector_impacts": [
     {

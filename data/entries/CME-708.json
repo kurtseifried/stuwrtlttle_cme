@@ -4,6 +4,7 @@
   "description": "Configures sudo to allow specific commands only, rather than unrestricted root access. Uses command allowlists, NOPASSWD only for specific safe commands, and requiretty.",
   "tactic": "Isolate",
   "category": "Privilege Isolation",
+  "category_id": "privilege-isolation",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

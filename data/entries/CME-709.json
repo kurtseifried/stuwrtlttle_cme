@@ -4,6 +4,7 @@
   "description": "systemd unit directives that sandbox services: PrivateDevices removes device access, PrivateTmp isolates /tmp, ProtectSystem=strict makes / read-only, ProtectHome=true hides /home.",
   "tactic": "Isolate",
   "category": "Privilege Isolation",
+  "category_id": "privilege-isolation",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

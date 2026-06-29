@@ -4,6 +4,7 @@
   "description": "Linux Security Module that allows unprivileged processes to restrict their own filesystem access. Process voluntarily drops access to paths it does not need, reducing impact of compromise.",
   "tactic": "Isolate",
   "category": "Filesystem Hardening",
+  "category_id": "filesystem-hardening",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

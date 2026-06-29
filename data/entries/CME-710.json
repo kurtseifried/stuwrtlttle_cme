@@ -4,6 +4,7 @@
   "description": "systemd dynamically allocates a unique UID/GID per service instance. No persistent user account exists; each service restart gets a fresh identity, preventing cross-service data access.",
   "tactic": "Isolate",
   "category": "Privilege Isolation",
+  "category_id": "privilege-isolation",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

@@ -4,6 +4,7 @@
   "description": "CPU feature preventing the kernel from reading/writing userspace memory except through designated copy functions. Hardens kernel against data-only attacks using userspace-controlled structures.",
   "tactic": "Harden",
   "category": "Kernel Hardening",
+  "category_id": "kernel-hardening",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

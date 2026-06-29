@@ -4,6 +4,7 @@
   "description": "Kubernetes NetworkPolicy resources that restrict pod-to-pod and pod-to-external communication. Default-deny ingress/egress with explicit allowlists.",
   "tactic": "Isolate",
   "category": "Network Isolation",
+  "category_id": "network-isolation",
   "control_layer": "Network",
   "cvss_vector_impacts": [
     {

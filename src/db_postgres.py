@@ -37,6 +37,7 @@ def init_db(conn: psycopg.Connection) -> None:
             description     TEXT NOT NULL,
             tactic          TEXT NOT NULL CHECK(tactic IN ('Harden','Isolate','Detect','Evict','Restore')),
             category        TEXT NOT NULL,
+            category_id     TEXT NOT NULL,
             control_layer   TEXT NOT NULL CHECK(control_layer IN ('Network','OS/Kernel','Application','Data','Identity')),
             confidence      TEXT CHECK(confidence IN ('High','Medium','Low')),
             platforms_json  TEXT,
@@ -88,6 +89,7 @@ def init_db(conn: psycopg.Connection) -> None:
         "CREATE INDEX IF NOT EXISTS idx_entries_tactic ON cme_entries(tactic)",
         "CREATE INDEX IF NOT EXISTS idx_entries_layer ON cme_entries(control_layer)",
         "CREATE INDEX IF NOT EXISTS idx_entries_category ON cme_entries(category)",
+        "CREATE INDEX IF NOT EXISTS idx_entries_category_id ON cme_entries(category_id)",
         "CREATE INDEX IF NOT EXISTS idx_cvss_cme ON cvss_vector_impacts(cme_id)",
         "CREATE INDEX IF NOT EXISTS idx_cwe_cme ON cwe_relationships(cme_id)",
         "CREATE INDEX IF NOT EXISTS idx_cwe_id ON cwe_relationships(cwe_id)",
@@ -100,11 +102,11 @@ def init_db(conn: psycopg.Connection) -> None:
 def insert_entry(conn: psycopg.Connection, entry: dict) -> None:
     conn.execute(
         """INSERT INTO cme_entries
-           (cme_id, control_name, description, tactic, category, control_layer,
+           (cme_id, control_name, description, tactic, category, category_id, control_layer,
             confidence, platforms_json, d3fend_technique_id, d3fend_technique_name,
             cve_schema_version, cve_affected_json)
            VALUES (%(cme_id)s, %(control_name)s, %(description)s, %(tactic)s, %(category)s,
-                   %(control_layer)s, %(confidence)s, %(platforms_json)s,
+                   %(category_id)s, %(control_layer)s, %(confidence)s, %(platforms_json)s,
                    %(d3fend_technique_id)s, %(d3fend_technique_name)s,
                    %(cve_schema_version)s, %(cve_affected_json)s)
            ON CONFLICT (cme_id) DO UPDATE SET
@@ -112,6 +114,7 @@ def insert_entry(conn: psycopg.Connection, entry: dict) -> None:
                description = EXCLUDED.description,
                tactic = EXCLUDED.tactic,
                category = EXCLUDED.category,
+               category_id = EXCLUDED.category_id,
                control_layer = EXCLUDED.control_layer,
                confidence = EXCLUDED.confidence,
                platforms_json = EXCLUDED.platforms_json,
@@ -125,6 +128,7 @@ def insert_entry(conn: psycopg.Connection, entry: dict) -> None:
             "description": entry["description"],
             "tactic": entry["tactic"],
             "category": entry["category"],
+            "category_id": entry["category_id"],
             "control_layer": entry["control_layer"],
             "confidence": entry.get("confidence"),
             "platforms_json": json.dumps(entry.get("platforms", [])),

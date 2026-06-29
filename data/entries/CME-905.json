@@ -4,6 +4,7 @@
   "description": "Browser-enforced HTTP header policy that restricts script sources, prevents inline execution, and blocks mixed content. Primary defense against stored/reflected XSS.",
   "tactic": "Harden",
   "category": "Application Controls",
+  "category_id": "application-controls",
   "control_layer": "Application",
   "cvss_vector_impacts": [
     {

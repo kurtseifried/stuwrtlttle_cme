@@ -4,6 +4,7 @@
   "description": "Separates network traffic into isolated segments by trust zone, preventing lateral movement between zones (e.g., DMZ, internal, management).",
   "tactic": "Isolate",
   "category": "Network Isolation",
+  "category_id": "network-isolation",
   "control_layer": "Network",
   "cvss_vector_impacts": [
     {

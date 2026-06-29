@@ -4,6 +4,7 @@
   "description": "Restricts the set of system calls a process can make to the kernel. Reduces kernel attack surface by blocking syscalls the application doesn't need, preventing exploitation of kernel vulnerabilities through unused syscall handlers.",
   "tactic": "Harden",
   "category": "Syscall & BPF Controls",
+  "category_id": "syscall-bpf-controls",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

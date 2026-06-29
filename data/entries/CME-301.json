@@ -4,6 +4,7 @@
   "description": "Mandatory access control system that confines processes to least-privilege security domains. Even if a process is compromised, it cannot access files, ports, or other processes outside its policy-defined domain.",
   "tactic": "Harden",
   "category": "Mandatory Access Control",
+  "category_id": "mandatory-access-control",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {
@@ -65,7 +66,12 @@
         "cpe:2.3:o:redhat:enterprise_linux:9:*:*:*:*:*:*:*",
         "cpe:2.3:o:redhat:enterprise_linux:8:*:*:*:*:*:*:*"
       ],
-      "platforms": ["x86_64", "aarch64", "s390x", "ppc64le"],
+      "platforms": [
+        "x86_64",
+        "aarch64",
+        "s390x",
+        "ppc64le"
+      ],
       "defaultStatus": "applicable"
     },
     {

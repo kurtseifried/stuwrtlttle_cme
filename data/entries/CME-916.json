@@ -4,6 +4,7 @@
   "description": "Configure the web server or reverse proxy to enforce the SameSite attribute (Lax or Strict) on all Set-Cookie response headers. When SameSite=Lax is set, browsers do not include the cookie in cross-site POST, PUT, DELETE, or other state-changing requests initiated from a different origin. When SameSite=Strict is set, cookies are not included in any cross-site navigation. This prevents CSRF attacks because the attacker cross-origin request arrives without the victim session cookie, making it unauthenticated. Modern browsers default to SameSite=Lax for cookies that omit SameSite, but applications that explicitly set SameSite=None (for cross-origin API use) or legacy applications that predate the default bypass this protection. Admin enforcement at the proxy layer overrides the application cookie attributes.",
   "tactic": "Harden",
   "category": "Application Controls",
+  "category_id": "application-controls",
   "control_layer": "Application",
   "cvss_vector_impacts": [
     {

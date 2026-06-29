@@ -4,6 +4,7 @@
   "description": "Prevents unprivileged users from creating user namespaces. User namespaces expose kernel attack surface (mount, network, PID operations) to unprivileged users and have been a frequent LPE vector.",
   "tactic": "Harden",
   "category": "Syscall & BPF Controls",
+  "category_id": "syscall-bpf-controls",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

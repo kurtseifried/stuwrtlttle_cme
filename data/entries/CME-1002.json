@@ -4,6 +4,7 @@
   "description": "Linux kernel audit framework that logs syscalls, file access, authentication events, and security-relevant operations. Provides forensic trail and can trigger alerts.",
   "tactic": "Detect",
   "category": "Runtime Detection",
+  "category_id": "runtime-detection",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

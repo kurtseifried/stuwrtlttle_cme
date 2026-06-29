@@ -4,6 +4,7 @@
   "description": "Automatically downloads and applies security updates on schedule. Reduces the window between vulnerability disclosure and patch application from days/weeks to hours.",
   "tactic": "Evict",
   "category": "Patch Management",
+  "category_id": "patch-management",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

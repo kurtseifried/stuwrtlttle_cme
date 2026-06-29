@@ -4,6 +4,7 @@
   "description": "All API endpoints require explicit authorization by default \u2014 any endpoint without a declared authorization rule returns 403 Forbidden. The authorization framework operates as a deny-by-default middleware that intercepts every incoming request and requires an explicit policy match before forwarding to the handler. Only explicitly allowlisted endpoints (health checks, public landing pages) bypass authorization. Prevents vulnerabilities where new endpoints are deployed without authorization checks, or where legacy endpoints silently allow unauthenticated access to sensitive functionality.",
   "tactic": "Harden",
   "category": "Application Controls",
+  "category_id": "application-controls",
   "control_layer": "Application",
   "cvss_vector_impacts": [
     {

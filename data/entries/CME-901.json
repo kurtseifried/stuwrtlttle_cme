@@ -4,6 +4,7 @@
   "description": "Comprehensive SSH hardening: disable root login, enforce Protocol 2, restrict ciphers to AEAD (chacha20/aes-gcm), disable X11/agent forwarding, set MaxAuthTries, enable LoginGraceTime.",
   "tactic": "Harden",
   "category": "Protocol Hardening",
+  "category_id": "protocol-hardening",
   "control_layer": "Network",
   "cvss_vector_impacts": [
     {

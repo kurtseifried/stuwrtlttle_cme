@@ -4,6 +4,7 @@
   "description": "Mounts root filesystem as read-only, preventing persistent modification of system binaries, libraries, and configuration. Writable areas are confined to specific tmpfs or overlay mounts.",
   "tactic": "Isolate",
   "category": "Filesystem Hardening",
+  "category_id": "filesystem-hardening",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

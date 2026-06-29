@@ -4,6 +4,7 @@
   "description": "Application-level kernel emulation (gVisor) or VM-based isolation (Kata Containers) that intercepts syscalls and prevents direct host kernel interaction. Provides defense-in-depth for container isolation.",
   "tactic": "Isolate",
   "category": "Container Isolation",
+  "category_id": "container-isolation",
   "control_layer": "Application",
   "cvss_vector_impacts": [
     {

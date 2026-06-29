@@ -4,6 +4,7 @@
   "description": "Real-time behavioral detection and automated response agent on endpoints. Detects exploit patterns, lateral movement, and persistence mechanisms. Can kill processes, isolate hosts, and quarantine files automatically.",
   "tactic": "Detect",
   "category": "Runtime Detection",
+  "category_id": "runtime-detection",
   "control_layer": "Application",
   "cvss_vector_impacts": [
     {

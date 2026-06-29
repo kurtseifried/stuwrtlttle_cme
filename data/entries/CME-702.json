@@ -4,6 +4,7 @@
   "description": "Kernel namespace isolation providing separate views of system resources per process group. PID namespace hides host processes, mount namespace isolates filesystem, network namespace isolates network stack, user namespace remaps UIDs.",
   "tactic": "Isolate",
   "category": "Container Isolation",
+  "category_id": "container-isolation",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

@@ -4,6 +4,7 @@
   "description": "Application pins expected TLS certificate fingerprints or public keys, preventing MitM attacks using rogue or compromised certificate authorities.",
   "tactic": "Harden",
   "category": "Cryptographic Controls",
+  "category_id": "cryptographic-controls",
   "control_layer": "Application",
   "cvss_vector_impacts": [
     {

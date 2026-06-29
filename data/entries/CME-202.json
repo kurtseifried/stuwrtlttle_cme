@@ -4,6 +4,7 @@
   "description": "Per-host network access control using firewalld zones or nftables rules. Restricts which network sources can reach specific services, reducing attack surface.",
   "tactic": "Isolate",
   "category": "Network Isolation",
+  "category_id": "network-isolation",
   "control_layer": "Network",
   "cvss_vector_impacts": [
     {

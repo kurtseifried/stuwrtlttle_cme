@@ -4,6 +4,7 @@
   "description": "Application enforces its own filesystem access boundaries independent of OS-level controls. Uses chroot-like path scoping, virtual filesystem abstraction, or explicit directory allowlists within the application code. Ensures that even if an attacker controls a file path parameter, operations are confined to the application data directory.",
   "tactic": "Isolate",
   "category": "Application Input Validation",
+  "category_id": "application-input-validation",
   "control_layer": "Application",
   "cvss_vector_impacts": [
     {

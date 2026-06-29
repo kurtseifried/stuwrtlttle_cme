@@ -4,7 +4,7 @@
   "title": "Common Mitigation Enumeration (CME) Entry",
   "description": "A structured defensive control entry in the CME taxonomy, designed to complement CVE/CWE by identifying mitigations and mapping their deterministic impact on CVSS environmental scoring.",
   "type": "object",
-  "required": ["cme_id", "control_name", "description", "tactic", "category", "control_layer", "cvss_vector_impacts"],
+  "required": ["cme_id", "control_name", "description", "tactic", "category", "category_id", "control_layer", "cvss_vector_impacts"],
   "dependentRequired": {
     "cve_affected": ["cve_schema_version"]
   },
@@ -30,6 +30,11 @@
     "category": {
       "type": "string",
       "description": "Sub-category within the tactic (e.g., Kernel Hardening, Network Isolation)"
+    },
+    "category_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "Kebab-case identifier linking to the category registry in data/categories.json"
     },
     "control_layer": {
       "type": "string",

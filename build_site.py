@@ -9,6 +9,7 @@ from jinja2 import Environment, FileSystemLoader
 
 PROJECT_ROOT = Path(__file__).parent
 ENTRIES_DIR = PROJECT_ROOT / "data" / "entries"
+CATEGORIES_PATH = PROJECT_ROOT / "data" / "categories.json"
 TEMPLATES_DIR = PROJECT_ROOT / "templates"
 OUTPUT_DIR = PROJECT_ROOT / "docs"
 
@@ -41,6 +42,11 @@ def load_entries():
     return entries
 
 
+def load_categories():
+    with open(CATEGORIES_PATH) as f:
+        return json.load(f)
+
+
 def build_taxonomy(entries):
     taxonomy = {}
     for entry in entries:
@@ -66,6 +72,7 @@ def build_cwe_map(entries):
 
 def main():
     entries = load_entries()
+    category_registry = load_categories()
     taxonomy = build_taxonomy(entries)
     cwe_map = build_cwe_map(entries)
 
@@ -83,6 +90,7 @@ def main():
         "tactic_order": TACTIC_ORDER,
         "tactic_counts": tactic_counts,
         "taxonomy": taxonomy,
+        "category_registry": category_registry,
         "metric_names": METRIC_NAMES,
     }
 

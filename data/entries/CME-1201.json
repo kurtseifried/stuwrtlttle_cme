@@ -4,6 +4,7 @@
   "description": "Servers are replaced rather than patched in place. Golden images are built in CI/CD, deployed fresh, and destroyed on replacement. Compromised instances are terminated and redeployed from known-good state.",
   "tactic": "Restore",
   "category": "Recovery Controls",
+  "category_id": "recovery-controls",
   "control_layer": "Application",
   "cvss_vector_impacts": [
     {

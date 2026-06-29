@@ -4,6 +4,7 @@
   "description": "Application avoids invoking shell commands with user-controlled input. Uses direct process execution (subprocess with list args, no shell=True) or purpose-built libraries instead of shell pipelines. When shell interaction is unavoidable, uses strict allowlist validation on inputs.",
   "tactic": "Harden",
   "category": "Application Input Validation",
+  "category_id": "application-input-validation",
   "control_layer": "Application",
   "cvss_vector_impacts": [
     {

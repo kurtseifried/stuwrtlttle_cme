@@ -4,6 +4,7 @@
   "description": "Mounts /tmp and /dev/shm with noexec option, preventing execution of attacker-dropped binaries or scripts from temporary directories commonly used as staging areas.",
   "tactic": "Harden",
   "category": "Filesystem Hardening",
+  "category_id": "filesystem-hardening",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

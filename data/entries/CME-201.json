@@ -4,6 +4,7 @@
   "description": "All network access requires authenticated identity verification. No implicit trust from network position. Every request is authenticated and authorized regardless of source network.",
   "tactic": "Isolate",
   "category": "Network Isolation",
+  "category_id": "network-isolation",
   "control_layer": "Network",
   "cvss_vector_impacts": [
     {

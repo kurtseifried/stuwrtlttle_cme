@@ -4,6 +4,7 @@
   "description": "Encrypts all network traffic between hosts using IPsec or WireGuard, preventing eavesdropping, injection, and man-in-the-middle attacks on the wire.",
   "tactic": "Isolate",
   "category": "Network Isolation",
+  "category_id": "network-isolation",
   "control_layer": "Network",
   "cvss_vector_impacts": [
     {

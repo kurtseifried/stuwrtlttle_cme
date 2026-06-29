@@ -4,6 +4,7 @@
   "description": "Locks user accounts after a configurable number of failed authentication attempts, preventing online brute force attacks.",
   "tactic": "Harden",
   "category": "Credential Hardening",
+  "category_id": "credential-hardening",
   "control_layer": "Identity",
   "cvss_vector_impacts": [
     {

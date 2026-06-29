@@ -4,6 +4,7 @@
   "description": "Enforce strict HTTP header parsing on all HTTP intermediaries (proxies, load balancers, reverse proxies, web servers) to prevent request smuggling via header desynchronization. The control requires: (1) rejecting requests containing both Content-Length and Transfer-Encoding headers per RFC 7230 Section 3.3.3, (2) rejecting requests with duplicate Content-Length headers carrying differing values, (3) disabling relaxed header parsing modes that tolerate whitespace or encoding variations in Transfer-Encoding values, and (4) normalizing or rejecting header values containing illegal characters (bare CR, bare LF, NUL bytes). These measures eliminate the primary desynchronization vectors that enable an attacker to inject smuggled requests across the proxy-backend boundary.",
   "tactic": "Harden",
   "category": "Application Controls",
+  "category_id": "application-controls",
   "control_layer": "Application",
   "cvss_vector_impacts": [
     {

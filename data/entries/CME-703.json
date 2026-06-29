@@ -4,6 +4,7 @@
   "description": "Containers run entirely without root privileges on the host. The container runtime, image pull, and all container processes run as an unprivileged user, eliminating host-level root compromise from container escape.",
   "tactic": "Isolate",
   "category": "Container Isolation",
+  "category_id": "container-isolation",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

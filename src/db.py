@@ -24,6 +24,7 @@ def init_db(conn: sqlite3.Connection) -> None:
             description     TEXT NOT NULL,
             tactic          TEXT NOT NULL CHECK(tactic IN ('Harden','Isolate','Detect','Evict','Restore')),
             category        TEXT NOT NULL,
+            category_id     TEXT NOT NULL,
             control_layer   TEXT NOT NULL CHECK(control_layer IN ('Network','OS/Kernel','Application','Data','Identity')),
             confidence      TEXT CHECK(confidence IN ('High','Medium','Low')),
             platforms_json  TEXT,   -- JSON array
@@ -68,6 +69,7 @@ def init_db(conn: sqlite3.Connection) -> None:
         CREATE INDEX IF NOT EXISTS idx_entries_tactic ON cme_entries(tactic);
         CREATE INDEX IF NOT EXISTS idx_entries_layer ON cme_entries(control_layer);
         CREATE INDEX IF NOT EXISTS idx_entries_category ON cme_entries(category);
+        CREATE INDEX IF NOT EXISTS idx_entries_category_id ON cme_entries(category_id);
         CREATE INDEX IF NOT EXISTS idx_cvss_cme ON cvss_vector_impacts(cme_id);
         CREATE INDEX IF NOT EXISTS idx_cwe_cme ON cwe_relationships(cme_id);
         CREATE INDEX IF NOT EXISTS idx_cwe_id ON cwe_relationships(cwe_id);
@@ -77,16 +79,17 @@ def init_db(conn: sqlite3.Connection) -> None:
 def insert_entry(conn: sqlite3.Connection, entry: dict) -> None:
     conn.execute(
         """INSERT OR REPLACE INTO cme_entries
-           (cme_id, control_name, description, tactic, category, control_layer,
+           (cme_id, control_name, description, tactic, category, category_id, control_layer,
             confidence, platforms_json, d3fend_technique_id, d3fend_technique_name,
             cve_schema_version, cve_affected_json)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (
             entry["cme_id"],
             entry["control_name"],
             entry["description"],
             entry["tactic"],
             entry["category"],
+            entry["category_id"],
             entry["control_layer"],
             entry.get("confidence"),
             json.dumps(entry.get("platforms", [])),

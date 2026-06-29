@@ -4,6 +4,7 @@
   "description": "Centrally enforces minimum cryptographic standards across all system components (OpenSSL, GnuTLS, NSS, OpenSSH, Kerberos). FUTURE policy disables TLS <1.2, SHA-1, RSA <3072, all CBC ciphers, and RC4.",
   "tactic": "Harden",
   "category": "Cryptographic Controls",
+  "category_id": "cryptographic-controls",
   "control_layer": "Application",
   "cvss_vector_impacts": [
     {

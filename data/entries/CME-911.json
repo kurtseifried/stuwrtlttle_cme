@@ -4,6 +4,7 @@
   "description": "Decompose coarse-grained administrative roles into fine-grained permission sets and assign each administrator the minimum permission scope required for their operational duties. Instead of granting broad management roles that bundle unrelated capabilities, the application defines atomic permissions (view-users, create-idp-mapper, assign-role, modify-client-settings) and composes them into purpose-specific administrative profiles. Administrators who manage identity providers receive only idp-configuration permissions without role-assignment capability; administrators who manage user accounts receive user-management permissions without IdP access. Regular audits compare each administrator is effective permissions against their documented job function and revoke unnecessary grants. Reduces the blast radius of compromised or malicious admin accounts by ensuring that exploiting one administrative capability does not grant access to unrelated privileged operations.",
   "tactic": "Isolate",
   "category": "Application Controls",
+  "category_id": "application-controls",
   "control_layer": "Application",
   "cvss_vector_impacts": [
     {

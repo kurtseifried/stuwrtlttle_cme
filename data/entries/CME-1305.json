@@ -4,6 +4,7 @@
   "description": "Application exclusively uses parameterized queries or prepared statements for all database operations. User input is never concatenated into SQL strings. ORMs with parameterized backends qualify. Prevents attackers from injecting SQL syntax to read, modify, or delete database contents.",
   "tactic": "Harden",
   "category": "Application Input Validation",
+  "category_id": "application-input-validation",
   "control_layer": "Application",
   "cvss_vector_impacts": [
     {

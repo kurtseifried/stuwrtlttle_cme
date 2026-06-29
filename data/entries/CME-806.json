@@ -4,6 +4,7 @@
   "description": "Centralized ticket-based authentication using Kerberos. Passwords never transmitted over the network; mutual authentication prevents impersonation of either party.",
   "tactic": "Harden",
   "category": "Credential Hardening",
+  "category_id": "credential-hardening",
   "control_layer": "Identity",
   "cvss_vector_impacts": [
     {

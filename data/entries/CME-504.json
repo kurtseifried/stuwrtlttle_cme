@@ -4,6 +4,7 @@
   "description": "Cryptographic verification of block device integrity using a Merkle tree hash. Every read from the block device is verified against pre-computed hashes, detecting any tampering at the block level.",
   "tactic": "Harden",
   "category": "Filesystem Hardening",
+  "category_id": "filesystem-hardening",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

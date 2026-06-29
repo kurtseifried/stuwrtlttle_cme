@@ -4,6 +4,7 @@
   "description": "Randomizes the kernel base address at each boot, making kernel exploits harder by requiring address leaks to locate kernel functions and data structures.",
   "tactic": "Harden",
   "category": "Kernel Hardening",
+  "category_id": "kernel-hardening",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

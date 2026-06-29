@@ -4,6 +4,7 @@
   "description": "Harden the dynamic linker search path and execution environment to prevent library injection and PATH manipulation attacks. Verify that /etc/ld.so.conf.d/ only references trusted, non-writable library directories. For systemd-managed services, use Environment=LD_PRELOAD= LD_LIBRARY_PATH= to explicitly clear dangerous environment variables, or use EnvironmentFile= with a whitelist of required variables. Ensure no world-writable directory appears in any service PATH. For containers and pods, combine with NoNewPrivileges (security_context.allow_privilege_escalation: false) to prevent LD_PRELOAD exploitation in setuid contexts. The dynamic linker (ld-linux.so) already ignores LD_PRELOAD and LD_LIBRARY_PATH for setuid/setgid binaries, but this does not protect non-setuid services running as root or elevated users.",
   "tactic": "Harden",
   "category": "Filesystem Hardening",
+  "category_id": "filesystem-hardening",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

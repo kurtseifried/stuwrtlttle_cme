@@ -4,6 +4,7 @@
   "description": "Enforces strict Cross-Origin Resource Sharing (CORS) policies and Origin header validation to prevent cross-origin attacks. Configures CORS headers (Access-Control-Allow-Origin, Access-Control-Allow-Methods, Access-Control-Allow-Credentials) with explicit domain allowlists rather than wildcards. Validates the Origin and Referer headers on all state-changing requests, rejecting requests from unlisted origins. Prevents CSRF and cross-origin data leakage attacks that rely on permissive or absent origin checks.",
   "tactic": "Harden",
   "category": "Application Input Validation",
+  "category_id": "application-input-validation",
   "control_layer": "Application",
   "cvss_vector_impacts": [
     {

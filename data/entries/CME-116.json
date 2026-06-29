@@ -4,6 +4,7 @@
   "description": "Compile-time and runtime detection of buffer overflows in common C library functions (memcpy, strcpy, sprintf, read, etc.). At compile time, the compiler replaces standard library calls with bounds-checked variants when buffer sizes are known. At runtime, remaining checks abort the process when a buffer overflow is detected. FORTIFY_SOURCE level 2 checks all detectable overflows; level 3 (GCC 12+) extends coverage to dynamically-sized buffers and flexible array members. Catches many integer-overflow-to-buffer-overflow chains where the overflowed size value is passed to a libc copy function.",
   "tactic": "Harden",
   "category": "Kernel Hardening",
+  "category_id": "kernel-hardening",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

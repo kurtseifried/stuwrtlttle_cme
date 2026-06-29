@@ -1,0 +1,254 @@
+{
+  "kernel-hardening": {
+    "name": "Kernel Hardening",
+    "description": "OS kernel-level security controls that harden memory layout, stack/heap protections, and kernel self-protection mechanisms.",
+    "tactic": "Harden",
+    "id_range_start": 101,
+    "expected_scope": [
+      "Address space layout randomization (ASLR)",
+      "Non-executable memory (NX/DEP)",
+      "Stack protection (canaries)",
+      "Kernel address randomization (KASLR)",
+      "Supervisor mode protections (SMEP/SMAP)",
+      "Kernel pointer restriction",
+      "Kernel lockdown mode",
+      "Kernel execution control (kexec)",
+      "Kernel module signing/restriction",
+      "Control flow integrity (CFI/CET)",
+      "Secure boot chain",
+      "Read-only relocations (RELRO/PIE)",
+      "Hardware security extensions (CCA/MTE)",
+      "io_uring restriction"
+    ]
+  },
+  "network-isolation": {
+    "name": "Network Isolation",
+    "description": "Controls that segment, filter, and restrict network traffic to limit lateral movement and reduce attack surface.",
+    "tactic": "Isolate",
+    "id_range_start": 201,
+    "expected_scope": [
+      "Host-based firewall (iptables/nftables)",
+      "Network segmentation (VLANs/subnets)",
+      "Zero Trust network access",
+      "VPN/IPsec tunneling",
+      "DNS filtering and sinkholing",
+      "Kubernetes NetworkPolicy",
+      "Reverse proxy / WAF placement"
+    ]
+  },
+  "mandatory-access-control": {
+    "name": "Mandatory Access Control",
+    "description": "Kernel-enforced access control frameworks that confine processes to least-privilege regardless of DAC permissions.",
+    "tactic": "Harden",
+    "id_range_start": 301,
+    "expected_scope": [
+      "SELinux policy enforcement",
+      "AppArmor profile confinement",
+      "Seccomp-BPF system call filtering",
+      "Linux Security Module (LSM) stacking",
+      "Windows Defender Application Control (WDAC)",
+      "macOS System Integrity Protection (SIP)"
+    ]
+  },
+  "cryptographic-controls": {
+    "name": "Cryptographic Controls",
+    "description": "Controls that protect data confidentiality and integrity through cryptographic mechanisms for data in transit and at rest.",
+    "tactic": "Harden",
+    "id_range_start": 401,
+    "expected_scope": [
+      "TLS configuration and version enforcement",
+      "Certificate pinning and validation",
+      "SSH hardening",
+      "Data-at-rest encryption (LUKS/BitLocker)",
+      "Key management and rotation",
+      "Cryptographic algorithm selection",
+      "Hardware security module (HSM) integration"
+    ]
+  },
+  "filesystem-hardening": {
+    "name": "Filesystem Hardening",
+    "description": "Controls that restrict filesystem access, enforce mount options, and protect file integrity.",
+    "tactic": "Harden",
+    "id_range_start": 501,
+    "expected_scope": [
+      "Mount option hardening (noexec/nosuid/nodev)",
+      "File permission enforcement",
+      "Immutable file attributes",
+      "Temporary directory isolation",
+      "POSIX ACL management",
+      "chroot/pivot_root confinement",
+      "Read-only root filesystem"
+    ]
+  },
+  "syscall-bpf-controls": {
+    "name": "Syscall & BPF Controls",
+    "description": "Controls that filter, restrict, or monitor system call usage and eBPF program loading.",
+    "tactic": "Harden",
+    "id_range_start": 601,
+    "expected_scope": [
+      "Seccomp profile enforcement",
+      "Unprivileged BPF restriction",
+      "Unprivileged user namespace restriction",
+      "ptrace scope restriction",
+      "io_uring system call restriction",
+      "Capability bounding set reduction"
+    ]
+  },
+  "container-isolation": {
+    "name": "Container Isolation",
+    "description": "Controls that strengthen container runtime boundaries, sandbox untrusted workloads, and enforce pod-level security policies.",
+    "tactic": "Isolate",
+    "id_range_start": 701,
+    "expected_scope": [
+      "Rootless container execution",
+      "Read-only container filesystems",
+      "Container capability dropping",
+      "Pod Security Standards enforcement",
+      "Sandbox runtimes (gVisor/Kata)",
+      "Container image signing and verification",
+      "Container network namespace isolation"
+    ]
+  },
+  "privilege-isolation": {
+    "name": "Privilege Isolation",
+    "description": "Controls that separate privilege domains, enforce least-privilege, and restrict privilege escalation paths.",
+    "tactic": "Isolate",
+    "id_range_start": 707,
+    "expected_scope": [
+      "Namespace-based privilege separation",
+      "Least-privilege user assignment",
+      "Sudo and SUID restriction",
+      "Privilege escalation prevention",
+      "Service account isolation",
+      "Role-based access control (RBAC)"
+    ]
+  },
+  "credential-hardening": {
+    "name": "Credential Hardening",
+    "description": "Controls that strengthen authentication mechanisms, enforce password policies, and protect credential storage.",
+    "tactic": "Harden",
+    "id_range_start": 801,
+    "expected_scope": [
+      "Multi-factor authentication (MFA)",
+      "Password complexity and length requirements",
+      "Account lockout policies",
+      "Credential storage protection (hashing/salting)",
+      "Credential rotation policies",
+      "Certificate-based authentication",
+      "Single sign-on (SSO) enforcement",
+      "Passkey/FIDO2 support"
+    ]
+  },
+  "protocol-hardening": {
+    "name": "Protocol Hardening",
+    "description": "Controls that harden network protocol configurations, disable insecure protocol versions, and reduce protocol-level attack surface.",
+    "tactic": "Harden",
+    "id_range_start": 901,
+    "expected_scope": [
+      "HTTPS enforcement and HSTS",
+      "Unnecessary service/port disabling",
+      "DNS security (DNSSEC/DoH/DoT)",
+      "SMTP/email protocol hardening",
+      "NTP authentication",
+      "SNMP version and community string hardening"
+    ]
+  },
+  "application-controls": {
+    "name": "Application Controls",
+    "description": "Application-layer security controls including secure headers, CORS policy, dependency management, and runtime application security.",
+    "tactic": "Harden",
+    "id_range_start": 904,
+    "expected_scope": [
+      "Security headers (CSP, X-Frame-Options, X-Content-Type-Options)",
+      "CORS policy enforcement",
+      "Cookie security attributes (Secure/HttpOnly/SameSite)",
+      "Dependency vulnerability scanning",
+      "Software composition analysis (SCA)",
+      "Application allowlisting",
+      "Runtime application self-protection (RASP)",
+      "API rate limiting",
+      "Subresource integrity (SRI)",
+      "Referrer policy",
+      "Permissions policy",
+      "CSRF protection"
+    ]
+  },
+  "runtime-detection": {
+    "name": "Runtime Detection",
+    "description": "Controls that detect security threats, anomalies, and policy violations at runtime through monitoring, logging, and analysis.",
+    "tactic": "Detect",
+    "id_range_start": 1001,
+    "expected_scope": [
+      "Endpoint detection and response (EDR)",
+      "Intrusion detection system (IDS/IPS)",
+      "Security audit logging (auditd)",
+      "Log aggregation and SIEM",
+      "Behavioral anomaly detection",
+      "File integrity monitoring",
+      "Network traffic analysis",
+      "Container runtime security monitoring"
+    ]
+  },
+  "integrity-detection": {
+    "name": "Integrity Detection",
+    "description": "Controls that verify the integrity of system components, configurations, and software to detect unauthorized modifications.",
+    "tactic": "Detect",
+    "id_range_start": 1004,
+    "expected_scope": [
+      "File integrity monitoring (AIDE/Tripwire)",
+      "Configuration drift detection",
+      "Binary attestation and verification",
+      "Boot integrity measurement (TPM/IMA)",
+      "Package signature verification",
+      "Supply chain integrity (SBOM/provenance)"
+    ]
+  },
+  "patch-management": {
+    "name": "Patch Management",
+    "description": "Controls that ensure timely application of security patches, automated update mechanisms, and vulnerability remediation processes.",
+    "tactic": "Evict",
+    "id_range_start": 1101,
+    "expected_scope": [
+      "Automated security updates (unattended-upgrades)",
+      "Live kernel patching (kpatch/livepatch)",
+      "Vulnerability scanning and prioritization",
+      "Patch compliance reporting",
+      "Emergency patch deployment",
+      "Container image rebuild automation"
+    ]
+  },
+  "recovery-controls": {
+    "name": "Recovery Controls",
+    "description": "Controls that enable system recovery after security incidents through backups, snapshots, and disaster recovery mechanisms.",
+    "tactic": "Restore",
+    "id_range_start": 1201,
+    "expected_scope": [
+      "Automated backup and verification",
+      "Immutable backup storage",
+      "Disaster recovery testing",
+      "System snapshot and rollback",
+      "Incident response playbooks",
+      "Business continuity planning"
+    ]
+  },
+  "application-input-validation": {
+    "name": "Application Input Validation",
+    "description": "Controls that validate, sanitize, and constrain application inputs to prevent injection attacks and input-driven vulnerabilities.",
+    "tactic": "Harden",
+    "id_range_start": 1301,
+    "expected_scope": [
+      "SQL injection prevention (parameterized queries)",
+      "Cross-site scripting (XSS) prevention",
+      "Command injection prevention",
+      "Path traversal prevention",
+      "XML external entity (XXE) prevention",
+      "Server-side request forgery (SSRF) prevention",
+      "Deserialization attack prevention",
+      "LDAP injection prevention",
+      "Template injection prevention",
+      "Regular expression DoS prevention",
+      "File upload validation",
+      "Input length and type validation"
+    ]
+  }
+}

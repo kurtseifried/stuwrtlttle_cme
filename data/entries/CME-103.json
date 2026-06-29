@@ -4,6 +4,7 @@
   "description": "Compiler-inserted random guard values on the stack that are checked before function return. Detects and aborts on stack buffer overflow before attacker gains control.",
   "tactic": "Harden",
   "category": "Kernel Hardening",
+  "category_id": "kernel-hardening",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

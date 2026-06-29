@@ -4,6 +4,7 @@
   "description": "Compiler/linker hardening that makes the Global Offset Table read-only after relocation (Full RELRO) and builds position-independent executables (PIE), working with ASLR to randomize all code sections.",
   "tactic": "Harden",
   "category": "Kernel Hardening",
+  "category_id": "kernel-hardening",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

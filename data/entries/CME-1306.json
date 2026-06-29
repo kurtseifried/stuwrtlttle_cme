@@ -4,6 +4,7 @@
   "description": "Application applies context-aware output encoding to all user-controlled data before rendering in HTML, JavaScript, CSS, or URL contexts. Uses framework auto-escaping (Django, Jinja2 autoescape, React JSX) rather than manual sanitization. Combined with CSP headers (CME-905), provides defense-in-depth against XSS.",
   "tactic": "Harden",
   "category": "Application Input Validation",
+  "category_id": "application-input-validation",
   "control_layer": "Application",
   "cvss_vector_impacts": [
     {

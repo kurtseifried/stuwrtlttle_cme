@@ -4,6 +4,7 @@
   "description": "Randomizes memory layout of processes, making memory corruption exploits significantly harder by requiring the attacker to guess or leak addresses.",
   "tactic": "Harden",
   "category": "Kernel Hardening",
+  "category_id": "kernel-hardening",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

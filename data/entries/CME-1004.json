@@ -4,6 +4,7 @@
   "description": "Detects unauthorized modifications to critical system files by comparing against a known-good baseline database. Scheduled or continuous monitoring of /etc, /bin, /sbin, /usr.",
   "tactic": "Detect",
   "category": "Integrity Detection",
+  "category_id": "integrity-detection",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

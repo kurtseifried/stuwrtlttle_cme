@@ -4,6 +4,7 @@
   "description": "Restricts deserialization to an explicit allowlist of permitted types, classes, or functions. Prevents attacker-controlled serialized data from instantiating arbitrary objects, invoking dangerous functions, or triggering unintended code paths. Applies to JSON schema validation, YAML safe_load, pickle restrictions, and custom deserialization frameworks.",
   "tactic": "Harden",
   "category": "Application Input Validation",
+  "category_id": "application-input-validation",
   "control_layer": "Application",
   "cvss_vector_impacts": [
     {

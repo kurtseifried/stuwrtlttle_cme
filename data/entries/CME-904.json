@@ -4,6 +4,7 @@
   "description": "HTTP-layer filtering that inspects requests for injection, XSS, path traversal, and other OWASP Top 10 patterns. Can operate in blocking or detection mode with OWASP Core Rule Set.",
   "tactic": "Harden",
   "category": "Application Controls",
+  "category_id": "application-controls",
   "control_layer": "Application",
   "cvss_vector_impacts": [
     {

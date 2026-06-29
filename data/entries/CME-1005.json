@@ -4,6 +4,7 @@
   "description": "Kernel AddressSanitizer (KASAN) and Hardware-assisted AddressSanitizer (HWASan) detect memory safety violations at runtime including use-after-free, out-of-bounds access, buffer size miscalculations, and NULL pointer dereferences. KASAN instruments kernel memory allocations with redzones and quarantine zones to detect invalid accesses. HWASan uses ARM Memory Tagging for lower-overhead production deployments. When a violation is detected, the kernel logs a detailed report and can be configured to panic, preventing silent exploitation.",
   "tactic": "Detect",
   "category": "Runtime Detection",
+  "category_id": "runtime-detection",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

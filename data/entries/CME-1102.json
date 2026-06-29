@@ -4,6 +4,7 @@
   "description": "Applies critical kernel security fixes without system reboot, eliminating the patch-reboot delay that leaves systems vulnerable. Patches are applied to the running kernel in memory.",
   "tactic": "Evict",
   "category": "Patch Management",
+  "category_id": "patch-management",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

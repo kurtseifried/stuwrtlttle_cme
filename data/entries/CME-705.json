@@ -4,6 +4,7 @@
   "description": "Removes unnecessary POSIX capabilities from container or process bounding set. Default container profiles drop CAP_SYS_ADMIN, CAP_NET_RAW, CAP_SYS_PTRACE, and others not needed by the workload.",
   "tactic": "Isolate",
   "category": "Container Isolation",
+  "category_id": "container-isolation",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

@@ -4,6 +4,7 @@
   "description": "Monitors cgroups v2 memory pressure signals \u2014 memory.events (oom_kill, high, max counters) and Pressure Stall Information (PSI) via /proc/pressure/memory \u2014 to detect resource leaks before they exhaust system memory. When a cgroup approaches its memory limit due to a resource leak, these interfaces provide deterministic signals (memory.high threshold crossings, oom_kill increments, PSI stall percentages) that monitoring systems consume to trigger alerts and automated remediation. Complements cgroup memory limits (CME-704) which contain the leak by adding detection of when containment is being stressed. The memory.events counters are monotonically increasing and per-cgroup, enabling precise attribution of pressure to the leaking workload.",
   "tactic": "Detect",
   "category": "Integrity Detection",
+  "category_id": "integrity-detection",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

@@ -4,6 +4,7 @@
   "description": "Firmware-level verification that only signed bootloaders and kernels execute, preventing boot-level rootkits and unauthorized kernel replacement.",
   "tactic": "Harden",
   "category": "Kernel Hardening",
+  "category_id": "kernel-hardening",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

@@ -4,6 +4,7 @@
   "description": "Disables and masks unnecessary listening services (rpcbind, avahi-daemon, cups, postfix on non-mail servers). Each removed service eliminates an attack surface.",
   "tactic": "Harden",
   "category": "Protocol Hardening",
+  "category_id": "protocol-hardening",
   "control_layer": "Network",
   "cvss_vector_impacts": [
     {

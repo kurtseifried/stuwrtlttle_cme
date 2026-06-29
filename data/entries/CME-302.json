@@ -4,6 +4,7 @@
   "description": "Maps Linux login users to SELinux confined user types instead of unconfined_u. Restricts user-level capabilities like running unconfined applications, accessing network, or executing in /tmp.",
   "tactic": "Harden",
   "category": "Mandatory Access Control",
+  "category_id": "mandatory-access-control",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

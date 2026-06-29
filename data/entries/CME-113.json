@@ -4,6 +4,7 @@
   "description": "Hardware or compiler-enforced control flow integrity that validates indirect branch targets match expected types, blocking ROP/JOP chains. On ARM64, shadow call stack protects return addresses in a separate stack.",
   "tactic": "Harden",
   "category": "Kernel Hardening",
+  "category_id": "kernel-hardening",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

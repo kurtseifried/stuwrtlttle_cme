@@ -4,6 +4,7 @@
   "description": "Path-based mandatory access control that restricts per-application file, network, and capability access. Each application runs under a profile defining allowed operations.",
   "tactic": "Harden",
   "category": "Mandatory Access Control",
+  "category_id": "mandatory-access-control",
   "control_layer": "OS/Kernel",
   "cvss_vector_impacts": [
     {

@@ -4,6 +4,7 @@
   "description": "Server-side validation of uploaded files using content inspection (magic byte verification), extension allowlisting, and size limits before the file is written to storage or processed. Rejects uploads whose actual content type does not match the declared MIME type, whose extension is not on the allowlist, or whose size exceeds configured limits. Files are stored outside the web root with randomized names to prevent direct execution. This prevents attackers from uploading executable payloads (web shells, scripts, malicious binaries) disguised as benign file types.",
   "tactic": "Harden",
   "category": "Application Input Validation",
+  "category_id": "application-input-validation",
   "control_layer": "Application",
   "cvss_vector_impacts": [
     {

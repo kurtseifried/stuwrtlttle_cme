@@ -4,6 +4,7 @@
   "description": "Automated rotation of secrets, API keys, and passwords on schedule. Limits the window during which compromised credentials remain valid.",
   "tactic": "Harden",
   "category": "Credential Hardening",
+  "category_id": "credential-hardening",
   "control_layer": "Identity",
   "cvss_vector_impacts": [
     {
